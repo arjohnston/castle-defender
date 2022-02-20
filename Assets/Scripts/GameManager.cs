@@ -17,11 +17,18 @@ public class GameManager : Singleton<GameManager>
     void Awake() {
         // Cap the frame rate
         Application.targetFrameRate = 60;
+
+        // Don't display waiting for others if:
+        // Unity is in editor mode
+        // or the client is joining (e.g., Player 2)
+        if (Application.isEditor || !string.IsNullOrEmpty(GameSettings.clientJoinCode)) {
+            waitingForOthersPanel.SetActive(false);
+        }
     }
 
     // Start is called before the first frame update
     async void Start() {
-        if (RelayManager.Instance.IsRelayEnabled) {
+        if (RelayManager.Instance.IsRelayEnabled && !Application.isEditor) {
             if (GameSettings.isLaunchingAsHost) {
                 await RelayManager.Instance.SetupRelay();
                 NetworkManager.Singleton.StartHost();
@@ -35,6 +42,10 @@ public class GameManager : Singleton<GameManager>
                 Logger.Instance.LogError("Unable to start or join the relay server");
                 errorJoiningPanel.SetActive(true);
             }
+        } else {
+            Logger.Instance.LogInfo("Detected Unity editor mode. Starting the game as a host without Relay enabled.");
+            Logger.Instance.LogInfo("To enable multiplayer (Relay), first build, then run the executable.");
+            NetworkManager.Singleton.StartHost();
         }
 
         NetworkManager.Singleton.OnClientConnectedCallback += (id) => {
@@ -50,11 +61,6 @@ public class GameManager : Singleton<GameManager>
             Logger.Instance.LogInfo($"player {id + 1} just disconnected.");
             _playersConnected--;
         };
-
-        if (Application.isEditor) {
-            // While in editor mode, don't wait for others
-            waitingForOthersPanel.SetActive(false);
-        }
     }
 
     // Update is called once per frame

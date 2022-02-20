@@ -7,5 +7,5 @@ public static class HexColors {
     public static Color VALID_MOVE = Color.cyan;
     public static Color AVAILABLE_MOVES = Color.yellow;
     public static Color CAN_MOVE = Color.green;
-    public static Color DEFAULT_COLOR = Color.white;
+    public static Color DEFAULT_COLOR = new Color(0.8f, 0.8f, 0.8f);
 }
