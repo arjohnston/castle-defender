@@ -54,7 +54,12 @@ public class GameManager : Singleton<GameManager>
 
             if (NetworkManager.Singleton.IsHost) {
                 waitingForOthersPanel.SetActive(false);
-            } 
+                GameSettings.player = Players.PLAYER_ONE;
+            }
+
+            if (NetworkManager.Singleton.IsClient && NetworkManager.Singleton.LocalClientId == 1) {
+                GameSettings.player = Players.PLAYER_TWO;
+            }
         };
 
         NetworkManager.Singleton.OnClientDisconnectCallback += (id) => {

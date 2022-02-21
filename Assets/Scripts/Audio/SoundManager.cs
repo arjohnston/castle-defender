@@ -6,7 +6,7 @@ using Utilities.Singletons;
 public class SoundManager : Singleton<SoundManager> {
     // The sound manager will be used to control all sounds in the game (UI elements, monster attacks, etc)
     private Dictionary<int, Audio> ui;
-    public float MasterVolume = 100.0f;
+    public float masterVolume = 0.4f;
 
     private AudioSource source;
     public AudioClip backgroundMusic;
@@ -17,12 +17,12 @@ public class SoundManager : Singleton<SoundManager> {
     }
 
     private void Initialize() {
-        // Debug.Log("Sound init");
         GameObject gameManager = GameObject.Find("GameManager");
         source = gameManager.AddComponent<AudioSource>();
         source.clip = backgroundMusic;
         source.loop = true;
-        source.volume = MasterVolume;
         source.Play();
+
+        source.volume = masterVolume;
     }
 }

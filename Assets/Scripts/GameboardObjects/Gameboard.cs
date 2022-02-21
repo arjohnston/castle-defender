@@ -24,7 +24,8 @@ public class Gameboard : Singleton<Gameboard> {
     public bool showDebugCoordsOnHexes = false;
     private bool _isRaycastRangeValid = true;
 
-    // TODO: We can make these getters / settings
+    // TODO: We can make these getters / setters to allow for the deck manager
+    // to get the location for spawning the deck prefabs
     private GameObject _playerOneDeckArea;
     private GameObject _playerOneGraveArea;
     private GameObject _playerTwoDeckArea;
