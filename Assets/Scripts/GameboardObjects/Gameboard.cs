@@ -37,8 +37,9 @@ public class Gameboard : Singleton<Gameboard> {
     }
 
     void Update() {
-        GetRayCastHit();
-        HighlightRaycastHitSpot(_currentRayCastHitSpot, HexColors.VALID_MOVE, 1);
+        // TODO: Use for getting hit spots when moving GBO's
+        // GetRayCastHit();
+        // HighlightRaycastHitSpot(_currentRayCastHitSpot, HexColors.VALID_MOVE, 1);
     }
 
     public void Initialize() {
@@ -242,5 +243,9 @@ public class Gameboard : Singleton<Gameboard> {
 
     public bool IsRaycastTargetUI() {
         return EventSystem.current.IsPointerOverGameObject();
+    }
+
+    public GameObject GetHexGameObject(Hex hex) {
+        return _hexToGameObjectMap[hex];
     }
 }

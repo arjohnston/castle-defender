@@ -34,7 +34,7 @@ public class CameraController : Singleton<CameraController> {
 	// cinemachine
 	private CinemachineVirtualCamera _virtualCamera;
 	private float _cinemachineTargetYaw;
-	private float _cinemachineTargetPitch = 30.0f;
+	private float _cinemachineTargetPitch = 38.0f;
 
 	// player
 	private float _speed;
@@ -47,6 +47,8 @@ public class CameraController : Singleton<CameraController> {
 	private GameObject _mainCamera;
 
 	private const float _threshold = 0.01f;
+
+	private bool _isInitialized = false;
 
 	private void Awake() {
 		// get a reference to our main camera
@@ -63,11 +65,29 @@ public class CameraController : Singleton<CameraController> {
 	}
 
 	private void Update() {
-		Move();
+		if (_isInitialized) Move();
 	}
 
 	private void LateUpdate() {
-		CameraRotation();
+		if (_isInitialized) CameraRotation();
+	}
+
+	public void SetStartingPosition() {
+		if (GameSettings.player == Players.PLAYER_ONE) {
+			CinemachineCameraTarget.transform.position = new Vector3(0, 2.0f, -10.0f);
+
+			_cinemachineTargetYaw = 0.0f;
+			CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch, _cinemachineTargetYaw, 0.0f);
+		}
+
+		if (GameSettings.player == Players.PLAYER_TWO) {
+			CinemachineCameraTarget.transform.position = new Vector3(0, 2.0f, 10.0f);
+
+			_cinemachineTargetYaw = 180.0f;
+			CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch, _cinemachineTargetYaw, 0.0f);
+		}
+
+		_isInitialized = true;
 	}
 
 	// Rotate while the right mouse is held down
@@ -141,7 +161,8 @@ public class CameraController : Singleton<CameraController> {
 		Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
 		// move the player
-		_controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+		// _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime));
+		CinemachineCameraTarget.transform.position += targetDirection.normalized * (_speed * Time.deltaTime);
 	}
 
 	private static float ClampAngle(float lfAngle, float lfMin, float lfMax) {

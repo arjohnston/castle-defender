@@ -7,6 +7,9 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     [SerializeField]
     public GameObject creaturePrefab;
 
+    [SerializeField]
+    private GameObject _castle;
+
     // [SerializeField]
     GameObject obj1;
     // Start is called before the first frame update
@@ -20,6 +23,52 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     {
         
     }
+
+    // Required to pass the player manually as GameSettings.player was encountering race conditions on awake
+    public void SetPlayerCastle(GameObject castle, Players player) {
+        if (castle.GetComponent<NetworkObject>().IsOwner) Logger.Instance.LogInfo("Setting castle for player: " + player);
+        NetworkObject networkObject = castle.GetComponent<NetworkObject>();
+
+        if (networkObject.IsOwner) {
+            _castle = castle;
+        }
+
+        // if (networkObject.IsOwner && player == Players.PLAYER_ONE) {
+        //     Hex hex = Gameboard.Instance.GetHexAt(-5, Gameboard.Instance.boardRadius - 2);
+        //     // Logger.Instance.LogInfo("P1 Hex: " + hex);
+        //     castle.transform.position = Gameboard.Instance.GetHexGameObject(hex).transform.position;
+        //     _castle = castle;
+        // } else if (networkObject.IsOwner && player == Players.PLAYER_TWO) {
+        //     Hex hex = Gameboard.Instance.GetHexAt(5, -(Gameboard.Instance.boardRadius - 2));
+        //     // Logger.Instance.LogInfo("P2 Hex: " + hex);
+
+        //     // TODO: Needs to be sent to the server to update!
+        //     // Otherwise the commented code has been verified to work.
+        //     castle.transform.position = Gameboard.Instance.GetHexGameObject(hex).transform.position;
+        //     // Logger.Instance.LogInfo("GO " + Gameboard.Instance.GetHexGameObject(hex));
+        //     // Logger.Instance.LogInfo("GO POS" + Gameboard.Instance.GetHexGameObject(hex).transform.position);
+        //     _castle = castle;
+        // }
+
+        // if (networkObject.IsOwner) _castle = castle;
+
+        // Need to determine correct owner.. and save it to the appropriate variable
+
+        // TODO:
+        // 1) Save player castle for _playerOneCastle, _playerTwoCastle so it can be moved
+        // 2) Set up the locations with network variables
+        // 3) Move the player castle
+        // 4) Add phases & only allow during SETUP phase (network variable)
+    }
+
+
+
+
+
+
+
+
+
 
     // TODO: Look at video 4 and replicate how there is the spawning pool
     // also like how the singleton works...

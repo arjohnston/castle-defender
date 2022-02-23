@@ -60,6 +60,8 @@ public class GameManager : Singleton<GameManager>
             if (NetworkManager.Singleton.IsClient && NetworkManager.Singleton.LocalClientId == 1) {
                 GameSettings.player = Players.PLAYER_TWO;
             }
+
+            CameraController.Instance.SetStartingPosition();
         };
 
         NetworkManager.Singleton.OnClientDisconnectCallback += (id) => {
