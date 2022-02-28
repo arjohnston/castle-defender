@@ -32,14 +32,11 @@ public class Gameboard : Singleton<Gameboard> {
     private GameObject _playerTwoGraveArea;
 
     // Start is called before the first frame update
-    void Start() {
+    void Awake() {
         Initialize();
     }
 
     void Update() {
-        // TODO: Use for getting hit spots when moving GBO's
-        // GetRayCastHit();
-        // HighlightRaycastHitSpot(_currentRayCastHitSpot, HexColors.VALID_MOVE, 1);
     }
 
     public void Initialize() {
@@ -48,17 +45,21 @@ public class Gameboard : Singleton<Gameboard> {
         _highlightedHexes = new List<Hex>();
     }
 
-    public Hex GetRayCastHit() {
+    public Hex GetHexRayCastHit() {
         ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
         RaycastHit hitData;
         _isRaycastRangeValid = true; // default to true for frame
 
-        if (Physics.Raycast(ray, out hitData)) {
-            if (hitData.collider != null && hitData.collider.transform != null && hitData.collider.transform.parent != null) {
+        int layerMask = LayerMask.GetMask("Gameboard");
+
+        if (Physics.Raycast(ray, out hitData, Mathf.Infinity, layerMask)) {
+            if (hitData.collider != null &&
+            hitData.collider.transform != null
+            && hitData.collider.transform.parent != null
+        ) {
                 GameObject hitParent = hitData.collider.transform.parent.gameObject;
 
                 if (hitParent.name.Contains("Hex")) {
-                    // Check if target tile is occupied
                     _currentRayCastHitSpot = GetHexByName(hitParent.name);
 
                     return _currentRayCastHitSpot;
@@ -70,11 +71,59 @@ public class Gameboard : Singleton<Gameboard> {
         return null;
     }
 
-    private void ClearHighlightedSpaces() {
+    public GameObject GetGameboardObjectAtRayCastHit() {
+        ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        RaycastHit hitData;
+        _isRaycastRangeValid = true; // default to true for frame
+
+        int layerMask = LayerMask.GetMask("GameboardObject");
+
+        if (Physics.Raycast(ray, out hitData, Mathf.Infinity, layerMask)) {
+            if (
+                hitData.collider != null &&
+                hitData.collider.transform != null
+                && hitData.collider.transform.parent != null
+            ) {
+                GameObject hitParent = hitData.collider.transform.parent.gameObject;
+
+                if (hitParent.GetComponent<GameboardObject>() != null) {
+                    return hitParent;
+                }
+            }
+            
+        }
+
+        return null;
+    }
+
+    public GameObject GetDeckAtRayCastHit() {
+        ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        RaycastHit hitData;
+        _isRaycastRangeValid = true; // default to true for frame
+
+        int layerMask = LayerMask.GetMask("Deck");
+
+        if (Physics.Raycast(ray, out hitData, Mathf.Infinity, layerMask)) {
+            if (
+                hitData.collider != null &&
+                hitData.collider.transform != null
+                && hitData.collider.transform.parent != null
+            ) {
+                GameObject hitParent = hitData.collider.transform.parent.gameObject;
+
+                return hitParent;
+            }
+            
+        }
+
+        return null;
+    }
+
+    public void ClearHighlightedSpaces() {
         HighlightRaycastHitSpot(null, HexColors.DEFAULT_COLOR, 0);
     }
 
-    public void HighlightRaycastHitSpot(Hex target, Color color, int radius = 0) {
+    public bool HighlightRaycastHitSpot(Hex target, Color color, int radius = 0) {
         List<Hex> hexesInRange = new List<Hex>();
 
         List<Hex> hexes = HighlightHexesWithinRange(target, radius, color);
@@ -108,9 +157,22 @@ public class Gameboard : Singleton<Gameboard> {
                 );
             }
         }
+
+        return _isRaycastRangeValid;
     }
 
     private List<Hex> HighlightHexesWithinRange(Hex center, int range, Color color) {
+        List<Hex> hexesInRange = GetHexesWithinRange(center, range);
+
+        foreach (Hex hex in hexesInRange) {
+            if (_isRaycastRangeValid) HighlightHex(hex, color);
+            else HighlightHex(hex, HexColors.INVALID_MOVE);
+        }
+
+        return hexesInRange;
+    }
+
+    public List<Hex> GetHexesWithinRange(Hex center, int range) {
         List<Hex> hexesInRange = new List<Hex>();
         if (center == null) return hexesInRange;
 
@@ -128,11 +190,6 @@ public class Gameboard : Singleton<Gameboard> {
                     }
                 }
             }
-        }
-
-        foreach (Hex hex in hexesInRange) {
-            if (_isRaycastRangeValid) HighlightHex(hex, color);
-            else HighlightHex(hex, HexColors.INVALID_MOVE);
         }
 
         return hexesInRange;
@@ -211,6 +268,22 @@ public class Gameboard : Singleton<Gameboard> {
         _playerTwoGraveArea.transform.localScale = new Vector3(2.5f, 1.0f, 2.5f);
         mr = _playerTwoGraveArea.GetComponentInChildren<MeshRenderer>();
         mr.materials[1].color = HexColors.DEFAULT_COLOR;
+    }
+
+    public GameObject GetPlayerOneDeckArea() {
+        return _playerOneDeckArea;
+    }
+
+    public GameObject GetPlayerTwoDeckArea() {
+        return _playerTwoDeckArea;
+    }
+
+    public GameObject GetPlayerOneGraveArea() {
+        return _playerOneGraveArea;
+    }
+
+    public GameObject GetPlayerTwoGraveArea() {
+        return _playerTwoGraveArea;
     }
 
     public Vector2Int GetCoordinateByName(string name) {

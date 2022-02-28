@@ -1,17 +1,21 @@
+using System.Collections;
+using System.Collections.Generic;
 using Utilities.Singletons;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 {
-    [SerializeField]
-    public GameObject creaturePrefab;
+    private List<GameboardObject> gameboardObjects = new List<GameboardObject>();
 
-    [SerializeField]
-    private GameObject _castle;
+    [SerializeField] private GameObject _castle;
 
-    // [SerializeField]
-    GameObject obj1;
+    [SerializeField] private GameObject _selectedGameboardObject = null;
+    [SerializeField] private bool _leftClickMouseChanged = false;
+    [SerializeField] private bool _lastLeftMouseButtonStateIsClicked = false;
+    [SerializeField] private bool _isRaycastRangeValid = true;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,45 +25,211 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     // Update is called once per frame
     void Update()
     {
-        
+        if (!TurnManager.Instance.IsMyTurn()) _selectedGameboardObject = null;
+
+        CheckOnLeftClick();
+        HighlightRaycastIfSelected();
+        SelectObjectAtRayCastHit();
     }
 
     // Required to pass the player manually as GameSettings.player was encountering race conditions on awake
     public void SetPlayerCastle(GameObject castle, Players player) {
         if (castle.GetComponent<NetworkObject>().IsOwner) Logger.Instance.LogInfo("Setting castle for player: " + player);
         NetworkObject networkObject = castle.GetComponent<NetworkObject>();
+        GameboardObject gbo = castle.GetComponent<GameboardObject>();
+        gameboardObjects.Add(gbo);
 
         if (networkObject.IsOwner) {
             _castle = castle;
+
+            gbo.SetupGboDetails(
+                Types.PERMANENT,
+                GameDefaults.CASTLE_HEALTH,
+                new Meta{
+                title = "Castle",
+                description = "Player castle."
+                },
+                new Attributes{
+                    cost = 0,
+                    speed = 1,
+                    range = 10,
+                    damage = 0,
+                    occupiedRadius = 1,
+                }
+            );
+
+            if (player == Players.PLAYER_ONE) {
+                Hex hex = Gameboard.Instance.GetHexAt(-5, Gameboard.Instance.boardRadius - 2);
+                gbo.SetPosition(hex);
+                gbo.SetRotation(new Vector3(0, 180.0f, 0));
+            } else {
+                Hex hex = Gameboard.Instance.GetHexAt(5, -(Gameboard.Instance.boardRadius - 2));
+                gbo.SetPosition(hex);
+            }
+        }
+    }
+
+    private void CheckOnLeftClick() {
+        bool isClicked = Mouse.current.leftButton.isPressed;
+        if (!_lastLeftMouseButtonStateIsClicked && isClicked) _leftClickMouseChanged = true;
+        else _leftClickMouseChanged = false;
+        _lastLeftMouseButtonStateIsClicked = Mouse.current.leftButton.isPressed;
+    }
+
+    private void SelectObjectAtRayCastHit() {
+        // Should be in its own function
+        if (_leftClickMouseChanged) {
+            if (!TurnManager.Instance.IsMyTurn()) return;
+
+            Hex hexRayCast = Gameboard.Instance.GetHexRayCastHit();
+            GameObject gameboardObjectRayCast = Gameboard.Instance.GetGameboardObjectAtRayCastHit();
+
+            if (hexRayCast == null && gameboardObjectRayCast == null) return;
+
+            // Nothing selected, selecting a gameboard object
+            if (_selectedGameboardObject == null && gameboardObjectRayCast != null) {
+                GameboardObject gbo = gameboardObjectRayCast.GetComponent<GameboardObject>();
+                NetworkObject networkObject = gameboardObjectRayCast.GetComponent<NetworkObject>();
+
+                if (networkObject.IsOwner && gbo.CanMoveOrAttack()) {
+                    _selectedGameboardObject = gameboardObjectRayCast;
+                    gbo.Select();
+                }
+
+            // Game object already selected, and I'm clicking on another gameboard object
+            } else if (_selectedGameboardObject != null && gameboardObjectRayCast != null) {
+                // Clicking on the same gameboard object I already have selected -> deselect it
+                GameboardObject targetGbo = gameboardObjectRayCast.GetComponent<GameboardObject>();
+                if (_selectedGameboardObject == gameboardObjectRayCast) {
+                    _selectedGameboardObject = null;
+                    targetGbo.Deselect();
+                }
+
+                // If I am the owner, then select that
+                if (gameboardObjectRayCast.GetComponent<NetworkObject>().IsOwner && targetGbo.CanMoveOrAttack()) {
+                    GameboardObject currentGbo = _selectedGameboardObject.GetComponent<GameboardObject>();
+                    if (currentGbo) currentGbo.Deselect();
+                    _selectedGameboardObject = gameboardObjectRayCast;
+                    targetGbo.Select();
+                } else {
+                    // I am not the owner, and I'm trying to select another game object -> attack
+                    TryAttack(_selectedGameboardObject.GetComponent<GameboardObject>(), gameboardObjectRayCast.GetComponent<GameboardObject>());
+                }
+
+            // Since we're not targeting another gameboard object, we're targeting a hex to try and move
+            } else if (_selectedGameboardObject != null && hexRayCast != null) {
+                if (_selectedGameboardObject.GetComponent<NetworkObject>().IsOwner) {
+                    TryMovement(_selectedGameboardObject.GetComponent<GameboardObject>(), hexRayCast);
+                }
+            }
+        }
+    }
+
+    public void Spawn() {
+        // gameboardObjects.Add(gbo);
+    }
+
+    public void HighlightRaycastIfSelected() {
+        if (_selectedGameboardObject == null) {
+            Gameboard.Instance.ClearHighlightedSpaces();
+            return;
         }
 
-        // if (networkObject.IsOwner && player == Players.PLAYER_ONE) {
-        //     Hex hex = Gameboard.Instance.GetHexAt(-5, Gameboard.Instance.boardRadius - 2);
-        //     // Logger.Instance.LogInfo("P1 Hex: " + hex);
-        //     castle.transform.position = Gameboard.Instance.GetHexGameObject(hex).transform.position;
-        //     _castle = castle;
-        // } else if (networkObject.IsOwner && player == Players.PLAYER_TWO) {
-        //     Hex hex = Gameboard.Instance.GetHexAt(5, -(Gameboard.Instance.boardRadius - 2));
-        //     // Logger.Instance.LogInfo("P2 Hex: " + hex);
+        Hex raycastHitSpot = Gameboard.Instance.GetHexRayCastHit();
+        GameboardObject gbo = _selectedGameboardObject.GetComponent<GameboardObject>();
 
-        //     // TODO: Needs to be sent to the server to update!
-        //     // Otherwise the commented code has been verified to work.
-        //     castle.transform.position = Gameboard.Instance.GetHexGameObject(hex).transform.position;
-        //     // Logger.Instance.LogInfo("GO " + Gameboard.Instance.GetHexGameObject(hex));
-        //     // Logger.Instance.LogInfo("GO POS" + Gameboard.Instance.GetHexGameObject(hex).transform.position);
-        //     _castle = castle;
-        // }
-
-        // if (networkObject.IsOwner) _castle = castle;
-
-        // Need to determine correct owner.. and save it to the appropriate variable
-
-        // TODO:
-        // 1) Save player castle for _playerOneCastle, _playerTwoCastle so it can be moved
-        // 2) Set up the locations with network variables
-        // 3) Move the player castle
-        // 4) Add phases & only allow during SETUP phase (network variable)
+        if (GetGboAtHex(raycastHitSpot) != null || !gbo.IsValidMovement(raycastHitSpot)) {
+            _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(raycastHitSpot, HexColors.INVALID_MOVE, gbo.GetOccupiedRadius());
+        } else {
+            _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(raycastHitSpot, HexColors.VALID_MOVE, gbo.GetOccupiedRadius());
+        }
     }
+
+    private void TryMovement(GameboardObject gbo, Hex target) {
+        // If target is off, or partially off the map
+        if (!_isRaycastRangeValid) {
+            gbo.Deselect();
+            _selectedGameboardObject = null;
+            return;
+        }
+        GameboardObject targetGbo = GetGboAtHex(target);
+        if (targetGbo != null) {
+            // If I'm the owner, then select that gbo
+            if (targetGbo.gameObject.GetComponent<NetworkObject>().IsOwner) {
+                _selectedGameboardObject.GetComponent<GameboardObject>().Deselect();
+                _selectedGameboardObject = targetGbo.gameObject;
+                _selectedGameboardObject.GetComponent<GameboardObject>().Select();
+            } else {
+                TryAttack(gbo, targetGbo);
+            }
+        } else {
+            if (gbo.IsValidMovement(target)) {
+                gbo.MoveToPosition(target);    
+            }
+
+            gbo.Deselect();
+            _selectedGameboardObject = null;
+        }
+    }
+
+    private void TryAttack(GameboardObject gbo, GameboardObject target) {
+        if (!_isRaycastRangeValid) {
+            if (gbo) gbo.Deselect();
+            _selectedGameboardObject = null;
+            return;
+        }
+
+        if (target.gameObject.GetComponent<NetworkObject>().IsOwner) {
+            _selectedGameboardObject.GetComponent<GameboardObject>().Deselect();
+            _selectedGameboardObject = target.gameObject;
+            _selectedGameboardObject.GetComponent<GameboardObject>().Select();
+        } else {
+            if (gbo.IsValidAttack(target.GetHexPosition())) {
+                bool isTargetDestroyed = gbo.Attack(target);
+
+                if (isTargetDestroyed) {
+                    gameboardObjects.Remove(target);
+                    Destroy(target.gameObject);
+                }
+            }
+
+            _selectedGameboardObject.GetComponent<GameboardObject>().Deselect();
+            _selectedGameboardObject = null;
+        }
+    }
+
+    private GameboardObject GetGboAtHex(Hex hex) {
+        foreach (GameboardObject gbo in gameboardObjects) {
+            foreach (Hex h in gbo.GetOccupiedHexes()) {
+                if (h == hex) return gbo;
+            }
+        }
+
+        return null;
+    }
+
+    public void ResetActions(Players player) {
+        if (GameManager.Instance.GetCurrentPlayer() == player) {
+            foreach (GameboardObject gbo in gameboardObjects) {
+                if (gbo.IsOwner) {
+                    gbo.ResetActions();
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -72,34 +242,34 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
     // TODO: Look at video 4 and replicate how there is the spawning pool
     // also like how the singleton works...
-    public void Spawn() {
-        if (IsClient) SpawnServerRpc();
-    }
+    // public void Spawn() {
+    //     if (IsClient) SpawnServerRpc();
+    // }
     
-    [ServerRpc(RequireOwnership = false)]
-    public void SpawnServerRpc() {
-        // if (!IsServer) return;
+    // [ServerRpc(RequireOwnership = false)]
+    // public void SpawnServerRpc() {
+    //     // if (!IsServer) return;
 
-        Vector3 position = new Vector3(0, 0, 0);
-        obj1 = (GameObject)Instantiate(creaturePrefab, position, Quaternion.identity);
-        obj1.GetComponent<NetworkObject>().Spawn();
+    //     Vector3 position = new Vector3(0, 0, 0);
+    //     obj1 = (GameObject)Instantiate(creaturePrefab, position, Quaternion.identity);
+    //     obj1.GetComponent<NetworkObject>().Spawn();
 
-        // obj1.GetComponent<NetworkObject>().Spawn();
-        // SpawnServerRpc(obj1);
-        // obj1.GetComponentInChildren<GameboardObject>().MoveTo(position);
-    }
+    //     // obj1.GetComponent<NetworkObject>().Spawn();
+    //     // SpawnServerRpc(obj1);
+    //     // obj1.GetComponentInChildren<GameboardObject>().MoveTo(position);
+    // }
 
-    public void Move() {
-        // obj1.GetComponentInChildren<GameboardObject>().MoveTo(new Vector3(10, 0, 10));
-        if (IsClient) MoveServerRpc();
-        // obj1.GetComponentInChildren<GameboardObject>().MoveTo(new Vector3(10, 0, 10));
-    }
+    // public void Move() {
+    //     // obj1.GetComponentInChildren<GameboardObject>().MoveTo(new Vector3(10, 0, 10));
+    //     if (IsClient) MoveServerRpc();
+    //     // obj1.GetComponentInChildren<GameboardObject>().MoveTo(new Vector3(10, 0, 10));
+    // }
 
-    [ServerRpc(RequireOwnership = false)]
-    public void MoveServerRpc() {
-        Debug.Log("Called!");
-        obj1.GetComponentInChildren<GameboardObject>().MoveToServer(new Vector3(10, 0, 10));
-    }
+    // [ServerRpc(RequireOwnership = false)]
+    // public void MoveServerRpc() {
+    //     Debug.Log("Called!");
+    //     obj1.GetComponentInChildren<GameboardObject>().MoveToServer(new Vector3(10, 0, 10));
+    // }
 
     // [ServerRpc]
     // private void SpawnServerRpc(GameObject go) {

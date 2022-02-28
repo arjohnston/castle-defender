@@ -6,7 +6,7 @@ using Utilities.Singletons;
 using Unity.Netcode;
 using TMPro;
 
-public class GameManager : Singleton<GameManager>
+public class GameManager : NetworkSingleton<GameManager>
 {
     public GameObject inGameMenu;
     public GameObject errorJoiningPanel;
@@ -54,11 +54,6 @@ public class GameManager : Singleton<GameManager>
 
             if (NetworkManager.Singleton.IsHost) {
                 waitingForOthersPanel.SetActive(false);
-                GameSettings.player = Players.PLAYER_ONE;
-            }
-
-            if (NetworkManager.Singleton.IsClient && NetworkManager.Singleton.LocalClientId == 1) {
-                GameSettings.player = Players.PLAYER_TWO;
             }
 
             CameraController.Instance.SetStartingPosition();
@@ -75,5 +70,16 @@ public class GameManager : Singleton<GameManager>
         if (Keyboard.current.escapeKey.wasReleasedThisFrame) {
             inGameMenu.SetActive(true);
         }
+    }
+
+    public Players GetCurrentPlayer() {
+        if (NetworkManager.Singleton.IsHost && NetworkManager.Singleton.LocalClientId == 0) {
+            return Players.PLAYER_ONE;
+        }
+        if (NetworkManager.Singleton.IsClient && NetworkManager.Singleton.LocalClientId == 1) {
+            return Players.PLAYER_TWO;
+        }
+
+        return Players.SPECTATOR;
     }
 }

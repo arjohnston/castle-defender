@@ -1,5 +1,5 @@
 public static class GameSettings {
     public static bool isLaunchingAsHost = false;
     public static string clientJoinCode = "";
-    public static Players player = Players.SPECTATOR;
+    public static int initialPlayerHandSize = 5;
 }
