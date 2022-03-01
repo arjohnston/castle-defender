@@ -24,6 +24,9 @@ public struct Card : INetworkSerializable, IEquatable<Card> {
     }
     
     public override int GetHashCode() {
+        // TODO: This needs to be updated to be unique 100% of the time. Right now this would
+        // think instantiated objects of type orc with the same meta and attributes are equal.
+        // That's not true since we want to compare object signatures against each other.
         return meta.GetHashCode() ^ attributes.GetHashCode();
     }
 }

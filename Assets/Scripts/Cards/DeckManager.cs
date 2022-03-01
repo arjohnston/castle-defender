@@ -6,13 +6,8 @@ using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(NetworkObject))]
 public class DeckManager : NetworkSingleton<DeckManager> {
-    // DONE - Initialize & know what decks each player has
-    // DONE - Show and hide decks on gameboard depending if there are cards (0 cards = hidden)
-    // DONE - Draw a card to the hand
-    // Fan the cards out while in the hand
-    // Click & drag a card to spawn a creature
-    // Draw only one card per turn
-
+    // Note: each client is responsible for their own decks, the server only cares about how many
+    // of each card each player has, so it can notify other clients if they should show/hide decks
     [SerializeField] private NetworkVariable<int> playerOneDeckCountServer = new NetworkVariable<int>(0);
     [SerializeField] private NetworkVariable<int> playerTwoDeckCountServer = new NetworkVariable<int>(0);
     [SerializeField] private NetworkVariable<int> playerOneGraveCountServer = new NetworkVariable<int>(0);
