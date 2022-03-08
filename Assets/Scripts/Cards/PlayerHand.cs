@@ -1,27 +1,35 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Utilities.Singletons;
+using System.Linq;
 
 public class PlayerHand : Singleton<PlayerHand> {
     public GameObject CardHandPrefab;
     public GameObject playerHandArea;
 
-    private Dictionary<GameObject, Card> renderedPlayerHandCards = new Dictionary<GameObject, Card>();
+    // TODO: Should this be a array?
+    Queue<KeyValuePair<GameObject, Card>> renderedPlayerHandCards = new Queue<KeyValuePair<GameObject, Card>>();
+
+    private List<Card> tempList;
+
+    private float _playerHandCardRotationAmount = 10f;
+    private float _playerHandTranslateYAmount = 7f;
+    private float _playerHandTranslateXAmount = -3f;
+    private float _cardWidth = 100;
 
     void Start() {
-        // TODO:
-        // This was my first take at spawning a gameobject that adheres to the player area. It does not work.
-        // Need to have a solid foundation for adding a card into the player area, and then we can do things like
-        // turn it in to a fan of cards, etc.
-        // This code is just temporary to get one card spawn to work, and then it can be removed
-        List<Card> newListOfCards = DeckManager.Instance.GetPlayerHand();
-        GameObject playerCard = Instantiate(CardHandPrefab, new Vector3(0, 0, 0), Quaternion.identity, this.transform);
-        playerCard.transform.SetParent(playerHandArea.transform, false);
+        Stack<Card> stack = new Ranger().GetDeck();
+
+        tempList = new List<Card>();
+
+        foreach (Card card in stack) {
+            tempList.Add(card);
+        }
     }
 
     void LateUpdate() {
         // TODO: re-enable this to get the other cards functions to be called once per frame
-        // UpdatePlayerHandDisplay();
+        UpdatePlayerHandDisplay();
     }
 
     private void UpdatePlayerHandDisplay() {
@@ -30,7 +38,11 @@ public class PlayerHand : Singleton<PlayerHand> {
     }
 
     private void AddRemoveCardsFromRender() {
-        List<Card> newListOfCards = DeckManager.Instance.GetPlayerHand();
+        // TODO: re-enable
+        // List<Card> newListOfCards = DeckManager.Instance.GetPlayerHand();
+
+        // TODO: delete
+        List<Card> newListOfCards = tempList;
 
         // TODO: If new list of cards is null, then that means the player hand should be cleared (e.g., all removed)
         if (newListOfCards == null) return;
@@ -39,10 +51,6 @@ public class PlayerHand : Singleton<PlayerHand> {
         foreach (Card newCard in newListOfCards) {
             bool newCardExists = false;
             foreach (var existingCard in renderedPlayerHandCards) {
-                // TODO: this equals method is not unique between two cards of the same type (e.g., 2 orc cards)
-                // the Equals method in the Card.cs class needs to be updated to always be unique. There should be
-                // some unique attribute already within each instantiated class (like a hash code). Need to re-do
-                // that GetHashCode() method.
                 if (newCard.Equals(existingCard.Value)) newCardExists = true;
             }
 
@@ -50,32 +58,44 @@ public class PlayerHand : Singleton<PlayerHand> {
                 // Instantiate game object, add it to the dictionary
                 GameObject playerCard = Instantiate(CardHandPrefab, new Vector3(0, 0, 0), Quaternion.identity, this.transform);
                 playerCard.transform.SetParent(playerHandArea.transform, false);
-                renderedPlayerHandCards.Add(playerCard, newCard);
+                // playerCard.GetComponent<TextMesh>("Title") = newCard.meta.title;
+                renderedPlayerHandCards.Enqueue(new KeyValuePair<GameObject, Card>(playerCard, newCard));
             }
-        }
+        };
+
+        List<GameObject> keysToRemove = new List<GameObject>();
 
         // For each new card removed, destroy the gameobject
         foreach(var existingCard in renderedPlayerHandCards) {
-            bool existingCardShouldBeRemoved = false;
+            bool existingCardShouldBeRemoved = true;
             foreach (Card newCard in newListOfCards) {
-                if (existingCard.Equals(newCard)) existingCardShouldBeRemoved = true;
+                if (existingCard.Value.Equals(newCard)) existingCardShouldBeRemoved = false;
             }
 
-            // TODO: After re-doing the GetHashCode() in the Card class from above, then we need to ensure the cards are appropriately
-            // being added and removed.
             if (existingCardShouldBeRemoved) {
                 Destroy(existingCard.Key);
-                renderedPlayerHandCards.Remove(existingCard.Key);
+                keysToRemove.Add(existingCard.Key);
             }
         }
+
+        renderedPlayerHandCards = new Queue<KeyValuePair<GameObject, Card>>(renderedPlayerHandCards.Where(item => !keysToRemove.Contains(item.Key)));
     }
 
     private void TransformPositionIntoFan() {
-        // TODO: Iterate through each card in `renderedPlayerHandCards`
-        // Make a helper function that determines its rotation for its position
+        float center = renderedPlayerHandCards.Count / 2;
 
-        // For when we add, remove cards from the dictionary - is the order preserved?
-        //     If not, then we may need to utilize a queue to strongly enforce order
+        foreach (KeyValuePair<GameObject, Card> kvp in renderedPlayerHandCards) {
+            float distanceFromCenter = GetDistanceAwayFromCenter(center, kvp);
+
+            kvp.Key.transform.eulerAngles = new Vector3(0f, 0f, -(distanceFromCenter * _playerHandCardRotationAmount));
+            kvp.Key.transform.localPosition = new Vector3((_cardWidth + _playerHandTranslateXAmount) * distanceFromCenter, -Mathf.Abs(_playerHandTranslateYAmount * distanceFromCenter), 0f);
+        }
+        
+    }
+
+    private float GetDistanceAwayFromCenter(float center, KeyValuePair<GameObject, Card> kvp) {
+        int indexOfKvp = renderedPlayerHandCards.ToArray().ToList().IndexOf(kvp);
+        return indexOfKvp - center;
     }
 
     // TODO: Add Draggable to the game object that's instantiated

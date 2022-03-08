@@ -44,12 +44,12 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
             gbo.SetupGboDetails(
                 Types.PERMANENT,
-                GameDefaults.CASTLE_HEALTH,
                 new Meta{
                 title = "Castle",
                 description = "Player castle."
                 },
                 new Attributes{
+                    hp = GameDefaults.CASTLE_HEALTH,
                     cost = 0,
                     speed = 1,
                     range = 10,

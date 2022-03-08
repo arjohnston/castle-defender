@@ -34,11 +34,11 @@ public class GameboardObject : NetworkBehaviour
         UpdatePosition();
     }
 
-    public void SetupGboDetails(Types type, int health, Meta info, Attributes attr) {
+    public void SetupGboDetails(Types type, Meta info, Attributes attr) {
         SetGboTypeServerRpc(type);
         SetupGboDetailsServerRpc(info, attr);
-        SetHpServerRpc(health);
-        hp = health;
+        SetHpServerRpc(attr.hp);
+        hp = attr.hp;
     }
 
     public void SetPosition(Hex hex) {
