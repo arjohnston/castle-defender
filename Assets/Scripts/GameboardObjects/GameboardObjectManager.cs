@@ -82,6 +82,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
             if (hexRayCast == null && gameboardObjectRayCast == null) return;
 
+            Logger.Instance.LogInfo("Clicked on GBO. DIO? " + gameboardObjectRayCast);
+
             // Nothing selected, selecting a gameboard object
             if (_selectedGameboardObject == null && gameboardObjectRayCast != null) {
                 GameboardObject gbo = gameboardObjectRayCast.GetComponent<GameboardObject>();
@@ -127,7 +129,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
         // TODO: Check to ensure I have enough resources
         GameObject go = Instantiate(CreatureToken, location.Position(), Quaternion.identity, this.transform);
-        
+
         NetworkObject networkObject = go.GetComponent<NetworkObject>();
         networkObject.Spawn();
         

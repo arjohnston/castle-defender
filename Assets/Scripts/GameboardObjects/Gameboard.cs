@@ -79,12 +79,15 @@ public class Gameboard : Singleton<Gameboard> {
         int layerMask = LayerMask.GetMask("GameboardObject");
 
         if (Physics.Raycast(ray, out hitData, Mathf.Infinity, layerMask)) {
+            Debug.Log("HIT1 " + hitData);
             if (
                 hitData.collider != null &&
                 hitData.collider.transform != null
                 && hitData.collider.transform.parent != null
             ) {
                 GameObject hitParent = hitData.collider.transform.parent.gameObject;
+
+                Debug.Log("HP: " + hitParent);
 
                 if (hitParent.GetComponent<GameboardObject>() != null) {
                     return hitParent;
