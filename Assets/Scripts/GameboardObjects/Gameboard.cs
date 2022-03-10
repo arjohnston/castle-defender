@@ -208,6 +208,10 @@ public class Gameboard : Singleton<Gameboard> {
         
     }
 
+    public bool IsOccupied(Hex hex) {
+        return GameboardObjectManager.Instance.GetGboAtHex(hex) != null;
+    }
+
     private void RemoveHighlightFromHex(Hex hex) {
         if (!_highlightedHexes.Contains(hex)) return;
 

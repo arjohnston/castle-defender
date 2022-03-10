@@ -11,11 +11,14 @@ public class Warrior : Deck {
 
     private Card CreateOrc() {
         return new Card(
+            Types.CREATURE,
+            Sprites.ORC,
             new Meta{
                 title = "Orc",
                 description = "A meany orc guy",
             },
             new Attributes{
+                hp = 4,
                 cost = 2,
                 speed = 1,
                 range = 1,

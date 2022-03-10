@@ -26,10 +26,6 @@ public class GameboardObject : NetworkBehaviour
     [SerializeField] private NetworkVariable<int> remainingMoveActions = new NetworkVariable<int>(0);
     [SerializeField] private NetworkVariable<int> remainingAttackActions = new NetworkVariable<int>(0);
 
-    void Start() {
-
-    }
-
     void Update() {
         UpdatePosition();
     }

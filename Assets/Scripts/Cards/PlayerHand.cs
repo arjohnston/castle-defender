@@ -2,20 +2,24 @@ using UnityEngine;
 using System.Collections.Generic;
 using Utilities.Singletons;
 using System.Linq;
+using TMPro;
 
 public class PlayerHand : Singleton<PlayerHand> {
     public GameObject CardHandPrefab;
     public GameObject playerHandArea;
 
-    // TODO: Should this be a array?
     Queue<KeyValuePair<GameObject, Card>> renderedPlayerHandCards = new Queue<KeyValuePair<GameObject, Card>>();
 
     private List<Card> tempList;
 
-    private float _playerHandCardRotationAmount = 10f;
-    private float _playerHandTranslateYAmount = 7f;
-    private float _playerHandTranslateXAmount = -3f;
-    private float _cardWidth = 100;
+    [Header("Player Hand Card")]
+    public int CardWidth = 100;
+    public float PlayerHandCardRotationAmount = 10.0f;
+    public float PlayerHandCardTranslateXAmount = 7.0f;
+    public float PlayerHandCardTranslateYAmount = -3.0f;
+
+    private GameObject cardHovered;
+    private GameObject cardDragged;
 
     void Start() {
         Stack<Card> stack = new Ranger().GetDeck();
@@ -23,62 +27,49 @@ public class PlayerHand : Singleton<PlayerHand> {
         tempList = new List<Card>();
 
         foreach (Card card in stack) {
-            tempList.Add(card);
+            AddCardToHand(card);
         }
     }
 
     void LateUpdate() {
-        // TODO: re-enable this to get the other cards functions to be called once per frame
-        UpdatePlayerHandDisplay();
-    }
-
-    private void UpdatePlayerHandDisplay() {
-        AddRemoveCardsFromRender();
         TransformPositionIntoFan();
     }
 
-    private void AddRemoveCardsFromRender() {
-        // TODO: re-enable
-        // List<Card> newListOfCards = DeckManager.Instance.GetPlayerHand();
-
-        // TODO: delete
-        List<Card> newListOfCards = tempList;
-
-        // TODO: If new list of cards is null, then that means the player hand should be cleared (e.g., all removed)
-        if (newListOfCards == null) return;
-
+    public void AddCardToHand(Card card) {
         // For each new card added, instantiate a new gameobject
-        foreach (Card newCard in newListOfCards) {
-            bool newCardExists = false;
-            foreach (var existingCard in renderedPlayerHandCards) {
-                if (newCard.Equals(existingCard.Value)) newCardExists = true;
-            }
-
-            if (!newCardExists) {
-                // Instantiate game object, add it to the dictionary
-                GameObject playerCard = Instantiate(CardHandPrefab, new Vector3(0, 0, 0), Quaternion.identity, this.transform);
-                playerCard.transform.SetParent(playerHandArea.transform, false);
-                // playerCard.GetComponent<TextMesh>("Title") = newCard.meta.title;
-                renderedPlayerHandCards.Enqueue(new KeyValuePair<GameObject, Card>(playerCard, newCard));
-            }
-        };
-
-        List<GameObject> keysToRemove = new List<GameObject>();
-
-        // For each new card removed, destroy the gameobject
-        foreach(var existingCard in renderedPlayerHandCards) {
-            bool existingCardShouldBeRemoved = true;
-            foreach (Card newCard in newListOfCards) {
-                if (existingCard.Value.Equals(newCard)) existingCardShouldBeRemoved = false;
-            }
-
-            if (existingCardShouldBeRemoved) {
-                Destroy(existingCard.Key);
-                keysToRemove.Add(existingCard.Key);
-            }
+        bool newCardExists = false;
+        foreach (var existingCard in renderedPlayerHandCards) {
+            if (card.Equals(existingCard.Value)) newCardExists = true;
         }
 
-        renderedPlayerHandCards = new Queue<KeyValuePair<GameObject, Card>>(renderedPlayerHandCards.Where(item => !keysToRemove.Contains(item.Key)));
+        if (!newCardExists) {
+            // Instantiate game object, add it to the dictionary
+            GameObject playerCard = Instantiate(CardHandPrefab, new Vector3(0, 0, 0), Quaternion.identity, this.transform);
+            playerCard.transform.SetParent(playerHandArea.transform, false);
+
+            CardBuilder.Instance.BuildCard(playerCard, card);
+
+            renderedPlayerHandCards.Enqueue(new KeyValuePair<GameObject, Card>(playerCard, card));
+        }
+    }
+
+    public void RemoveCardFromHand(GameObject gameObject) {
+        renderedPlayerHandCards = new Queue<KeyValuePair<GameObject, Card>>(renderedPlayerHandCards.Where(item => !item.Key.Equals(gameObject)));
+        Destroy(gameObject);
+    }
+
+    private KeyValuePair<GameObject, Card>? GetKvpForGameObject(GameObject gameObject) {
+        foreach (KeyValuePair<GameObject, Card> kvp in renderedPlayerHandCards) {
+            if (kvp.Key.Equals(gameObject)) return kvp;
+        }
+
+        return null;
+    }
+
+    public Card GetCardForGameObject(GameObject gameObject) {
+        KeyValuePair<GameObject, Card>? kvp = GetKvpForGameObject(gameObject);
+
+        return kvp?.Value;
     }
 
     private void TransformPositionIntoFan() {
@@ -87,10 +78,20 @@ public class PlayerHand : Singleton<PlayerHand> {
         foreach (KeyValuePair<GameObject, Card> kvp in renderedPlayerHandCards) {
             float distanceFromCenter = GetDistanceAwayFromCenter(center, kvp);
 
-            kvp.Key.transform.eulerAngles = new Vector3(0f, 0f, -(distanceFromCenter * _playerHandCardRotationAmount));
-            kvp.Key.transform.localPosition = new Vector3((_cardWidth + _playerHandTranslateXAmount) * distanceFromCenter, -Mathf.Abs(_playerHandTranslateYAmount * distanceFromCenter), 0f);
+            if (!kvp.Key.Equals(cardDragged)) {
+                if (kvp.Key.Equals(cardHovered)) {
+                    kvp.Key.transform.SetAsLastSibling(); // Move to front most so its not obscured by other cards
+                    kvp.Key.transform.localScale = new Vector3(1.3f, 1.3f, 1.3f); // zoom in
+                    kvp.Key.transform.eulerAngles = Vector3.zero; // remove rotation
+                    kvp.Key.transform.localPosition = new Vector3((CardWidth + PlayerHandCardTranslateXAmount) * distanceFromCenter, 15.0f, 0f); // move up
+                } else {
+                    kvp.Key.transform.SetSiblingIndex(renderedPlayerHandCards.ToArray().ToList().IndexOf(kvp));
+                    kvp.Key.transform.localScale = new Vector3(1f, 1f, 1f);
+                    kvp.Key.transform.eulerAngles = new Vector3(0f, 0f, -(distanceFromCenter * PlayerHandCardRotationAmount));
+                    kvp.Key.transform.localPosition = new Vector3((CardWidth + PlayerHandCardTranslateXAmount) * distanceFromCenter, -PlayerHandCardTranslateYAmount * 3.0f - Mathf.Abs(PlayerHandCardTranslateYAmount * distanceFromCenter * 1.4f), 0f);
+                }
+            }
         }
-        
     }
 
     private float GetDistanceAwayFromCenter(float center, KeyValuePair<GameObject, Card> kvp) {
@@ -98,5 +99,21 @@ public class PlayerHand : Singleton<PlayerHand> {
         return indexOfKvp - center;
     }
 
-    // TODO: Add Draggable to the game object that's instantiated
+    public void SetCardIsHovered(GameObject card) {
+        cardHovered = card;
+    }
+
+    public void RemoveCardIsHovered() {
+        cardHovered = null;
+    }
+
+    public void SetCardIsDragged(GameObject card) {
+        cardDragged = card;
+        GameboardObjectManager.Instance.SetIsCardBeingDragged(true);
+    }
+
+    public void RemoveCardIsDragged() {
+        cardDragged = null;
+        GameboardObjectManager.Instance.SetIsCardBeingDragged(false);
+    }
 }

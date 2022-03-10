@@ -21,8 +21,6 @@ public class DeckManager : NetworkSingleton<DeckManager> {
     private Stack<Card> playerDeck;
     private Stack<Card> playerGrave;
 
-    private List<Card> playerHand;
-
     public GameObject GameboardDeckPrefab;
     public Material DeckBackMaterial;
 
@@ -47,7 +45,6 @@ public class DeckManager : NetworkSingleton<DeckManager> {
     public void InitializeDeck(Deck deck) {
         playerDeck = deck.GetDeck();
         playerGrave = new Stack<Card>();
-        playerHand = new List<Card>();
 
         if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
             SetPlayerOneDeckServerRpc(deck.GetDeck().Count, 0);
@@ -155,7 +152,7 @@ public class DeckManager : NetworkSingleton<DeckManager> {
 
     private void DrawCard() {
         Card card = playerDeck.Pop();
-        playerHand.Add(card);
+        PlayerHand.Instance.AddCardToHand(card);
 
         if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
             SetPlayerOneDeckServerRpc(playerDeck.Count, playerGrave.Count);
@@ -164,10 +161,6 @@ public class DeckManager : NetworkSingleton<DeckManager> {
         if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO) {
             SetPlayerTwoDeckServerRpc(playerDeck.Count, playerGrave.Count);
         }
-    }
-
-    public List<Card> GetPlayerHand() {
-        return playerHand;
     }
 
     [ServerRpc(RequireOwnership=false)]

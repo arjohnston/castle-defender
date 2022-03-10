@@ -7,14 +7,16 @@ public struct Attributes : INetworkSerializable {
     public int range;
     public int damage;
     public int occupiedRadius;
+    public bool isRestrictedToMyTurn;
 
-    public Attributes(int hp = 5, int cost = 2, int speed = 1, int range = 1, int damage = 1, int occupiedRadius = 0) {
+    public Attributes(int hp = 5, int cost = 2, int speed = 1, int range = 1, int damage = 1, int occupiedRadius = 0, bool isRestrictedToMyTurn = true) {
         this.hp = hp;
         this.cost = cost;
         this.speed = speed;
         this.range = range;
         this.damage = damage;
         this.occupiedRadius = occupiedRadius;
+        this.isRestrictedToMyTurn = isRestrictedToMyTurn;
     }
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter {
@@ -24,5 +26,6 @@ public struct Attributes : INetworkSerializable {
         serializer.SerializeValue(ref range);
         serializer.SerializeValue(ref damage);
         serializer.SerializeValue(ref occupiedRadius);
+        serializer.SerializeValue(ref isRestrictedToMyTurn);
     }
 }
