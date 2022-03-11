@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using Utilities.Singletons;
 using Unity.Netcode;
 using TMPro;
+using System.IO;
 
 public class GameManager : NetworkSingleton<GameManager>
 {
@@ -17,12 +18,26 @@ public class GameManager : NetworkSingleton<GameManager>
     void Awake() {
         // Cap the frame rate
         Application.targetFrameRate = 60;
+        Application.logMessageReceived += HandleException;
 
         // Don't display waiting for others if:
         // Unity is in editor mode
         // or the client is joining (e.g., Player 2)
         if (Application.isEditor || !string.IsNullOrEmpty(GameSettings.clientJoinCode)) {
             waitingForOthersPanel.SetActive(false);
+        }
+    }
+
+    private void HandleException(string logString, string stackTrace, LogType type) {
+        if (type == LogType.Exception) {
+            Logger.Instance.LogError(logString);
+
+            string path = "debug.txt";
+
+            StreamWriter writer = new StreamWriter(path, true);
+            writer.WriteLine(logString);
+            writer.Write(stackTrace + "\n");
+            writer.Close();
         }
     }
 

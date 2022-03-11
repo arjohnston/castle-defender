@@ -98,6 +98,8 @@ public class TurnManager: NetworkSingleton<TurnManager> {
             default:
                 break;
         }
+
+        if (IsMyTurn()) DeckManager.Instance.DrawCard();
     }
 
     [ServerRpc(RequireOwnership = false)]

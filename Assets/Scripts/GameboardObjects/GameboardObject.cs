@@ -6,9 +6,8 @@ using System.Collections.Generic;
 
 [RequireComponent(typeof(NetworkObject))]
 [RequireComponent(typeof(ClientNetworkTransform))]
-public class GameboardObject : NetworkBehaviour
-{
-    private Vector3 targetPosition;
+public class GameboardObject : NetworkBehaviour {
+    private NetworkVariable<Vector3> targetPositionServer = new NetworkVariable<Vector3>();
     private float animationSpeed = 8.0f;
     private float floatingHeight = 0.5f;
     private bool isSelected = false;
@@ -39,12 +38,12 @@ public class GameboardObject : NetworkBehaviour
 
     public void SetPosition(Hex hex) {
         transform.position = hex.Position();
-        targetPosition = hex.Position();
+        SetTargetPositionServerRpc(hex.Position());
         UpdateHexPositionServerRpc(new Vector2Int(hex.Q, hex.R));
     }
 
     public void MoveToPosition(Hex hex) {
-        targetPosition = hex.Position();
+        SetTargetPositionServerRpc(hex.Position());
         UpdateHexPositionServerRpc(new Vector2Int(hex.Q, hex.R));
 
         SetRemainingMoveActionsServerRpc(remainingMoveActions.Value - 1);
@@ -57,7 +56,6 @@ public class GameboardObject : NetworkBehaviour
     public void Select() {
         if (!TurnManager.Instance.IsMyTurn()) return;
         this.isSelected = true;
-        this.targetPosition.y = floatingHeight;        
     }
 
     public void Deselect() {
@@ -66,20 +64,16 @@ public class GameboardObject : NetworkBehaviour
 
     public void UpdatePosition() {
         Vector3 currentPosition = transform.position;
+        float newHeight = 0;
     
-        if (currentPosition.x == targetPosition.x && currentPosition.z == targetPosition.z) {
-            if (currentPosition.y > 0 && !isSelected) targetPosition.y = 0;
-            else if (currentPosition.y == 0 && isSelected) targetPosition.y = floatingHeight;
+        if (!IsSamePosition(currentPosition, targetPositionServer.Value) || isSelected) {
+            newHeight = floatingHeight;
         } else {
-            targetPosition.y = floatingHeight;
+            newHeight = 0;
         }
 
-        if (!IsOwner) targetPosition.y = 0;
-
-        if (currentPosition == targetPosition) return;
-
         float step = animationSpeed * Time.deltaTime;
-        transform.position = Vector3.MoveTowards(currentPosition, targetPosition, step);
+        transform.position = Vector3.MoveTowards(currentPosition, new Vector3(targetPositionServer.Value.x, newHeight, targetPositionServer.Value.z), step);
     }
 
     public List<Hex> GetOccupiedHexes() {
@@ -183,6 +177,11 @@ public class GameboardObject : NetworkBehaviour
         return gboType.Value;
     }
 
+    // https://stackoverflow.com/questions/44221679/example-of-seemingly-equal-float-variables-not-equal
+    public bool IsSamePosition(Vector3 pos1, Vector3 pos2) {
+        return Mathf.Abs(pos1.x - pos2.x) < 1e-5 && Mathf.Abs(pos1.z - pos2.z) < 1e-5;
+    }
+
     [ServerRpc(RequireOwnership = false)]
     public void SetGboTypeServerRpc(Types type) {
         gboType.Value = type;
@@ -218,5 +217,10 @@ public class GameboardObject : NetworkBehaviour
     [ClientRpc]
     public void SetHpClientRpc(int health) {
         hp = health;
+    }
+
+    [ServerRpc]
+    public void SetTargetPositionServerRpc(Vector3 position) {
+        targetPositionServer.Value = position;
     }
 }

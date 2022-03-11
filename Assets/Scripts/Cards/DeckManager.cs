@@ -13,11 +13,6 @@ public class DeckManager : NetworkSingleton<DeckManager> {
     [SerializeField] private NetworkVariable<int> playerOneGraveCountServer = new NetworkVariable<int>(0);
     [SerializeField] private NetworkVariable<int> playerTwoGraveCountServer = new NetworkVariable<int>(0);
 
-    private int playerOneDeckCount = 0;
-    private int playerTwoDeckCount = 0;
-    private int playerOneGraveCount = 0;
-    private int playerTwoGraveCount = 0;
-
     private Stack<Card> playerDeck;
     private Stack<Card> playerGrave;
 
@@ -101,10 +96,10 @@ public class DeckManager : NetworkSingleton<DeckManager> {
     }
 
     public void ShowHideGameboardDecks() {
-        P1DeckGameObject.SetActive(playerOneDeckCount > 0);
-        P2DeckGameObject.SetActive(playerTwoDeckCount > 0);
-        P1GraveGameObject.SetActive(playerOneGraveCount > 0);
-        P2GraveGameObject.SetActive(playerTwoGraveCount > 0);
+        P1DeckGameObject.SetActive(playerOneDeckCountServer.Value > 0);
+        P2DeckGameObject.SetActive(playerTwoDeckCountServer.Value > 0);
+        P1GraveGameObject.SetActive(playerOneGraveCountServer.Value > 0);
+        P2GraveGameObject.SetActive(playerTwoGraveCountServer.Value > 0);
     }
 
     private void CheckOnLeftClick() {
@@ -150,7 +145,7 @@ public class DeckManager : NetworkSingleton<DeckManager> {
         }
     }
 
-    private void DrawCard() {
+    public void DrawCard() {
         Card card = playerDeck.Pop();
         PlayerHand.Instance.AddCardToHand(card);
 
@@ -167,33 +162,11 @@ public class DeckManager : NetworkSingleton<DeckManager> {
     public void SetPlayerOneDeckServerRpc(int deckCount, int graveCount) {
         playerOneDeckCountServer.Value = deckCount;
         playerOneGraveCountServer.Value = graveCount;
-
-        UpdateDeckVisualsClientRpc(
-            playerOneDeckCountServer.Value, 
-            playerTwoDeckCountServer.Value, 
-            playerOneGraveCountServer.Value, 
-            playerOneGraveCountServer.Value
-        );
     }
 
     [ServerRpc(RequireOwnership=false)]
     public void SetPlayerTwoDeckServerRpc(int deckCount, int graveCount) {
         playerTwoDeckCountServer.Value = deckCount;
         playerTwoGraveCountServer.Value = graveCount;
-
-        UpdateDeckVisualsClientRpc(
-            playerOneDeckCountServer.Value, 
-            playerTwoDeckCountServer.Value,
-            playerOneGraveCountServer.Value, 
-            playerOneGraveCountServer.Value
-        );
-    }
-
-    [ClientRpc]
-    public void UpdateDeckVisualsClientRpc(int p1DeckCount, int p2DeckCount, int p1GraveCount, int p2GraveCount) {
-        playerOneDeckCount = p1DeckCount;
-        playerTwoDeckCount = p2DeckCount;
-        playerOneGraveCount = p1GraveCount;
-        playerTwoGraveCount = p2GraveCount;
     }
 }

@@ -21,16 +21,6 @@ public class PlayerHand : Singleton<PlayerHand> {
     private GameObject cardHovered;
     private GameObject cardDragged;
 
-    void Start() {
-        Stack<Card> stack = new Ranger().GetDeck();
-
-        tempList = new List<Card>();
-
-        foreach (Card card in stack) {
-            AddCardToHand(card);
-        }
-    }
-
     void LateUpdate() {
         TransformPositionIntoFan();
     }

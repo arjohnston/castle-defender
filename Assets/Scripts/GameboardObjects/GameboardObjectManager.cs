@@ -18,6 +18,9 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     [SerializeField] private bool _isRaycastRangeValid = true;
     [SerializeField] private bool _isCardBeingDragged = false;
 
+    private Hex _spawnLocation;
+    private Card _spawnCard;
+
     // Update is called once per frame
     void Update()
     {
@@ -82,8 +85,6 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
             if (hexRayCast == null && gameboardObjectRayCast == null) return;
 
-            Logger.Instance.LogInfo("Clicked on GBO. DIO? " + gameboardObjectRayCast);
-
             // Nothing selected, selecting a gameboard object
             if (_selectedGameboardObject == null && gameboardObjectRayCast != null) {
                 GameboardObject gbo = gameboardObjectRayCast.GetComponent<GameboardObject>();
@@ -102,11 +103,10 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                     _selectedGameboardObject = null;
                     targetGbo.Deselect();
                 }
-
                 // If I am the owner, then select that
-                if (gameboardObjectRayCast.GetComponent<NetworkObject>().IsOwner && targetGbo.CanMoveOrAttack()) {
+                else if (gameboardObjectRayCast.GetComponent<NetworkObject>().IsOwner && targetGbo.CanMoveOrAttack()) {
                     GameboardObject currentGbo = _selectedGameboardObject.GetComponent<GameboardObject>();
-                    if (currentGbo) currentGbo.Deselect();
+                    if (currentGbo != null) currentGbo.Deselect();
                     _selectedGameboardObject = gameboardObjectRayCast;
                     targetGbo.Select();
                 } else {
@@ -123,28 +123,53 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         }
     }
 
-    public bool Spawn(Hex location, Card card) {
-        if (!TurnManager.Instance.IsMyTurn()) return false;
-        if (GetGboAtHex(location) != null) return false;
+    public void Spawn(Hex location, Card card) {
+        if (!TurnManager.Instance.IsMyTurn()) return;
+        if (GetGboAtHex(location) != null) return;
 
         // TODO: Check to ensure I have enough resources
-        GameObject go = Instantiate(CreatureToken, location.Position(), Quaternion.identity, this.transform);
+        _spawnLocation = location;
+        _spawnCard = card;
 
+        ulong clientId = NetworkManager.Singleton.LocalClientId;
+        SpawnServerRpc(location.Position(), clientId);
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    private void SpawnServerRpc(Vector3 position, ulong clientId) {
+        GameObject go = Instantiate(CreatureToken, position, Quaternion.identity);
         NetworkObject networkObject = go.GetComponent<NetworkObject>();
         networkObject.Spawn();
-        
+        networkObject.ChangeOwnership(clientId);
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams {
+            Send = new ClientRpcSendParams {
+                TargetClientIds = new ulong[]{clientId}
+            }
+        };
+
+        SpawnClientRpc(networkObject.NetworkObjectId, clientRpcParams);
+    }
+
+    [ClientRpc]
+    private void SpawnClientRpc(ulong objectId, ClientRpcParams clientRpcParams = default) {
+        GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
+
         GameboardObject gbo = go.GetComponent<GameboardObject>();
+        
         gameboardObjects.Add(gbo);
-        gbo.SetPosition(location);
+        gbo.SetPosition(_spawnLocation);
 
         gbo.SetupGboDetails(
             Types.CREATURE,
-            card.meta,
-            card.attributes
+            _spawnCard.meta,
+            _spawnCard.attributes
         );
 
-        return true;
+        _spawnCard = null;
+        _spawnLocation = null;
     }
+
 
     public void HighlightRaycastIfSelected() {
         if (_selectedGameboardObject == null) {
@@ -206,13 +231,21 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
                 if (isTargetDestroyed) {
                     gameboardObjects.Remove(target);
-                    Destroy(target.gameObject);
+
+                    NetworkObject networkObject = target.gameObject.GetComponent<NetworkObject>();
+                    DestroyServerRpc(networkObject.NetworkObjectId);
                 }
             }
 
             _selectedGameboardObject.GetComponent<GameboardObject>().Deselect();
             _selectedGameboardObject = null;
         }
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    public void DestroyServerRpc(ulong objectId) {
+        NetworkObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId];
+        go.Despawn();
     }
 
     public GameboardObject GetGboAtHex(Hex hex) {

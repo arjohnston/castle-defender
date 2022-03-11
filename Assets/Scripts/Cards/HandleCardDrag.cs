@@ -8,12 +8,16 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private Vector3 origin;
 
     public void OnBeginDrag(PointerEventData eventData) {
+        if (!TurnManager.Instance.IsMyTurn()) return;
+
         transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
         origin = transform.position;
         PlayerHand.Instance.SetCardIsDragged(gameObject);
     }
 
     public void OnDrag(PointerEventData eventData) {
+        if (!TurnManager.Instance.IsMyTurn()) return;
+
         Card card = PlayerHand.Instance.GetCardForGameObject(gameObject);
         hexRayCast = Gameboard.Instance.GetHexRayCastHit();
 
@@ -27,6 +31,8 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     }
 
     public void OnEndDrag(PointerEventData eventData) {
+        if (!TurnManager.Instance.IsMyTurn()) return;
+        
         Card card = PlayerHand.Instance.GetCardForGameObject(gameObject);
 
         if (
@@ -37,15 +43,8 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
                 transform.position = origin;
                 transform.localScale = new Vector3(1f, 1f, 1f);
         } else {
-            
-            bool didSpawnSuccessfully = GameboardObjectManager.Instance.Spawn(hexRayCast, card);
-            
-            if (didSpawnSuccessfully) {
-                PlayerHand.Instance.RemoveCardFromHand(gameObject);
-            } else {
-                transform.position = origin;
-                transform.localScale = new Vector3(1f, 1f, 1f);
-            }
+            GameboardObjectManager.Instance.Spawn(hexRayCast, card);
+            PlayerHand.Instance.RemoveCardFromHand(gameObject);
         }
 
         PlayerHand.Instance.RemoveCardIsDragged();

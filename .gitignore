@@ -71,3 +71,4 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 ProjectSettings/QualitySettings.asset
 ProjectSettings/QualitySettings.asset
+debug.txt
