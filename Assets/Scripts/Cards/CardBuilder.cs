@@ -43,21 +43,25 @@ public class CardBuilder : Singleton<CardBuilder> {
                 break;
         }
 
+        playerCardImages[1].sprite = GetSpriteForCard(card);
+    }
+
+    public Sprite GetSpriteForCard(Card card) {
         // TODO: Create a mapping of available creature types & their images.
         // Similar to switch-case above, but create another enum class with all
         // possible cards (orc, fireball, etc)
         switch (card.sprite) {
             case Sprites.BOWMAN:
-                playerCardImages[1].sprite = Bowman;
-                break;
+                return Bowman;
 
             case Sprites.ORC:
-                playerCardImages[1].sprite = Orc;
-                break;
+                return Orc;
 
             case Sprites.CLERIC:
-                playerCardImages[1].sprite = Cleric;
-                break;
+                return Cleric;
+
+            default:
+                return null;
         }
     }
 }

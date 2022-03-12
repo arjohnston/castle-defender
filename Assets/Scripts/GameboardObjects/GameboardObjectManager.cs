@@ -9,8 +9,10 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 {
     private List<GameboardObject> gameboardObjects = new List<GameboardObject>();
 
-    [SerializeField] private GameObject _castle;
+    [SerializeField] private NetworkVariable<int> playerOneCastleHealth = new NetworkVariable<int>();
+    [SerializeField] private NetworkVariable<int> playerTwoCastleHealth = new NetworkVariable<int>();
     [SerializeField] public GameObject CreatureToken;
+    [SerializeField] private GameboardObject _castle;
 
     [SerializeField] private GameObject _selectedGameboardObject = null;
     [SerializeField] private bool _leftClickMouseChanged = false;
@@ -29,6 +31,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         CheckOnLeftClick();
         HighlightRaycastIfSelected();
         SelectObjectAtRayCastHit();
+        UpdateCastleHealth();
     }
 
     // Required to pass the player manually as GameSettings.player was encountering race conditions on awake
@@ -39,7 +42,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         gameboardObjects.Add(gbo);
 
         if (networkObject.IsOwner) {
-            _castle = castle;
+            _castle = gbo;
 
             gbo.SetupGboDetails(
                 Types.PERMANENT,
@@ -65,6 +68,53 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 Hex hex = Gameboard.Instance.GetHexAt(5, -(Gameboard.Instance.boardRadius - 2));
                 gbo.SetPosition(hex);
             }
+
+            if (player == Players.PLAYER_ONE) {
+                SetPlayerOneCastleHealthServerRpc(GameDefaults.CASTLE_HEALTH);
+            } else if (player == Players.PLAYER_TWO) {
+                SetPlayerTwoCastleHealthServerRpc(GameDefaults.CASTLE_HEALTH);
+            }
+        }
+    }
+
+    public int GetCurrentPlayerCastleHealth() {
+        Players player = GameManager.Instance.GetCurrentPlayer();
+
+        if (player == Players.PLAYER_ONE) {
+            return playerOneCastleHealth.Value;
+        } else {
+            return playerTwoCastleHealth.Value;
+        }
+    }
+
+    public int GetOpposingPlayerCastleHealth() {
+        Players player = GameManager.Instance.GetCurrentPlayer();
+
+        if (player == Players.PLAYER_ONE) {
+            return playerTwoCastleHealth.Value;
+        } else {
+            return playerOneCastleHealth.Value;
+        }
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    public void SetPlayerOneCastleHealthServerRpc(int health) {
+        playerOneCastleHealth.Value = health;
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    public void SetPlayerTwoCastleHealthServerRpc(int health) {
+        playerTwoCastleHealth.Value = health;
+    }
+
+    private void UpdateCastleHealth() {
+        Players player = GameManager.Instance.GetCurrentPlayer();
+        int castleHealth = _castle.GetHp();
+
+        if (player == Players.PLAYER_ONE && castleHealth != playerOneCastleHealth.Value) {
+            SetPlayerOneCastleHealthServerRpc(castleHealth);
+        } else if (player == Players.PLAYER_TWO && castleHealth != playerTwoCastleHealth.Value) {
+            SetPlayerTwoCastleHealthServerRpc(castleHealth);
         }
     }
 
@@ -126,8 +176,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     public void Spawn(Hex location, Card card) {
         if (!TurnManager.Instance.IsMyTurn()) return;
         if (GetGboAtHex(location) != null) return;
+        if (!ResourceManager.Instance.HaveEnoughResources(card.attributes.cost)) return;
 
-        // TODO: Check to ensure I have enough resources
         _spawnLocation = location;
         _spawnCard = card;
 
@@ -141,6 +191,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         NetworkObject networkObject = go.GetComponent<NetworkObject>();
         networkObject.Spawn();
         networkObject.ChangeOwnership(clientId);
+
+        // Set the material
 
         ClientRpcParams clientRpcParams = new ClientRpcParams {
             Send = new ClientRpcSendParams {

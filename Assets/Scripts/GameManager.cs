@@ -95,8 +95,8 @@ public class GameManager : NetworkSingleton<GameManager>
     }
 
     private void UpdatePlayerStats() {
-        currentPlayerHp.text = "40";
-        opposingPlayerHp.text = "40";
+        currentPlayerHp.text = GameboardObjectManager.Instance.GetCurrentPlayerCastleHealth().ToString();
+        opposingPlayerHp.text = GameboardObjectManager.Instance.GetOpposingPlayerCastleHealth().ToString();
         currentPlayerResources.text = ResourceManager.Instance.GetResourcesForCurrentPlayer().ToString();
         opposingPlayerResources.text = ResourceManager.Instance.GetResourcesForOpposingPlayer().ToString();
     }
