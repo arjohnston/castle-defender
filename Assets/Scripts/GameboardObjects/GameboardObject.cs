@@ -20,12 +20,13 @@ public class GameboardObject : NetworkBehaviour {
     [SerializeField] private NetworkVariable<Types> gboType = new NetworkVariable<Types>();
 
     [SerializeField] private NetworkVariable<int> hpServer = new NetworkVariable<int>();
-    private int hp;
+    private int hp = 1; // client cache
 
     [SerializeField] private NetworkVariable<int> remainingMoveActions = new NetworkVariable<int>(0);
     [SerializeField] private NetworkVariable<int> remainingAttackActions = new NetworkVariable<int>(0);
 
     void Update() {
+        CheckIfDestroyed();
         UpdatePosition();
     }
 
@@ -33,7 +34,6 @@ public class GameboardObject : NetworkBehaviour {
         SetGboTypeServerRpc(type);
         SetupGboDetailsServerRpc(info, attr);
         SetHpServerRpc(attr.hp);
-        hp = attr.hp;
     }
 
     public void SetPosition(Hex hex) {
@@ -76,6 +76,13 @@ public class GameboardObject : NetworkBehaviour {
         transform.position = Vector3.MoveTowards(currentPosition, new Vector3(targetPositionServer.Value.x, newHeight, targetPositionServer.Value.z), step);
     }
 
+    public void CheckIfDestroyed() {
+        if (hp <= 0) {
+            NetworkObject networkObject = gameObject.GetComponent<NetworkObject>();
+            GameboardObjectManager.Instance.DestroyServerRpc(networkObject.NetworkObjectId);
+        }
+    }
+
     public List<Hex> GetOccupiedHexes() {
         Hex center = Gameboard.Instance.GetHexAt(hexPosition.Value);
         List<Hex> hexesInRange = Gameboard.Instance.GetHexesWithinRange(center, attributes.Value.occupiedRadius);
@@ -88,7 +95,7 @@ public class GameboardObject : NetworkBehaviour {
     }
 
     public int GetHp() {
-        return hp;
+        return hpServer.Value;
     }
 
     public void SetHp(int hp) {
@@ -155,13 +162,11 @@ public class GameboardObject : NetworkBehaviour {
         return true;
     }
 
-    public bool Attack(GameboardObject target) {
+    public void Attack(GameboardObject target) {
         int targetHp = target.GetHp() - attributes.Value.damage;
         target.SetHp(targetHp);
 
         SetRemainingAttackActionsServerRpc(remainingAttackActions.Value - 1);
-
-        return targetHp <= 0;
     }
 
     public void ResetActions() {

@@ -15,6 +15,11 @@ public class GameManager : NetworkSingleton<GameManager>
     public TextMeshProUGUI waitingForOthersPanelJoinCodeText;
     private int _playersConnected = 0;
 
+    public TextMeshProUGUI currentPlayerHp;
+    public TextMeshProUGUI opposingPlayerHp;
+    public TextMeshProUGUI currentPlayerResources;
+    public TextMeshProUGUI opposingPlayerResources;
+
     void Awake() {
         // Cap the frame rate
         Application.targetFrameRate = 60;
@@ -85,6 +90,15 @@ public class GameManager : NetworkSingleton<GameManager>
         if (Keyboard.current.escapeKey.wasReleasedThisFrame) {
             inGameMenu.SetActive(true);
         }
+
+        UpdatePlayerStats();
+    }
+
+    private void UpdatePlayerStats() {
+        currentPlayerHp.text = "40";
+        opposingPlayerHp.text = "40";
+        currentPlayerResources.text = ResourceManager.Instance.GetResourcesForCurrentPlayer().ToString();
+        opposingPlayerResources.text = ResourceManager.Instance.GetResourcesForOpposingPlayer().ToString();
     }
 
     public Players GetCurrentPlayer() {

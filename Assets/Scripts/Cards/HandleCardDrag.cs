@@ -43,8 +43,14 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
                 transform.position = origin;
                 transform.localScale = new Vector3(1f, 1f, 1f);
         } else {
-            GameboardObjectManager.Instance.Spawn(hexRayCast, card);
-            PlayerHand.Instance.RemoveCardFromHand(gameObject);
+            if (ResourceManager.Instance.HaveEnoughResources(card.attributes.cost)) {
+                GameboardObjectManager.Instance.Spawn(hexRayCast, card);
+                PlayerHand.Instance.RemoveCardFromHand(gameObject);
+                ResourceManager.Instance.UseResource(card.attributes.cost);
+            } else {
+                transform.position = origin;
+                transform.localScale = new Vector3(1f, 1f, 1f);
+            }
         }
 
         PlayerHand.Instance.RemoveCardIsDragged();

@@ -54,6 +54,7 @@ public class TurnManager: NetworkSingleton<TurnManager> {
             GameStateButton.interactable = GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE;
 
             DeckManager.Instance.DrawInitialHandOfCards();
+            ResourceManager.Instance.SetDefaultResources();
         }
     }
 
@@ -82,8 +83,6 @@ public class TurnManager: NetworkSingleton<TurnManager> {
                 GameStateText.text = "Player One";
                 GameStateButton.GetComponentInChildren<TextMeshProUGUI>().text = "End Turn";
                 GameStateButton.interactable = GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE;
-                // this.playerUI.increaseResourceTotalPlayer1();
-                // this.playerUI.resetResourcePlayer1();
                 break;
 
             case GameState.PLAYER_TWO_TURN:
@@ -91,15 +90,20 @@ public class TurnManager: NetworkSingleton<TurnManager> {
                 GameStateText.text = "Player Two";
                 GameStateButton.GetComponentInChildren<TextMeshProUGUI>().text = "End Turn";
                 GameStateButton.interactable = GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO;
-                // this.playerUI.increaseResourceTotalPlayer2();
-                // this.playerUI.resetResourcePlayer2();
                 break;
 
             default:
                 break;
         }
 
-        if (IsMyTurn()) DeckManager.Instance.DrawCard();
+        if (IsMyTurn()) {
+            DeckManager.Instance.DrawCard();
+            ResourceManager.Instance.SetPlayerResourcesForTurn();
+
+            // TODO: Expect this number to increment per turn
+            // but only player one is incrementing at the moment
+            // Logger.Instance.LogInfo("Current resources for " + GameManager.Instance.GetCurrentPlayer() + ": " + ResourceManager.Instance.GetResourcesForCurrentPlayer());
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]

@@ -227,14 +227,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             _selectedGameboardObject.GetComponent<GameboardObject>().Select();
         } else {
             if (gbo.IsValidAttack(target.GetHexPosition())) {
-                bool isTargetDestroyed = gbo.Attack(target);
-
-                if (isTargetDestroyed) {
-                    gameboardObjects.Remove(target);
-
-                    NetworkObject networkObject = target.gameObject.GetComponent<NetworkObject>();
-                    DestroyServerRpc(networkObject.NetworkObjectId);
-                }
+                gbo.Attack(target);
             }
 
             _selectedGameboardObject.GetComponent<GameboardObject>().Deselect();

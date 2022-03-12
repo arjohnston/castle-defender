@@ -21,6 +21,7 @@ public class CardBuilder : Singleton<CardBuilder> {
         playerCardText[1].text = card.meta.description;
         playerCardText[2].text = card.attributes.hp.ToString();
         playerCardText[3].text = card.attributes.damage.ToString();
+        playerCardText[4].text = card.attributes.cost.ToString();
 
         Image[] playerCardImages = gameObject.GetComponentsInChildren<Image>();
 
@@ -30,22 +31,21 @@ public class CardBuilder : Singleton<CardBuilder> {
                 break;
 
             case Types.PERMANENT:
-                playerCardImages[0].sprite = Creature; // TODO: Update once there's a valid img
+                playerCardImages[0].sprite = Permanent;
                 break;
 
             case Types.TRAP:
-                playerCardImages[0].sprite = Creature; // TODO: Update once there's a valid img
+                playerCardImages[0].sprite = Trap;
                 break;
 
             case Types.SPELL:
-                playerCardImages[0].sprite = Creature; // TODO: Update once there's a valid img
+                playerCardImages[0].sprite = Spell;
                 break;
         }
 
         // TODO: Create a mapping of available creature types & their images.
         // Similar to switch-case above, but create another enum class with all
         // possible cards (orc, fireball, etc)
-        // playerCardImages[1].sprite = Bowman;
         switch (card.sprite) {
             case Sprites.BOWMAN:
                 playerCardImages[1].sprite = Bowman;
