@@ -4084,11 +4084,57 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Creature: {fileID: 21300000, guid: 86697b6cd4753044ea44deecf12648fc, type: 3}
   Trap: {fileID: 21300000, guid: 63c0e91ad2174f64fb474c077cc76a3c, type: 3}
-  Permanent: {fileID: 21300000, guid: 63c0e91ad2174f64fb474c077cc76a3c, type: 3}
   Spell: {fileID: 21300000, guid: 9379d07d3d9d8614b92074468a2414de, type: 3}
-  Bowman: {fileID: 21300000, guid: 25249bdfd7a6b0147bab8f24af7f91ff, type: 3}
+  Enchantment: {fileID: 21300000, guid: e13eb12b665bdcf43a4f951d2e99b760, type: 3}
   Orc: {fileID: 21300000, guid: dc9e1ebea31d1d74ea0218ad9dfc1176, type: 3}
-  Cleric: {fileID: 21300000, guid: a7c798c33b942254a84485e26057c807, type: 3}
+  Ranger: {fileID: 0}
+  Wolf: {fileID: 0}
+  Shinobi: {fileID: 0}
+  Archer: {fileID: 0}
+  Minions: {fileID: 0}
+  WargRider: {fileID: 0}
+  Plaguecrafter: {fileID: 0}
+  TwoGoblins: {fileID: 0}
+  Dragonling: {fileID: 0}
+  KelensDagger: {fileID: 0}
+  BearTrap: {fileID: 0}
+  SpikePit: {fileID: 0}
+  Purge: {fileID: 0}
+  ElytrianBlessing: {fileID: 0}
+  Swamp: {fileID: 0}
+  ElvenLongbow: {fileID: 0}
+  Charge: {fileID: 0}
+  Heal: {fileID: 0}
+  FieryGreaves: {fileID: 0}
+  ArrowStorm: {fileID: 0}
+  Knight: {fileID: 0}
+  Squire: {fileID: 0}
+  Assassin: {fileID: 0}
+  Dragon: {fileID: 0}
+  Catapult: {fileID: 0}
+  CavalryLancer: {fileID: 0}
+  DeusVult: {fileID: 0}
+  TowerArcher: {fileID: 0}
+  CallToArms: {fileID: 0}
+  ColossalHammer: {fileID: 0}
+  ClericsRobe: {fileID: 0}
+  ManaElemental: {fileID: 0}
+  AncientGolem: {fileID: 0}
+  Archmage: {fileID: 0}
+  EternalDragon: {fileID: 0}
+  Skeletons: {fileID: 0}
+  CursedNecromancer: {fileID: 0}
+  Phantom: {fileID: 0}
+  FrostGiant: {fileID: 0}
+  NecroticPlague: {fileID: 0}
+  LightningBolt: {fileID: 0}
+  Meteor: {fileID: 0}
+  LightningStorm: {fileID: 0}
+  EarthShatter: {fileID: 0}
+  DeepFreeze: {fileID: 0}
+  Fireball: {fileID: 0}
+  SoulRing: {fileID: 0}
+  DevilsCollar: {fileID: 0}
 --- !u!114 &983941258
 MonoBehaviour:
   m_ObjectHideFlags: 0

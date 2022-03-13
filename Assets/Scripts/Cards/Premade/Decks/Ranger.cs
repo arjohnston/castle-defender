@@ -4,6 +4,9 @@ public class Ranger : Deck {
     public Ranger() {
         Stack<Card> d = new Stack<Card>();
 
+        // for (int i = 0; i < 5; i++)
+        //     d.Push(CardsLibrary.CreateWall());
+
         for (int i = 0; i < 2; i++)
             d.Push(CardsLibrary.CreateRanger());
 
@@ -34,38 +37,38 @@ public class Ranger : Deck {
         for (int i = 0; i < 1; i++)
             d.Push(CardsLibrary.CreateDragonling());
 
-        for (int i = 0; i < 1; i++)
-            d.Push(CardsLibrary.CreateKelensDagger());
+        // for (int i = 0; i < 1; i++)
+        //     d.Push(CardsLibrary.CreateKelensDagger());
 
-        for (int i = 0; i < 2; i++)
-            d.Push(CardsLibrary.CreateBearTrap());
+        // for (int i = 0; i < 2; i++)
+        //     d.Push(CardsLibrary.CreateBearTrap());
         
-        for (int i = 0; i < 2; i++)
-            d.Push(CardsLibrary.CreateSpikePit());
+        // for (int i = 0; i < 2; i++)
+        //     d.Push(CardsLibrary.CreateSpikePit());
 
-        for (int i = 0; i < 1; i++)
-            d.Push(CardsLibrary.CreatePurge());
+        // for (int i = 0; i < 1; i++)
+        //     d.Push(CardsLibrary.CreatePurge());
 
-        for (int i = 0; i < 1; i++)
-            d.Push(CardsLibrary.CreateElytrianBlessing());
+        // for (int i = 0; i < 1; i++)
+        //     d.Push(CardsLibrary.CreateElytrianBlessing());
 
-        for (int i = 0; i < 1; i++)
-            d.Push(CardsLibrary.CreateSwamp());
+        // for (int i = 0; i < 1; i++)
+        //     d.Push(CardsLibrary.CreateSwamp());
 
-        for (int i = 0; i < 1; i++)
-            d.Push(CardsLibrary.CreateElvenLongbow());
+        // for (int i = 0; i < 1; i++)
+        //     d.Push(CardsLibrary.CreateElvenLongbow());
 
-        for (int i = 0; i < 2; i++)
-            d.Push(CardsLibrary.CreateCharge());
+        // for (int i = 0; i < 2; i++)
+        //     d.Push(CardsLibrary.CreateCharge());
 
-        for (int i = 0; i < 2; i++)
-            d.Push(CardsLibrary.CreateHeal());
+        // for (int i = 0; i < 2; i++)
+        //     d.Push(CardsLibrary.CreateHeal());
 
-        for (int i = 0; i < 1; i++)
-            d.Push(CardsLibrary.CreateFieryGreaves());
+        // for (int i = 0; i < 1; i++)
+        //     d.Push(CardsLibrary.CreateFieryGreaves());
 
-        for (int i = 0; i < 2; i++)
-            d.Push(CardsLibrary.CreateArrowStorm());
+        // for (int i = 0; i < 2; i++)
+        //     d.Push(CardsLibrary.CreateArrowStorm());
 
         base.SetDeck(d);
     }

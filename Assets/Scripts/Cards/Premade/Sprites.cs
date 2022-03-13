@@ -1,7 +1,6 @@
 public enum Sprites {
-    BOWMAN,
     ORC,
-    CLERIC,
+    WALL,
     RANGER,
     WOLF,
     SHINOBI,

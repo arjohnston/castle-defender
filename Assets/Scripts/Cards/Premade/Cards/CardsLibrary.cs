@@ -2,8 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class CardsLibrary
-{
+public static class CardsLibrary {
+    public static Card CreateWall() {
+        return new Card(
+            Types.WALL,
+            Sprites.WALL,
+            new Meta{
+                title = "Wall",
+            },
+            new Attributes{
+                hp = 5,
+                cost = 0,
+                occupiedRadius = 0,
+            }
+        );
+    }
 
     public static Card CreateRanger() {
         return new Card(
@@ -197,7 +210,7 @@ public static class CardsLibrary
 
     public static Card CreateKelensDagger() {
         return new Card(
-            Types.PERMANENT,
+            Types.ENCHANTMENT,
             Sprites.KELENSDAGGER,
             new Meta{
                 title = "Kelen's Dagger",
@@ -256,7 +269,7 @@ public static class CardsLibrary
 
     public static Card CreateElytrianBlessing() {
         return new Card(
-            Types.PERMANENT,
+            Types.ENCHANTMENT,
             Sprites.ELYTRIANBLESSING,
             new Meta{
                 title = "Elytrian Blessing",
@@ -284,7 +297,7 @@ public static class CardsLibrary
 
     public static Card CreateElvenLongbow() {
         return new Card(
-            Types.PERMANENT,
+            Types.ENCHANTMENT,
             Sprites.ELVENLONGBOW,
             new Meta{
                 title = "Elven Longbow",
@@ -299,7 +312,7 @@ public static class CardsLibrary
 
     public static Card CreateCharge() {
         return new Card(
-            Types.PERMANENT,
+            Types.ENCHANTMENT,
             Sprites.CHARGE,
             new Meta{
                 title = "Charge",
@@ -313,7 +326,7 @@ public static class CardsLibrary
 
     public static Card CreateHeal() {
         return new Card(
-            Types.PERMANENT,
+            Types.SPELL,
             Sprites.HEAL,
             new Meta{
                 title = "Heal",
@@ -328,7 +341,7 @@ public static class CardsLibrary
 
     public static Card CreateFieryGreaves() {
         return new Card(
-            Types.PERMANENT,
+            Types.ENCHANTMENT,
             Sprites.FIERYGREAVES,
             new Meta{
                 title = "Fiery Greaves",
@@ -342,7 +355,7 @@ public static class CardsLibrary
 
     public static Card CreateArrowStorm() {
         return new Card(
-            Types.TRAP,
+            Types.SPELL,
             Sprites.ARROWSTORM,
             new Meta{
                 title = "Arrow Storm",
@@ -470,7 +483,7 @@ public static class CardsLibrary
  
     public static Card CreateDeusVult() {
         return new Card(
-            Types.PERMANENT,
+            Types.ENCHANTMENT,
             Sprites.DEUSVULT,
             new Meta{
                 title = "Deus Vult",
@@ -487,7 +500,7 @@ public static class CardsLibrary
 
     public static Card CreateTowerArcher() {
         return new Card(
-            Types.PERMANENT,
+            Types.ENCHANTMENT,
             Sprites.TOWERARCHER,
             new Meta{
                 title = "Tower Archer",
@@ -517,7 +530,7 @@ public static class CardsLibrary
 
     public static Card CreateColossalHammer() {
         return new Card(
-            Types.PERMANENT,
+            Types.ENCHANTMENT,
             Sprites.COLOSSALHAMMER,
             new Meta{
                 title = "Colossal Hammer",
@@ -532,7 +545,7 @@ public static class CardsLibrary
 
     public static Card CreateClericsRobe() {
         return new Card(
-            Types.PERMANENT,
+            Types.ENCHANTMENT,
             Sprites.CLERICSROBE,
             new Meta{
                 title = "Cleric's Robe",
@@ -802,7 +815,7 @@ public static class CardsLibrary
 
     public static Card CreateSoulRing() {
         return new Card(
-            Types.PERMANENT,
+            Types.ENCHANTMENT,
             Sprites.SOULRING,
             new Meta{
                 title = "Soul Ring",
@@ -816,7 +829,7 @@ public static class CardsLibrary
 
     public static Card CreateDevilsCollar() {
         return new Card(
-            Types.PERMANENT,
+            Types.ENCHANTMENT,
             Sprites.DEVILSCOLLAR,
             new Meta{
                 title = "Devil's Collar",

@@ -3,4 +3,6 @@ public enum Types {
     CREATURE,
     TRAP,
     SPELL,
+    ENCHANTMENT,
+    WALL,
 }

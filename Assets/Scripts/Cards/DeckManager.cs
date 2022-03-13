@@ -3,6 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using System.Linq;
 
 [RequireComponent(typeof(NetworkObject))]
 public class DeckManager : NetworkSingleton<DeckManager> {
@@ -38,7 +39,7 @@ public class DeckManager : NetworkSingleton<DeckManager> {
     }
 
     public void InitializeDeck(Deck deck) {
-        playerDeck = deck.GetDeck();
+        playerDeck = Shuffle(deck.GetDeck());
         playerGrave = new Stack<Card>();
 
         if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
@@ -48,6 +49,11 @@ public class DeckManager : NetworkSingleton<DeckManager> {
         if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO) {
             SetPlayerTwoDeckServerRpc(deck.GetDeck().Count, 0);
         }
+    }
+
+    public Stack<Card> Shuffle(Stack<Card> deck) {
+        System.Random rnd = new System.Random();
+        return new Stack<Card>(deck.OrderBy(x => rnd.Next()));
     }
 
     public void CreateDeckGameObjects() {

@@ -8,8 +8,7 @@ using TMPro;
 using System.IO;
 using System;
 
-public class GameManager : NetworkSingleton<GameManager>
-{
+public class GameManager : NetworkSingleton<GameManager> {
     public GameObject inGameMenu;
     public GameObject errorJoiningPanel;
     public GameObject waitingForOthersPanel;

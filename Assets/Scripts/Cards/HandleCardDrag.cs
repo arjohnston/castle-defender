@@ -44,7 +44,7 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
                 transform.localScale = new Vector3(1f, 1f, 1f);
         } else {
             if (ResourceManager.Instance.HaveEnoughResources(card.attributes.cost)) {
-                GameboardObjectManager.Instance.Spawn(hexRayCast, card);
+                GameboardObjectManager.Instance.SpawnCreature(hexRayCast, card);
                 PlayerHand.Instance.RemoveCardFromHand(gameObject);
                 ResourceManager.Instance.UseResource(card.attributes.cost);
             } else {

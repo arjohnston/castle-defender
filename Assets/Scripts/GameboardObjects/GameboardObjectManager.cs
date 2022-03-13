@@ -175,7 +175,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         }
     }
 
-    public void Spawn(Hex location, Card card) {
+    public void SpawnCreature(Hex location, Card card) {
         if (!TurnManager.Instance.IsMyTurn()) return;
         if (GetGboAtHex(location) != null) return;
         if (!ResourceManager.Instance.HaveEnoughResources(card.attributes.cost)) return;
@@ -185,6 +185,22 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
         ulong clientId = NetworkManager.Singleton.LocalClientId;
         SpawnServerRpc(location.Position(), clientId);
+    }
+
+    public void SpawnWall() {
+        // TODO: Mechanics for spawning a wall
+    }
+
+    public void SpawnTrap() {
+        // TODO: Mechanics for trap
+    }
+
+    public void CastSpell() {
+        // TODO: Mechanics for casting a spell
+    }
+
+    public void CastEnchantment() {
+        // TODO: Mechanics for casting enchantment
     }
 
     [ServerRpc(RequireOwnership=false)]
