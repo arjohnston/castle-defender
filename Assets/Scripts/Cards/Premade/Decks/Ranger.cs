@@ -69,5 +69,5 @@ public class Ranger : Deck {
 
         base.SetDeck(d);
     }
-
+  
 }

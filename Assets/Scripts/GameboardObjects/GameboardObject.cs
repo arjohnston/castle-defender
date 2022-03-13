@@ -139,15 +139,18 @@ public class GameboardObject : NetworkBehaviour {
         return distanceToTarget <= GetSpeed();
     }
 
-    public bool IsValidAttack(Hex target) {
-        Hex currentPosition = Gameboard.Instance.GetHexAt(hexPosition.Value);
-        int distanceToTarget = Cube.GetDistanceToHex(currentPosition, target);
-
+    public bool IsValidAttack(GameboardObject target) {
         if (!TurnManager.Instance.IsMyTurn()) return false;
-
         if (remainingAttackActions.Value <= 0) return false;
 
-        return distanceToTarget <= GetRange();
+        // Check entire radius of target. If any of the tiles are within range, then
+        // its a valid attack
+        foreach (Hex hex in target.GetOccupiedHexes()) {
+            int distanceToTarget = Cube.GetDistanceToHex(GetHexPosition(), hex);
+            if (distanceToTarget <= GetRange()) return true;
+        }
+
+        return false;
     }
 
     public bool CanMoveOrAttack() {

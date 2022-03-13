@@ -109,6 +109,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
     private void UpdateCastleHealth() {
         Players player = GameManager.Instance.GetCurrentPlayer();
+        if (_castle == null) return;
+
         int castleHealth = _castle.GetHp();
 
         if (player == Players.PLAYER_ONE && castleHealth != playerOneCastleHealth.Value) {
@@ -192,7 +194,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         networkObject.Spawn();
         networkObject.ChangeOwnership(clientId);
 
-        // Set the material
+        // TODO: Set the material
 
         ClientRpcParams clientRpcParams = new ClientRpcParams {
             Send = new ClientRpcSendParams {
@@ -232,11 +234,17 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         Hex raycastHitSpot = Gameboard.Instance.GetHexRayCastHit();
         GameboardObject gbo = _selectedGameboardObject.GetComponent<GameboardObject>();
 
-        if (GetGboAtHex(raycastHitSpot) != null || !gbo.IsValidMovement(raycastHitSpot)) {
-            _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(raycastHitSpot, HexColors.INVALID_MOVE, gbo.GetOccupiedRadius());
-        } else {
-            _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(raycastHitSpot, HexColors.VALID_MOVE, gbo.GetOccupiedRadius());
+        if (GetGboAtHex(raycastHitSpot) != null && gbo.IsValidAttack(GetGboAtHex(raycastHitSpot)) && !GetGboAtHex(raycastHitSpot).IsOwner) {
+            _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(raycastHitSpot, HexColors.VALID_ATTACK, gbo.GetOccupiedRadius());
+            return;
         }
+
+        if (GetGboAtHex(raycastHitSpot) == null && gbo.IsValidMovement(raycastHitSpot)) {
+            _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(raycastHitSpot, HexColors.VALID_MOVE, gbo.GetOccupiedRadius());
+            return;
+        }
+
+        _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(raycastHitSpot, HexColors.INVALID_MOVE, gbo.GetOccupiedRadius());
     }
 
     private void TryMovement(GameboardObject gbo, Hex target) {
@@ -278,7 +286,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             _selectedGameboardObject = target.gameObject;
             _selectedGameboardObject.GetComponent<GameboardObject>().Select();
         } else {
-            if (gbo.IsValidAttack(target.GetHexPosition())) {
+            if (gbo.IsValidAttack(target)) { // this is returning 2 hexes away
                 gbo.Attack(target);
             }
 
