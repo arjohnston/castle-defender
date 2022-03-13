@@ -6,13 +6,16 @@ using Utilities.Singletons;
 using Unity.Netcode;
 using TMPro;
 using System.IO;
+using System;
 
 public class GameManager : NetworkSingleton<GameManager>
 {
     public GameObject inGameMenu;
     public GameObject errorJoiningPanel;
     public GameObject waitingForOthersPanel;
+    public GameObject winConditionPanel;
     public TextMeshProUGUI waitingForOthersPanelJoinCodeText;
+    public TextMeshProUGUI winConditionText;
     private int _playersConnected = 0;
 
     public TextMeshProUGUI currentPlayerHp;
@@ -23,6 +26,8 @@ public class GameManager : NetworkSingleton<GameManager>
     void Awake() {
         // Cap the frame rate
         Application.targetFrameRate = 60;
+
+        // Push error messages to the custom logger
         Application.logMessageReceived += HandleException;
 
         // Don't display waiting for others if:
@@ -92,13 +97,14 @@ public class GameManager : NetworkSingleton<GameManager>
         }
 
         UpdatePlayerStats();
+        CheckWinCondition();
     }
 
     private void UpdatePlayerStats() {
-        currentPlayerHp.text = GameboardObjectManager.Instance.GetCurrentPlayerCastleHealth().ToString();
-        opposingPlayerHp.text = GameboardObjectManager.Instance.GetOpposingPlayerCastleHealth().ToString();
-        currentPlayerResources.text = ResourceManager.Instance.GetResourcesForCurrentPlayer().ToString();
-        opposingPlayerResources.text = ResourceManager.Instance.GetResourcesForOpposingPlayer().ToString();
+        currentPlayerHp.text = Math.Max(GameboardObjectManager.Instance.GetCurrentPlayerCastleHealth(), 0).ToString();
+        opposingPlayerHp.text = Math.Max(GameboardObjectManager.Instance.GetOpposingPlayerCastleHealth(), 0).ToString();
+        currentPlayerResources.text = Math.Max(ResourceManager.Instance.GetResourcesForCurrentPlayer(), 0).ToString();
+        opposingPlayerResources.text = Math.Max(ResourceManager.Instance.GetResourcesForOpposingPlayer(), 0).ToString();
     }
 
     public Players GetCurrentPlayer() {
@@ -110,5 +116,28 @@ public class GameManager : NetworkSingleton<GameManager>
         }
 
         return Players.SPECTATOR;
+    }
+
+    private void CheckWinCondition() {
+        int currentPlayerCastleHealth = GameboardObjectManager.Instance.GetCurrentPlayerCastleHealth();
+        int opposingPlayerCastleHealth = GameboardObjectManager.Instance.GetOpposingPlayerCastleHealth();
+
+        if (TurnManager.Instance.GetGameState() != GameState.SETUP) {
+            if (currentPlayerCastleHealth <= 0) {
+                // You use
+                TurnManager.Instance.SetGameState(GameState.WIN_CONDITION);
+
+                winConditionText.text = "You lost.";
+                winConditionPanel.SetActive(true);
+            }
+
+            if (opposingPlayerCastleHealth <= 0) {
+                // Opponent loses
+                TurnManager.Instance.SetGameState(GameState.WIN_CONDITION);
+
+                winConditionText.text = "You won!";
+                winConditionPanel.SetActive(true);
+            }
+        }
     }
 }

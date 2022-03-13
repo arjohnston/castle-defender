@@ -23,7 +23,7 @@ public class Ranger : Deck {
                 cost = 2,
                 speed = 1,
                 range = 2,
-                damage = 3,
+                damage = 30,
                 occupiedRadius = 0,
             }
         );
