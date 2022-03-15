@@ -58,9 +58,14 @@ public class GameManager : NetworkSingleton<GameManager> {
                 NetworkManager.Singleton.StartHost();
                 waitingForOthersPanelJoinCodeText.text = GameSettings.clientJoinCode;
             } else if (!string.IsNullOrEmpty(GameSettings.clientJoinCode)) {
-                await RelayManager.Instance.JoinRelay(GameSettings.clientJoinCode);
-                NetworkManager.Singleton.StartClient();
-                waitingForOthersPanel.SetActive(false);
+                try {
+                    await RelayManager.Instance.JoinRelay(GameSettings.clientJoinCode);
+                    NetworkManager.Singleton.StartClient();
+                    waitingForOthersPanel.SetActive(false);
+                } catch {
+                    Logger.Instance.LogError("Unable to start or join the relay server");
+                    errorJoiningPanel.SetActive(true);
+                }
             } else {
                 // Show an error scene
                 Logger.Instance.LogError("Unable to start or join the relay server");
@@ -71,6 +76,8 @@ public class GameManager : NetworkSingleton<GameManager> {
             Logger.Instance.LogInfo("To enable multiplayer (Relay), first build, then run the executable.");
             NetworkManager.Singleton.StartHost();
         }
+
+        // TODO: Fade.StartAnimation(); // to defer after try/catch
 
         NetworkManager.Singleton.OnClientConnectedCallback += (id) => {
             Logger.Instance.LogInfo($"player {id + 1} just connected.");
