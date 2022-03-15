@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 public class MainMenu : MonoBehaviour
 {
     public void HostGame() {
-        // RelayManager.Instance.IsLaunchingAsHost = true;
         GameSettings.isLaunchingAsHost = true;
         SceneManager.LoadScene(Scenes.GAME);
     }
@@ -20,6 +20,9 @@ public class MainMenu : MonoBehaviour
     }
 
     public void QuitToMainMenu() {
+        GameManager.Instance.ResetScene();
+        GameSettings.isLaunchingAsHost = false;
+        GameSettings.clientJoinCode = "";
         SceneManager.LoadScene(Scenes.MAIN_MENU);
     }
 }

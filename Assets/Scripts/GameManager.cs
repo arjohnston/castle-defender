@@ -139,4 +139,8 @@ public class GameManager : NetworkSingleton<GameManager> {
             }
         }
     }
+
+    public void ResetScene() {
+        waitingForOthersPanel.SetActive(true);
+    }
 }

@@ -123,21 +123,15 @@ public class DeckManager : NetworkSingleton<DeckManager> {
 
             if (gameboardObjectRayCast == null) return;
 
+            // Check to see if graveyard is clicked
+            // Note: we do not check for Deck clicks here since its auto-drawn at the start of each turn
             if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
-                if (gameboardObjectRayCast.name.Contains("Deck_p1")) {
-                    DrawCard();
-                }
-
                 if (gameboardObjectRayCast.name.Contains("Grave_p1")) {
                     // TODO: handle doing something with the graveyard
                 }
             } 
 
             if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO) {
-                if (gameboardObjectRayCast.name.Contains("Deck_p2")) {
-                    DrawCard();
-                }
-
                 if (gameboardObjectRayCast.name.Contains("Grave_p2")) {
                     // TODO: handle doing something with the graveyard
                 }

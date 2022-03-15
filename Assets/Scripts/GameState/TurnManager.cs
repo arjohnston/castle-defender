@@ -13,6 +13,7 @@ public class TurnManager: NetworkSingleton<TurnManager> {
 
     [SerializeField] private NetworkVariable<bool> readyPlayerOne = new NetworkVariable<bool>(false);
     [SerializeField] private NetworkVariable<bool> readyPlayerTwo = new NetworkVariable<bool>(false);
+    [SerializeField] private NetworkVariable<bool> hasGameStarted = new NetworkVariable<bool>(false);
 
     public void HandleTurnPhaseButtonClicked() {
         switch(GetGameState()) {
@@ -90,13 +91,15 @@ public class TurnManager: NetworkSingleton<TurnManager> {
                 GameStateText.text = "Player Two";
                 GameStateButton.GetComponentInChildren<TextMeshProUGUI>().text = "End Turn";
                 GameStateButton.interactable = GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO;
+                SetHasGameStartedServerRpc(true);
                 break;
 
             default:
                 break;
         }
 
-        if (IsMyTurn()) {
+        // Weird hack to ensure that p1 doesn't draw at the start, but we do start drawing once p2 goes
+        if ((hasGameStarted.Value || GetGameState() == GameState.PLAYER_TWO_TURN) && IsMyTurn()) {
             DeckManager.Instance.DrawCard();
             ResourceManager.Instance.SetPlayerResourcesForTurn();
 
@@ -126,10 +129,18 @@ public class TurnManager: NetworkSingleton<TurnManager> {
         if (readyPlayerOne.Value == true && readyPlayerTwo.Value == true) StartGameClientRpc();
     }
 
+    [ServerRpc(RequireOwnership=false)]
+    public void SetHasGameStartedServerRpc(bool hasStarted) {
+        hasGameStarted.Value = hasStarted;
+    }
+
     [ClientRpc]
     public void SetGameStateClientRpc(GameState state) {
         gameState = state;
         UpdateClientGameState();
+
+        // Ensure nothing is selected on each turn switch
+        GameboardObjectManager.Instance.ResetSelection();
     }
     
     [ClientRpc]

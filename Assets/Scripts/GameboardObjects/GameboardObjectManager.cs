@@ -203,6 +203,16 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         // TODO: Mechanics for casting enchantment
     }
 
+    public void ResetSelection() {
+        if (_selectedGameboardObject == null) return;
+
+        GameboardObject gbo = _selectedGameboardObject.GetComponent<GameboardObject>();
+
+        if (gbo) gbo.Deselect();
+
+        _selectedGameboardObject = null;
+    }
+
     [ServerRpc(RequireOwnership=false)]
     private void SpawnServerRpc(Vector3 position, ulong clientId) {
         GameObject go = Instantiate(CreatureToken, position, Quaternion.identity);
@@ -212,19 +222,12 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
         // TODO: Set the material
 
-        ClientRpcParams clientRpcParams = new ClientRpcParams {
-            Send = new ClientRpcSendParams {
-                TargetClientIds = new ulong[]{clientId}
-            }
-        };
-
-        SpawnClientRpc(networkObject.NetworkObjectId, clientRpcParams);
+        SpawnClientRpc(networkObject.NetworkObjectId);
     }
 
     [ClientRpc]
-    private void SpawnClientRpc(ulong objectId, ClientRpcParams clientRpcParams = default) {
+    private void SpawnClientRpc(ulong objectId) {
         GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
-
         GameboardObject gbo = go.GetComponent<GameboardObject>();
         
         gameboardObjects.Add(gbo);
