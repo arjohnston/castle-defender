@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -20,12 +21,17 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         Card card = PlayerHand.Instance.GetCardForGameObject(gameObject);
         hexRayCast = Gameboard.Instance.GetHexRayCastHit();
+        Dictionary<Hex, HitSpot> hitSpots = new Dictionary<Hex, HitSpot>();
 
         if (Gameboard.Instance.IsOccupied(hexRayCast)) {
-            Gameboard.Instance.HighlightRaycastHitSpot(hexRayCast, HexColors.INVALID_MOVE, card.attributes.occupiedRadius);
+            hitSpots.Add(hexRayCast, new HitSpot(HexColors.INVALID_MOVE, card.attributes.occupiedRadius));
+            // Gameboard.Instance.HighlightRaycastHitSpot(hexRayCast, HexColors.INVALID_MOVE, card.attributes.occupiedRadius);
         } else {
-            Gameboard.Instance.HighlightRaycastHitSpot(hexRayCast, HexColors.VALID_MOVE, card.attributes.occupiedRadius);
+            hitSpots.Add(hexRayCast, new HitSpot(HexColors.VALID_MOVE, card.attributes.occupiedRadius));
+            // Gameboard.Instance.HighlightRaycastHitSpot(hexRayCast, HexColors.VALID_MOVE, card.attributes.occupiedRadius);
         }
+
+        Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
 
         transform.position = eventData.position + new Vector2(21f, -30f);
     }

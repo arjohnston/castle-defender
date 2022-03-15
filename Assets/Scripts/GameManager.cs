@@ -13,6 +13,7 @@ public class GameManager : NetworkSingleton<GameManager> {
     public GameObject errorJoiningPanel;
     public GameObject waitingForOthersPanel;
     public GameObject winConditionPanel;
+    public GameObject playerDisconnectedPanel;
     public TextMeshProUGUI waitingForOthersPanelJoinCodeText;
     public TextMeshProUGUI winConditionText;
     private int _playersConnected = 0;
@@ -93,6 +94,11 @@ public class GameManager : NetworkSingleton<GameManager> {
         NetworkManager.Singleton.OnClientDisconnectCallback += (id) => {
             Logger.Instance.LogInfo($"player {id + 1} just disconnected.");
             _playersConnected--;
+
+            if (id == 0 || id == 1) {
+                TurnManager.Instance.SetGameState(GameState.WIN_CONDITION);
+                playerDisconnectedPanel.SetActive(true);
+            }
         };
     }
 

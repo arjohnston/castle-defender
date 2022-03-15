@@ -252,19 +252,28 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
         Hex raycastHitSpot = Gameboard.Instance.GetHexRayCastHit();
         GameboardObject gbo = _selectedGameboardObject.GetComponent<GameboardObject>();
+        Dictionary<Hex, HitSpot> hitSpots = new Dictionary<Hex, HitSpot>();
+
+        if (gbo.CanMove()) {
+            hitSpots.Add(gbo.GetHexPosition(), new HitSpot(HexColors.AVAILABLE_MOVES, gbo.GetSpeed()));
+        }
 
         if (GetGboAtHex(raycastHitSpot) != null && gbo.IsValidAttack(GetGboAtHex(raycastHitSpot)) && !GetGboAtHex(raycastHitSpot).IsOwner) {
-            _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(raycastHitSpot, HexColors.VALID_ATTACK, gbo.GetOccupiedRadius());
+            if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_ATTACK, gbo.GetOccupiedRadius()));
+            _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
             return;
         }
 
         if (GetGboAtHex(raycastHitSpot) == null && gbo.IsValidMovement(raycastHitSpot)) {
-            _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(raycastHitSpot, HexColors.VALID_MOVE, gbo.GetOccupiedRadius());
+            if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_MOVE, gbo.GetOccupiedRadius()));
+            _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
             return;
         }
 
-        _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(raycastHitSpot, HexColors.INVALID_MOVE, gbo.GetOccupiedRadius());
+        if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.INVALID_MOVE, gbo.GetOccupiedRadius()));
+        _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
     }
+
 
     private void TryMovement(GameboardObject gbo, Hex target) {
         // If target is off, or partially off the map

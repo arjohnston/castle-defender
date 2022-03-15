@@ -154,12 +154,28 @@ public class GameboardObject : NetworkBehaviour {
     }
 
     public bool CanMoveOrAttack() {
+        return CanMove() || CanAttack();
+    }
+
+    public bool CanMove() {
         if (TurnManager.Instance.GetGameState() == GameState.SETUP) {
             return true;
         } else {
             if (gboType.Value == Types.PERMANENT) return false;
 
-            if (remainingAttackActions.Value <= 0 && remainingMoveActions.Value <= 0) return false;
+            if (remainingMoveActions.Value <= 0) return false;
+        }
+
+        return true;
+    }
+
+    public bool CanAttack() {
+        if (TurnManager.Instance.GetGameState() == GameState.SETUP) {
+            return true;
+        } else {
+            if (gboType.Value == Types.PERMANENT) return false;
+
+            if (remainingAttackActions.Value <= 0) return false;
         }
 
         return true;

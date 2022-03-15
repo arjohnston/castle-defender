@@ -115,14 +115,16 @@ public class Gameboard : Singleton<Gameboard> {
     }
 
     public void ClearHighlightedSpaces() {
-        HighlightRaycastHitSpot(null, HexColors.DEFAULT_COLOR, 0);
+        HighlightRaycastHitSpot(new Dictionary<Hex, HitSpot>());
     }
 
-    public bool HighlightRaycastHitSpot(Hex target, Color color, int radius = 0) {
+    public bool HighlightRaycastHitSpot(Dictionary<Hex, HitSpot> hitSpots) {
         List<Hex> hexesInRange = new List<Hex>();
 
-        List<Hex> hexes = HighlightHexesWithinRange(target, radius, color);
-        hexesInRange.AddRange(hexes);
+        foreach (KeyValuePair<Hex, HitSpot> kvp in hitSpots) {
+            List<Hex> hexes = HighlightHexesWithinRange(kvp.Key, kvp.Value.radius, kvp.Value.color);
+            hexesInRange.AddRange(hexes);
+        }
 
         // Remove all highlights where raycast is not hitting
         // or is highlighted
@@ -131,7 +133,7 @@ public class Gameboard : Singleton<Gameboard> {
                 if (_currentRayCastHitSpot == null) {
                     RemoveHighlightFromHex(h);
                 } else if (
-                    h != target // not raycast target
+                    !hitSpots.ContainsKey(h) // not raycast target
                     && (
                         // not highlighted hexes in range
                         (hexesInRange != null && !hexesInRange.Contains(h))
@@ -146,7 +148,7 @@ public class Gameboard : Singleton<Gameboard> {
                 _highlightedHexes.RemoveAll(h => true);
             } else {
                 _highlightedHexes.RemoveAll(h => (
-                    h != target
+                    !hitSpots.ContainsKey(h)
                     && _currentRayCastHitSpot != h
                     && ((hexesInRange != null && !hexesInRange.Contains(h)) || hexesInRange == null))
                 );
