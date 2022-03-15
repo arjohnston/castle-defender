@@ -23,14 +23,14 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         hexRayCast = Gameboard.Instance.GetHexRayCastHit();
         Dictionary<Hex, HitSpot> hitSpots = new Dictionary<Hex, HitSpot>();
 
-        if (Gameboard.Instance.IsOccupied(hexRayCast)) {
-            hitSpots.Add(hexRayCast, new HitSpot(HexColors.INVALID_MOVE, card.attributes.occupiedRadius));
-            // Gameboard.Instance.HighlightRaycastHitSpot(hexRayCast, HexColors.INVALID_MOVE, card.attributes.occupiedRadius);
-        } else {
-            hitSpots.Add(hexRayCast, new HitSpot(HexColors.VALID_MOVE, card.attributes.occupiedRadius));
-            // Gameboard.Instance.HighlightRaycastHitSpot(hexRayCast, HexColors.VALID_MOVE, card.attributes.occupiedRadius);
+        if (hexRayCast != null) {
+            if (Gameboard.Instance.IsOccupied(hexRayCast)) {
+                hitSpots.Add(hexRayCast, new HitSpot(HexColors.INVALID_MOVE, card.attributes.occupiedRadius));
+            } else {
+                hitSpots.Add(hexRayCast, new HitSpot(HexColors.VALID_MOVE, card.attributes.occupiedRadius));
+            }
         }
-
+    
         Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
 
         transform.position = eventData.position + new Vector2(21f, -30f);

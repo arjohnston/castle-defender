@@ -8,9 +8,11 @@ using System.Collections.Generic;
 [RequireComponent(typeof(ClientNetworkTransform))]
 public class GameboardObject : NetworkBehaviour {
     private NetworkVariable<Vector3> targetPositionServer = new NetworkVariable<Vector3>();
+    private NetworkVariable<bool> isInstantiated = new NetworkVariable<bool>(false);
     private float animationSpeed = 8.0f;
     private float floatingHeight = 0.5f;
-    private bool isSelected = false;
+
+    private NetworkVariable<bool> isSelected = new NetworkVariable<bool>(false);
 
     [SerializeField]
     private NetworkVariable<Vector2Int> hexPosition = new NetworkVariable<Vector2Int>(); // Q, R (e.g., X, Y)
@@ -55,18 +57,20 @@ public class GameboardObject : NetworkBehaviour {
 
     public void Select() {
         if (!TurnManager.Instance.IsMyTurn()) return;
-        this.isSelected = true;
+        SetIsSelectedServerRpc(true);
     }
 
     public void Deselect() {
-        this.isSelected = false;
+        SetIsSelectedServerRpc(false);
     }
 
     public void UpdatePosition() {
+        if (!isInstantiated.Value) return;
+
         Vector3 currentPosition = transform.position;
         float newHeight = 0;
     
-        if (!IsSamePosition(currentPosition, targetPositionServer.Value) || isSelected) {
+        if (!IsSamePosition(currentPosition, targetPositionServer.Value) || isSelected.Value) {
             newHeight = floatingHeight;
         } else {
             newHeight = 0;
@@ -224,6 +228,7 @@ public class GameboardObject : NetworkBehaviour {
     [ServerRpc(RequireOwnership = false)]
     public void UpdateHexPositionServerRpc(Vector2Int position) {
         hexPosition.Value = position;
+        isInstantiated.Value = true;
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -246,5 +251,10 @@ public class GameboardObject : NetworkBehaviour {
     [ServerRpc]
     public void SetTargetPositionServerRpc(Vector3 position) {
         targetPositionServer.Value = position;
+    }
+
+    [ServerRpc]
+    public void SetIsSelectedServerRpc(bool selected) {
+        isSelected.Value = selected;
     }
 }

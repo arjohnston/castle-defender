@@ -72,22 +72,22 @@ public class CameraController : Singleton<CameraController> {
 		if (_isInitialized) CameraRotation();
 	}
 
-	public void SetStartingPosition() {
-		if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
+	public void SetStartingPosition(Players player = Players.PLAYER_ONE) {
+		if (player == Players.PLAYER_ONE) {
 			CinemachineCameraTarget.transform.position = new Vector3(0, 2.0f, -10.0f);
 
 			_cinemachineTargetYaw = 0.0f;
 			CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch, _cinemachineTargetYaw, 0.0f);
 		}
 
-		if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO) {
+		if (player == Players.PLAYER_TWO) {
 			CinemachineCameraTarget.transform.position = new Vector3(0, 2.0f, 10.0f);
 
 			_cinemachineTargetYaw = 180.0f;
 			CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch, _cinemachineTargetYaw, 0.0f);
 		}
 
-		if (GameManager.Instance.GetCurrentPlayer() == Players.SPECTATOR) {
+		if (player == Players.SPECTATOR) {
 			CinemachineCameraTarget.transform.position = new Vector3(0, 2.0f, 10.0f);
 
 			_cinemachineTargetYaw = 0.0f;

@@ -23,6 +23,7 @@ public class TurnManager: NetworkSingleton<TurnManager> {
 
             case GameState.PLAYER_ONE_TURN:
                 SetGameState(GameState.PLAYER_TWO_TURN);
+                
                 break;
 
             case GameState.PLAYER_TWO_TURN:
@@ -107,6 +108,10 @@ public class TurnManager: NetworkSingleton<TurnManager> {
             // but only player one is incrementing at the moment
             // Logger.Instance.LogInfo("Current resources for " + GameManager.Instance.GetCurrentPlayer() + ": " + ResourceManager.Instance.GetResourcesForCurrentPlayer());
         }
+
+        if (Application.isEditor && GetGameState() == GameState.PLAYER_TWO_TURN) {
+            SetGameStateServerRpc(GameState.PLAYER_ONE_TURN);
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -119,14 +124,14 @@ public class TurnManager: NetworkSingleton<TurnManager> {
     public void SetPlayerOneReadyServerRpc(bool isReady) {
         readyPlayerOne.Value = isReady;
 
-        if (readyPlayerOne.Value == true && readyPlayerTwo.Value == true) StartGameClientRpc();
+        if ((readyPlayerOne.Value == true && readyPlayerTwo.Value == true) || Application.isEditor) StartGameClientRpc();
     }
 
     [ServerRpc(RequireOwnership = false)]
     public void SetPlayerTwoReadyServerRpc(bool isReady) {
         readyPlayerTwo.Value = isReady;
 
-        if (readyPlayerOne.Value == true && readyPlayerTwo.Value == true) StartGameClientRpc();
+        if ((readyPlayerOne.Value == true && readyPlayerTwo.Value == true) || Application.isEditor) StartGameClientRpc();
     }
 
     [ServerRpc(RequireOwnership=false)]

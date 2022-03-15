@@ -76,6 +76,7 @@ public class GameManager : NetworkSingleton<GameManager> {
             Logger.Instance.LogInfo("Detected Unity editor mode. Starting the game as a host without Relay enabled.");
             Logger.Instance.LogInfo("To enable multiplayer (Relay), first build, then run the executable.");
             NetworkManager.Singleton.StartHost();
+            CameraController.Instance.SetStartingPosition(Players.PLAYER_ONE);
         }
 
         // TODO: Fade.StartAnimation(); // to defer after try/catch
@@ -88,7 +89,7 @@ public class GameManager : NetworkSingleton<GameManager> {
                 waitingForOthersPanel.SetActive(false);
             }
 
-            CameraController.Instance.SetStartingPosition();
+            CameraController.Instance.SetStartingPosition(GetCurrentPlayer());
         };
 
         NetworkManager.Singleton.OnClientDisconnectCallback += (id) => {
@@ -134,9 +135,9 @@ public class GameManager : NetworkSingleton<GameManager> {
         int currentPlayerCastleHealth = GameboardObjectManager.Instance.GetCurrentPlayerCastleHealth();
         int opposingPlayerCastleHealth = GameboardObjectManager.Instance.GetOpposingPlayerCastleHealth();
 
-        if (TurnManager.Instance.GetGameState() != GameState.SETUP) {
+        if (TurnManager.Instance.GetGameState() != GameState.SETUP && !Application.isEditor) {
             if (currentPlayerCastleHealth <= 0) {
-                // You use
+                // You lose
                 TurnManager.Instance.SetGameState(GameState.WIN_CONDITION);
 
                 winConditionText.text = "You lost.";

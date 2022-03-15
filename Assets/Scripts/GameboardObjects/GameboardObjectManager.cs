@@ -258,19 +258,20 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             hitSpots.Add(gbo.GetHexPosition(), new HitSpot(HexColors.AVAILABLE_MOVES, gbo.GetSpeed()));
         }
 
-        if (GetGboAtHex(raycastHitSpot) != null && gbo.IsValidAttack(GetGboAtHex(raycastHitSpot)) && !GetGboAtHex(raycastHitSpot).IsOwner) {
+        if (raycastHitSpot != null && GetGboAtHex(raycastHitSpot) != null && gbo.IsValidAttack(GetGboAtHex(raycastHitSpot)) && !GetGboAtHex(raycastHitSpot).IsOwner) {
             if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_ATTACK, gbo.GetOccupiedRadius()));
             _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
             return;
         }
 
-        if (GetGboAtHex(raycastHitSpot) == null && gbo.IsValidMovement(raycastHitSpot)) {
+        if (raycastHitSpot != null && GetGboAtHex(raycastHitSpot) == null && gbo.IsValidMovement(raycastHitSpot)) {
             if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_MOVE, gbo.GetOccupiedRadius()));
             _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
             return;
         }
 
-        if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.INVALID_MOVE, gbo.GetOccupiedRadius()));
+        if (raycastHitSpot != null && !hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.INVALID_MOVE, gbo.GetOccupiedRadius()));
+
         _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
     }
 
