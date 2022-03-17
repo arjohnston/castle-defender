@@ -134,13 +134,25 @@ public class GameboardObject : NetworkBehaviour {
         
         // Permanent objects can only move during SETUP phase and placement
         // Otherwise creatures are free to move at any time
-        if (GetGboType() == Types.PERMANENT) {
+        if (GetGboType() == Types.PERMANENT && IsValidPermanentMovement(target)) {
             return TurnManager.Instance.GetGameState() == GameState.SETUP;
         }
 
         if (remainingMoveActions.Value <= 0 && GetGboType() == Types.CREATURE) return false;
 
         return distanceToTarget <= GetSpeed();
+    }
+    private bool IsValidPermanentMovement(Hex target) {
+        if(target != null) {
+            Players player = GameManager.Instance.GetCurrentPlayer();
+            
+            foreach (Hex h in Gameboard.Instance.GetHexesWithinRange(target, GetOccupiedRadius())) {
+                if(player == Players.PLAYER_ONE && h.R <= 0) return false;
+                if(player == Players.PLAYER_TWO && h.R >= 0) return false;
+            }
+        }
+        
+        return true;
     }
 
     public bool IsValidAttack(GameboardObject target) {
