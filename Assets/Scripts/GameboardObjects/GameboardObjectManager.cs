@@ -256,6 +256,23 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
         if (gbo.CanMove()) {
             hitSpots.Add(gbo.GetHexPosition(), new HitSpot(HexColors.AVAILABLE_MOVES, gbo.GetSpeed()));
+
+            if (gbo.GetGboType() == Types.PERMANENT && raycastHitSpot != null) {
+                
+                if(gbo.IsValidMovement(raycastHitSpot)) {
+                    if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_MOVE, gbo.GetOccupiedRadius()));
+                    _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+                    return;
+                }
+
+                else {
+                    if (raycastHitSpot != null && !hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.INVALID_MOVE, gbo.GetOccupiedRadius()));
+                    
+                    _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+                    return;
+                }
+
+            }
         }
 
         if (raycastHitSpot != null && GetGboAtHex(raycastHitSpot) != null && gbo.IsValidAttack(GetGboAtHex(raycastHitSpot)) && !GetGboAtHex(raycastHitSpot).IsOwner) {
@@ -274,7 +291,6 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
         _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
     }
-
 
     private void TryMovement(GameboardObject gbo, Hex target) {
         // If target is off, or partially off the map
