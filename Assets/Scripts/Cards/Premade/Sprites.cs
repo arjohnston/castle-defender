@@ -1,6 +1,7 @@
 public enum Sprites {
-    ORC,
+    CASTLE,
     WALL,
+    ORC,
     RANGER,
     WOLF,
     SHINOBI,

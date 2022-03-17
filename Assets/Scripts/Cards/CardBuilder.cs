@@ -11,8 +11,9 @@ public class CardBuilder : Singleton<CardBuilder> {
     public Sprite Enchantment;
 
     [Header("Card Images")]
-    public Sprite Orc;
+    public Sprite Castle;
     public Sprite Wall;
+    public Sprite Orc;
     public Sprite Ranger;
     public Sprite Wolf;
     public Sprite Shinobi;
@@ -100,6 +101,10 @@ public class CardBuilder : Singleton<CardBuilder> {
     public Sprite GetSpriteForCard(Card card) {
         switch (card.sprite) {
             case Sprites.ORC:
+                return Orc;
+
+            case Sprites.CASTLE:
+                // return Castle;
                 return Orc;
 
             case Sprites.WALL:
