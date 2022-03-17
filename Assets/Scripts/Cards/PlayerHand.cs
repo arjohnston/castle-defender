@@ -106,4 +106,8 @@ public class PlayerHand : Singleton<PlayerHand> {
         cardDragged = null;
         GameboardObjectManager.Instance.SetIsCardBeingDragged(false);
     }
+
+    public int Count() {
+        return renderedPlayerHandCards.Count;
+    }
 }

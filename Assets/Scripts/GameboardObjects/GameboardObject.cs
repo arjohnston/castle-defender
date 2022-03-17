@@ -27,15 +27,19 @@ public class GameboardObject : NetworkBehaviour {
     [SerializeField] private NetworkVariable<int> remainingMoveActions = new NetworkVariable<int>(0);
     [SerializeField] private NetworkVariable<int> remainingAttackActions = new NetworkVariable<int>(0);
 
+    private Card card;
+
     void Update() {
         CheckIfDestroyed();
         UpdatePosition();
     }
 
-    public void SetupGboDetails(Types type, Meta info, Attributes attr) {
-        SetGboTypeServerRpc(type);
-        SetupGboDetailsServerRpc(info, attr);
-        SetHpServerRpc(attr.hp);
+    public void SetupGboDetails(Card card) {
+        SetGboTypeServerRpc(card.type);
+        SetupGboDetailsServerRpc(card.meta, card.attributes);
+        SetHpServerRpc(card.attributes.hp);
+
+        this.card = card;
     }
 
     public void SetPosition(Hex hex) {
@@ -83,6 +87,7 @@ public class GameboardObject : NetworkBehaviour {
     public void CheckIfDestroyed() {
         if (hp <= 0) {
             NetworkObject networkObject = gameObject.GetComponent<NetworkObject>();
+            DeckManager.Instance.AddToGrave(card);
             GameboardObjectManager.Instance.DestroyServerRpc(networkObject.NetworkObjectId);
         }
     }

@@ -12,6 +12,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     [SerializeField] private NetworkVariable<int> playerOneCastleHealth = new NetworkVariable<int>();
     [SerializeField] private NetworkVariable<int> playerTwoCastleHealth = new NetworkVariable<int>();
     [SerializeField] public GameObject CreatureToken;
+    [SerializeField] public Sprites CastleSprite;
     [SerializeField] private GameboardObject _castle;
 
     [SerializeField] private GameObject _selectedGameboardObject = null;
@@ -45,19 +46,22 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             _castle = gbo;
 
             gbo.SetupGboDetails(
-                Types.PERMANENT,
-                new Meta{
-                title = "Castle",
-                description = "Player castle."
-                },
-                new Attributes{
-                    hp = GameDefaults.CASTLE_HEALTH,
-                    cost = 0,
-                    speed = 1,
-                    range = 10,
-                    damage = 0,
-                    occupiedRadius = 1,
-                }
+                new Card(
+                    Types.PERMANENT,
+                    CastleSprite,
+                    new Meta{
+                    title = "Castle",
+                    description = "Player castle."
+                    },
+                    new Attributes{
+                        hp = GameDefaults.CASTLE_HEALTH,
+                        cost = 0,
+                        speed = 1,
+                        range = 10,
+                        damage = 0,
+                        occupiedRadius = 1,
+                    }
+                )
             );
 
             if (player == Players.PLAYER_ONE) {
@@ -233,11 +237,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         gameboardObjects.Add(gbo);
         gbo.SetPosition(_spawnLocation);
 
-        gbo.SetupGboDetails(
-            Types.CREATURE,
-            _spawnCard.meta,
-            _spawnCard.attributes
-        );
+        gbo.SetupGboDetails(_spawnCard);
 
         _spawnCard = null;
         _spawnLocation = null;

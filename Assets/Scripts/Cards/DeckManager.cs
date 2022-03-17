@@ -146,9 +146,21 @@ public class DeckManager : NetworkSingleton<DeckManager> {
     }
 
     public void DrawCard() {
+        if (PlayerHand.Instance.Count() >= GameSettings.maxPlayerHandSize) return;
+
         Card card = playerDeck.Pop();
         PlayerHand.Instance.AddCardToHand(card);
 
+        SetPlayerDeck();
+    }
+
+    public void AddToGrave(Card card) {
+        playerGrave.Push(card);
+
+        SetPlayerDeck();
+    }
+
+    private void SetPlayerDeck() {
         if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
             SetPlayerOneDeckServerRpc(playerDeck.Count, playerGrave.Count);
         }
