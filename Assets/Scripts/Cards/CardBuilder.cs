@@ -81,7 +81,6 @@ public class CardBuilder : Singleton<CardBuilder> {
                 break;
 
             case Types.PERMANENT:
-            case Types.WALL:
             case Types.TRAP:
                 playerCardImages[0].sprite = Trap;
                 break;

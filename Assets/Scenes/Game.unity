@@ -4273,6 +4273,7 @@ MonoBehaviour:
   playerTwoCastleHealth:
     m_InternalValue: 0
   CreatureToken: {fileID: 902822864000634048, guid: 860ca49d79718f14291680c953e92303, type: 3}
+  WallPrefab: {fileID: 8561377651853254154, guid: 0291290527487364eb51b02914806a3c, type: 3}
   _castle: {fileID: 0}
   _selectedGameboardObject: {fileID: 0}
   _leftClickMouseChanged: 0
@@ -4419,8 +4420,9 @@ MonoBehaviour:
   Trap: {fileID: 21300000, guid: 63c0e91ad2174f64fb474c077cc76a3c, type: 3}
   Spell: {fileID: 21300000, guid: 9379d07d3d9d8614b92074468a2414de, type: 3}
   Enchantment: {fileID: 21300000, guid: e13eb12b665bdcf43a4f951d2e99b760, type: 3}
-  Orc: {fileID: 21300000, guid: dc9e1ebea31d1d74ea0218ad9dfc1176, type: 3}
+  Castle: {fileID: 0}
   Wall: {fileID: 0}
+  Orc: {fileID: 21300000, guid: dc9e1ebea31d1d74ea0218ad9dfc1176, type: 3}
   Ranger: {fileID: 0}
   Wolf: {fileID: 0}
   Shinobi: {fileID: 0}

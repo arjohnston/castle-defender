@@ -4,8 +4,8 @@ public class Warrior : Deck {
     public Warrior() {
         Stack<Card> d = new Stack<Card>();
 
-        // for (int i = 0; i < 5; i++)
-        //     d.Push(CardsLibrary.CreateWall());
+        for (int i = 0; i < 5; i++)
+            d.Push(CardsLibrary.CreateWall());
         
         for (int i = 0; i < 3; i++)
             d.Push(CardsLibrary.CreateKnight());

@@ -12,6 +12,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     [SerializeField] private NetworkVariable<int> playerOneCastleHealth = new NetworkVariable<int>();
     [SerializeField] private NetworkVariable<int> playerTwoCastleHealth = new NetworkVariable<int>();
     [SerializeField] public GameObject CreatureToken;
+    [SerializeField] public GameObject WallPrefab;
     [SerializeField] private GameboardObject _castle;
 
     [SerializeField] private GameObject _selectedGameboardObject = null;
@@ -178,6 +179,31 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         }
     }
 
+    public void UseCard(Hex location, Card card) {
+        switch (card.type) {
+            case Types.CREATURE:
+                SpawnCreature(location, card);
+                break;
+
+            case Types.ENCHANTMENT:
+                CastEnchantment();
+                break;
+
+            case Types.TRAP:
+                SpawnTrap();
+                break;
+
+            case Types.PERMANENT:
+                SpawnPermanent(location, card);
+                break;
+
+            case Types.SPELL:
+                CastSpell();
+                break;
+        }
+        
+    }
+
     public void SpawnCreature(Hex location, Card card) {
         if (!TurnManager.Instance.IsMyTurn()) return;
         if (GetGboAtHex(location) != null) return;
@@ -187,11 +213,19 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         _spawnCard = card;
 
         ulong clientId = NetworkManager.Singleton.LocalClientId;
-        SpawnServerRpc(location.Position(), clientId);
+        SpawnCreatureServerRpc(location.Position(), clientId);
     }
 
-    public void SpawnWall() {
-        // TODO: Mechanics for spawning a wall
+    public void SpawnPermanent(Hex location, Card card) {
+        if (!TurnManager.Instance.IsMyTurn()) return;
+        if (GetGboAtHex(location) != null) return;
+        if (!ResourceManager.Instance.HaveEnoughResources(card.attributes.cost)) return;
+
+        _spawnLocation = location;
+        _spawnCard = card;
+
+        ulong clientId = NetworkManager.Singleton.LocalClientId;
+        SpawnPermanentServerRpc(location.Position(), clientId);
     }
 
     public void SpawnTrap() {
@@ -215,33 +249,6 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
         _selectedGameboardObject = null;
     }
-
-    [ServerRpc(RequireOwnership=false)]
-    private void SpawnServerRpc(Vector3 position, ulong clientId) {
-        GameObject go = Instantiate(CreatureToken, position, Quaternion.identity);
-        NetworkObject networkObject = go.GetComponent<NetworkObject>();
-        networkObject.Spawn();
-        networkObject.ChangeOwnership(clientId);
-
-        // TODO: Set the material
-
-        SpawnClientRpc(networkObject.NetworkObjectId);
-    }
-
-    [ClientRpc]
-    private void SpawnClientRpc(ulong objectId) {
-        GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
-        GameboardObject gbo = go.GetComponent<GameboardObject>();
-        
-        gameboardObjects.Add(gbo);
-        gbo.SetPosition(_spawnLocation);
-
-        gbo.SetupGboDetails(_spawnCard);
-
-        _spawnCard = null;
-        _spawnLocation = null;
-    }
-
 
     public void HighlightRaycastIfSelected() {
         if (_selectedGameboardObject == null) {
@@ -367,5 +374,55 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
     public void SetIsCardBeingDragged(bool isBeingDragged) {
         _isCardBeingDragged = isBeingDragged;
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    private void SpawnCreatureServerRpc(Vector3 position, ulong clientId) {
+        GameObject go = Instantiate(CreatureToken, position, Quaternion.identity);
+        NetworkObject networkObject = go.GetComponent<NetworkObject>();
+        networkObject.Spawn();
+        networkObject.ChangeOwnership(clientId);
+
+        // TODO: Set the material
+
+        SpawnCreatureClientRpc(networkObject.NetworkObjectId);
+    }
+
+    [ClientRpc]
+    private void SpawnCreatureClientRpc(ulong objectId) {
+        GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
+        GameboardObject gbo = go.GetComponent<GameboardObject>();
+        
+        gameboardObjects.Add(gbo);
+        gbo.SetPosition(_spawnLocation);
+
+        gbo.SetupGboDetails(_spawnCard);
+
+        _spawnCard = null;
+        _spawnLocation = null;
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    private void SpawnPermanentServerRpc(Vector3 position, ulong clientId) {
+        GameObject go = Instantiate(WallPrefab, position, Quaternion.identity);
+        NetworkObject networkObject = go.GetComponent<NetworkObject>();
+        networkObject.Spawn();
+        networkObject.ChangeOwnership(clientId);
+
+        SpawnPermanentClientRpc(networkObject.NetworkObjectId);
+    }
+
+    [ClientRpc]
+    private void SpawnPermanentClientRpc(ulong objectId) {
+        GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
+        GameboardObject gbo = go.GetComponent<GameboardObject>();
+        
+        gameboardObjects.Add(gbo);
+        gbo.SetPosition(_spawnLocation);
+
+        gbo.SetupGboDetails(_spawnCard);
+
+        _spawnCard = null;
+        _spawnLocation = null;
     }
 }

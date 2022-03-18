@@ -4,8 +4,8 @@ public class Ranger : Deck {
     public Ranger() {
         Stack<Card> d = new Stack<Card>();
 
-        // for (int i = 0; i < 5; i++)
-        //     d.Push(CardsLibrary.CreateWall());
+        for (int i = 0; i < 5; i++)
+            d.Push(CardsLibrary.CreateWall());
 
         for (int i = 0; i < 2; i++)
             d.Push(CardsLibrary.CreateRanger());

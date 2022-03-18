@@ -4,5 +4,4 @@ public enum Types {
     TRAP,
     SPELL,
     ENCHANTMENT,
-    WALL,
 }

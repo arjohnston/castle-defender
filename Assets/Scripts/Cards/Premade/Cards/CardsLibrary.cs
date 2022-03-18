@@ -5,7 +5,7 @@ using UnityEngine;
 public static class CardsLibrary {
     public static Card CreateWall() {
         return new Card(
-            Types.WALL,
+            Types.PERMANENT,
             Sprites.WALL,
             new Meta{
                 title = "Wall",
@@ -312,7 +312,7 @@ public static class CardsLibrary {
 
     public static Card CreateCharge() {
         return new Card(
-            Types.ENCHANTMENT,
+            Types.SPELL,
             Sprites.CHARGE,
             new Meta{
                 title = "Charge",
@@ -487,7 +487,7 @@ public static class CardsLibrary {
             Sprites.DEUSVULT,
             new Meta{
                 title = "Deus Vult",
-                description = "Target creature gets +1 to all stats, and is immune to all enemy spell and trap effects.",
+                description = "Equipped creature gets +1 to all stats, and is immune to all enemy spell and trap effects.",
             },
             new Attributes{
                 hp = 1,
@@ -504,7 +504,7 @@ public static class CardsLibrary {
             Sprites.TOWERARCHER,
             new Meta{
                 title = "Tower Archer",
-                description = "Equipped castle does 1 damage to all creatures within 3 spaces of castle",
+                description = "Equipped castle does 1 damage to all creatures within 3 spaces of castle each turn",
             },
             new Attributes{
                 cost = 4,
@@ -549,7 +549,7 @@ public static class CardsLibrary {
             Sprites.CLERICSROBE,
             new Meta{
                 title = "Cleric's Robe",
-                description = "Target creature gets +2 HP while equipped",
+                description = "Equipped creature gets +2 HP",
             },
             new Attributes{
                 hp = 2,
@@ -564,7 +564,7 @@ public static class CardsLibrary {
             Sprites.MANAELEMENTAL,
             new Meta{
                 title = "Mana Elemental",
-                description = "Gains +1 Attack for every enchantment used on it",
+                description = "Gains +1 Attack for every enchantment equipped",
             },
             new Attributes{
                 hp = 3,
@@ -663,7 +663,7 @@ public static class CardsLibrary {
             },
             new Attributes{
                 hp = 3,
-                cost = 5,
+                cost = 9,
                 speed = 1,
                 range = 1,
                 damage = 0,
@@ -716,10 +716,11 @@ public static class CardsLibrary {
             Sprites.NECROTICPLAGUE,
             new Meta{
                 title = "Necrotic Plague",
-                description = "Create a trap that deals 1 damage per turn for each monster in the trap. Creatures move at half speed while trapped",
+                description = "Create a trap that deals 1 damage per turn for each monster in the trap. Creatures move at half speed while trapped. Destroyed once no creatures are in the activated trap.",
             },
             new Attributes{
                 cost = 2,
+                occupiedRadius = 1,
             }
         );
     }
