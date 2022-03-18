@@ -147,6 +147,7 @@ public class DeckManager : NetworkSingleton<DeckManager> {
 
     public void DrawCard() {
         if (PlayerHand.Instance.Count() >= GameSettings.maxPlayerHandSize) return;
+        if (playerDeck.Count <= 0) return;
 
         Card card = playerDeck.Pop();
         PlayerHand.Instance.AddCardToHand(card);

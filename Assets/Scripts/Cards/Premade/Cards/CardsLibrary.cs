@@ -439,6 +439,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 2,
                 occupiedRadius = 0,
+                flying = true,
             }
         );
     }
@@ -630,6 +631,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 2,
                 occupiedRadius = 0,
+                flying = true,
             }
         );
     }
@@ -687,6 +689,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 2,
                 occupiedRadius = 0,
+                flying = true,
             }
         );
     }
@@ -720,7 +723,6 @@ public static class CardsLibrary {
             },
             new Attributes{
                 cost = 2,
-                occupiedRadius = 1,
             }
         );
     }

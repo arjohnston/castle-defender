@@ -122,7 +122,7 @@ public class Gameboard : Singleton<Gameboard> {
         List<Hex> hexesInRange = new List<Hex>();
 
         foreach (KeyValuePair<Hex, HitSpot> kvp in hitSpots) {
-            List<Hex> hexes = HighlightHexesWithinRange(kvp.Key, kvp.Value.radius, kvp.Value.color);
+            List<Hex> hexes = HighlightHexesWithinRange(kvp.Key, kvp.Value);
             hexesInRange.AddRange(hexes);
         }
 
@@ -158,18 +158,18 @@ public class Gameboard : Singleton<Gameboard> {
         return _isRaycastRangeValid;
     }
 
-    private List<Hex> HighlightHexesWithinRange(Hex center, int range, Color color) {
-        List<Hex> hexesInRange = GetHexesWithinRange(center, range);
+    private List<Hex> HighlightHexesWithinRange(Hex center, HitSpot hitSpot) {
+        List<Hex> hexesInRange = GetHexesWithinRange(center, hitSpot.radius, hitSpot.ignoreEdgeOfMap);
 
         foreach (Hex hex in hexesInRange) {
-            if (_isRaycastRangeValid) HighlightHex(hex, color);
+            if (_isRaycastRangeValid) HighlightHex(hex, hitSpot.color);
             else HighlightHex(hex, HexColors.INVALID_MOVE);
         }
 
         return hexesInRange;
     }
 
-    public List<Hex> GetHexesWithinRange(Hex center, int range) {
+    public List<Hex> GetHexesWithinRange(Hex center, int range, bool ignoreEdgeOfMap = false) {
         List<Hex> hexesInRange = new List<Hex>();
         if (center == null) return hexesInRange;
 
@@ -181,7 +181,7 @@ public class Gameboard : Singleton<Gameboard> {
                         Hex h = GetHexAt((int)loc.x, (int)loc.y);
 
                         // Breakaway because at least one space is not valid in target ray cast hit
-                        if (h == null) _isRaycastRangeValid = false;
+                        if (h == null && !ignoreEdgeOfMap) _isRaycastRangeValid = false;
 
                         if (h != null) hexesInRange.Add(h);
                     }

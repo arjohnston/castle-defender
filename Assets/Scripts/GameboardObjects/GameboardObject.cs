@@ -11,6 +11,7 @@ public class GameboardObject : NetworkBehaviour {
     private NetworkVariable<bool> isInstantiated = new NetworkVariable<bool>(false);
     private float animationSpeed = 8.0f;
     private float floatingHeight = 0.5f;
+    private float defaultHeight = 0.0f;
 
     private NetworkVariable<bool> isSelected = new NetworkVariable<bool>(false);
 
@@ -40,6 +41,8 @@ public class GameboardObject : NetworkBehaviour {
         SetHpServerRpc(card.attributes.hp);
 
         this.card = card;
+
+        if (card.attributes.flying) defaultHeight = 1.0f;
     }
 
     public void SetPosition(Hex hex) {
@@ -72,12 +75,12 @@ public class GameboardObject : NetworkBehaviour {
         if (!isInstantiated.Value) return;
 
         Vector3 currentPosition = transform.position;
-        float newHeight = 0;
+        float newHeight = defaultHeight;
     
         if (!IsSamePosition(currentPosition, targetPositionServer.Value) || isSelected.Value) {
-            newHeight = floatingHeight;
+            newHeight = defaultHeight + floatingHeight;
         } else {
-            newHeight = 0;
+            newHeight = defaultHeight;
         }
 
         float step = animationSpeed * Time.deltaTime;
@@ -148,7 +151,7 @@ public class GameboardObject : NetworkBehaviour {
         return distanceToTarget <= GetSpeed();
     }
     private bool IsValidPermanentMovement(Hex target) {
-        if(target != null) {
+        if (target != null) {
             Players player = GameManager.Instance.GetCurrentPlayer();
             
             foreach (Hex h in Gameboard.Instance.GetHexesWithinRange(target, GetOccupiedRadius())) {
@@ -169,6 +172,11 @@ public class GameboardObject : NetworkBehaviour {
         foreach (Hex hex in target.GetOccupiedHexes()) {
             int distanceToTarget = Cube.GetDistanceToHex(GetHexPosition(), hex);
             if (distanceToTarget <= GetRange()) return true;
+        }
+
+        // Ground creatures cannot attack flying creatures by default
+        if (!card.attributes.flying && target.card.attributes.flying) {
+            return false;
         }
 
         return false;

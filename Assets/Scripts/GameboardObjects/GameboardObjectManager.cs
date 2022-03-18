@@ -201,7 +201,6 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 CastSpell();
                 break;
         }
-        
     }
 
     public void SpawnCreature(Hex location, Card card) {
@@ -261,7 +260,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         Dictionary<Hex, HitSpot> hitSpots = new Dictionary<Hex, HitSpot>();
 
         if (gbo.CanMove()) {
-            hitSpots.Add(gbo.GetHexPosition(), new HitSpot(HexColors.AVAILABLE_MOVES, gbo.GetSpeed()));
+            hitSpots.Add(gbo.GetHexPosition(), new HitSpot(HexColors.AVAILABLE_MOVES, gbo.GetSpeed(), true));
 
             if (gbo.GetGboType() == Types.PERMANENT && raycastHitSpot != null) {
                 
