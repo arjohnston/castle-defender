@@ -362,10 +362,26 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     }
 
     public void ResetActions(Players player) {
+        List<GameboardObject> gboListSpawnGhoulEveryTurn = new List<GameboardObject>();
         if (GameManager.Instance.GetCurrentPlayer() == player) {
             foreach (GameboardObject gbo in gameboardObjects) {
                 if (gbo.IsOwner) {
                     gbo.ResetActions();
+                    if (gbo.GetSpawnGhoulEveryTurn()) gboListSpawnGhoulEveryTurn.Add(gbo);
+                }
+            }
+        }
+
+        foreach (GameboardObject gbo in gboListSpawnGhoulEveryTurn) {
+            List<Hex> areaAroundCreature = Gameboard.Instance.GetHexesWithinRange(gbo.GetHexPosition(), 1, true);
+
+            foreach (Hex hex in areaAroundCreature) {
+                GameboardObject go = GetGboAtHex(hex);
+
+                // This should not modify the collection since we're looping through right now
+                if (go == null) {
+                    SpawnCreature(hex, CardsLibrary.CreateGhoul());
+                    return;
                 }
             }
         }

@@ -12,6 +12,7 @@ public class GameboardObject : NetworkBehaviour {
     private float animationSpeed = 8.0f;
     private float floatingHeight = 0.5f;
     private float defaultHeight = 0.0f;
+    private bool hasAttacked = false;
 
     private NetworkVariable<bool> isSelected = new NetworkVariable<bool>(false);
 
@@ -42,7 +43,7 @@ public class GameboardObject : NetworkBehaviour {
 
         this.card = card;
 
-        if (card.attributes.flying) defaultHeight = 1.0f;
+        if (card.attributes.flying) defaultHeight = 0.75f;
     }
 
     public void SetPosition(Hex hex) {
@@ -90,7 +91,7 @@ public class GameboardObject : NetworkBehaviour {
     public void CheckIfDestroyed() {
         if (hp <= 0) {
             NetworkObject networkObject = gameObject.GetComponent<NetworkObject>();
-            DeckManager.Instance.AddToGrave(card);
+            if (!attributes.Value.ethereal) DeckManager.Instance.AddToGrave(card);
             GameboardObjectManager.Instance.DestroyServerRpc(networkObject.NetworkObjectId);
         }
     }
@@ -134,6 +135,10 @@ public class GameboardObject : NetworkBehaviour {
         return attributes.Value.occupiedRadius;
     }
 
+    public bool GetSpawnGhoulEveryTurn() {
+        return attributes.Value.spawnGhoulEveryTurn;
+    }
+
     public bool IsValidMovement(Hex target) {
         Hex currentPosition = Gameboard.Instance.GetHexAt(hexPosition.Value);
         int distanceToTarget = Cube.GetDistanceToHex(currentPosition, target);
@@ -175,7 +180,7 @@ public class GameboardObject : NetworkBehaviour {
         }
 
         // Ground creatures cannot attack flying creatures by default
-        if (!card.attributes.flying && target.card.attributes.flying) {
+        if (!attributes.Value.flying && target.attributes.Value.flying) {
             return false;
         }
 
@@ -205,19 +210,32 @@ public class GameboardObject : NetworkBehaviour {
             if (gboType.Value == Types.PERMANENT) return false;
 
             if (remainingAttackActions.Value <= 0) return false;
+
+            // If there are no creatures in range, return false
+            List<Hex> hexesInRange = Gameboard.Instance.GetHexesWithinRange(GetHexPosition(), attributes.Value.range, true);
+            foreach (Hex hex in hexesInRange) {
+                GameboardObject gbo = GameboardObjectManager.Instance.GetGboAtHex(hex);
+                if (gbo != null && !gbo.IsOwner) return true;
+            }
         }
 
-        return true;
+        return false;
     }
 
     public void Attack(GameboardObject target) {
-        int targetHp = target.GetHp() - attributes.Value.damage;
+        int damageModifier = 0;
+        if (target.GetGboType() == Types.PERMANENT) damageModifier += attributes.Value.permanentDamageModifier;
+        if (!hasAttacked) damageModifier += attributes.Value.firstAttackDamageModifier;
+
+        int targetHp = target.GetHp() - (attributes.Value.damage + damageModifier);
         target.SetHp(targetHp);
 
         SetRemainingAttackActionsServerRpc(remainingAttackActions.Value - 1);
+        hasAttacked = true;
     }
 
     public void ResetActions() {
+        // Reset actions
         SetRemainingMoveActionsServerRpc(1); // only 1 movement per round
         SetRemainingAttackActionsServerRpc(1); // only one attack per round
     }

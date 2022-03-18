@@ -4471,6 +4471,7 @@ MonoBehaviour:
   Fireball: {fileID: 0}
   SoulRing: {fileID: 0}
   DevilsCollar: {fileID: 0}
+  Ghoul: {fileID: 0}
 --- !u!114 &983941258
 MonoBehaviour:
   m_ObjectHideFlags: 0

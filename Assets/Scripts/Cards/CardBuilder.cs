@@ -62,6 +62,7 @@ public class CardBuilder : Singleton<CardBuilder> {
     public Sprite Fireball;
     public Sprite SoulRing;
     public Sprite DevilsCollar;
+    public Sprite Ghoul;
 
 
 
@@ -300,6 +301,10 @@ public class CardBuilder : Singleton<CardBuilder> {
 
             case Sprites.DEVILSCOLLAR:
                 // return DevilsCollar;
+                return Orc;
+
+            case Sprites.GHOUL:
+                // return Ghoul;
                 return Orc;
 
             default:

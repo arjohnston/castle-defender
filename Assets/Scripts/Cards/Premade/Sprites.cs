@@ -50,4 +50,5 @@ public enum Sprites {
     FIREBALL,
     SOULRING,
     DEVILSCOLLAR,
+    GHOUL,
 }

@@ -459,6 +459,7 @@ public static class CardsLibrary {
                 range = 10,
                 damage = 1,
                 occupiedRadius = 0,
+                permanentDamageModifier = 3,
             }
         );
     }
@@ -478,6 +479,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 2,
                 occupiedRadius = 0,
+                firstAttackDamageModifier = 2,
             }
         );
     }
@@ -670,6 +672,27 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 0,
                 occupiedRadius = 0,
+                spawnGhoulEveryTurn = true,
+            }
+        );
+    }
+
+    public static Card CreateGhoul() {
+        return new Card(
+            Types.CREATURE,
+            Sprites.GHOUL,
+            new Meta{
+                title = "Ghoul",
+                description = "Weakling creature",
+            },
+            new Attributes{
+                hp = 1,
+                cost = 1,
+                speed = 1,
+                range = 1,
+                damage = 1,
+                occupiedRadius = 0,
+                ethereal = true,
             }
         );
     }
