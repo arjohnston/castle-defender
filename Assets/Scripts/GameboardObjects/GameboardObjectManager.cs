@@ -324,6 +324,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             _selectedGameboardObject = null;
             return;
         }
+
         GameboardObject targetGbo = GetGboAtHex(target);
         if (targetGbo != null && !IsEnemyTrap(targetGbo.gameObject)) {
             // If I'm the owner, then select that gbo
@@ -338,17 +339,12 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             if (gbo.IsValidMovement(target)) {
                 gbo.MoveToPosition(target);
 
-                if (IsEnemyTrap(targetGbo.gameObject)) ActivateTrap(targetGbo);
+                if (targetGbo != null && IsEnemyTrap(targetGbo.gameObject)) targetGbo.ActivateTrap();
             }
 
             gbo.Deselect();
             _selectedGameboardObject = null;
         }
-    }
-
-    private void ActivateTrap(GameboardObject trap) {
-        // Get all creatures in range of the trap
-        // do trap things to those creatures
     }
 
     private void TryAttack(GameboardObject gbo, GameboardObject target) {
@@ -374,43 +370,74 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
     public void DestroyGameObject(GameObject gameObject) {
         NetworkObject networkObject = gameObject.GetComponent<NetworkObject>();
+
+        GameboardObject gbo = gameObject.GetComponent<GameboardObject>();
+        if (!gbo.IsEthereal() && gbo.IsOwner) DeckManager.Instance.AddToGrave(gbo.GetCard());
+        RemoveGameObjectClientRpc(networkObject.NetworkObjectId);
         DestroyServerRpc(networkObject.NetworkObjectId);
+    }
+
+    [ClientRpc]
+    public void RemoveGameObjectClientRpc(ulong objectId) {
+        GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
+        GameboardObject gbo = go.GetComponent<GameboardObject>();
+        gameboardObjects.Remove(gbo);
     }
 
     [ServerRpc(RequireOwnership=false)]
     public void DestroyServerRpc(ulong objectId) {
-        DestroyClientRpc(objectId);
         NetworkObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId];
         go.Despawn();
     }
 
-    [ClientRpc]
-    public void DestroyClientRpc(ulong objectId) {
-        GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
-        GameboardObject gbo = go.GetComponent<GameboardObject>();
-        if (!gbo.IsEthereal() && gbo.IsOwner) DeckManager.Instance.AddToGrave(gbo.GetCard());
-        gameboardObjects.Remove(gbo);
-        
-    }
-
     public GameboardObject GetGboAtHex(Hex hex) {
+        List<GameboardObject> gbos = new List<GameboardObject>();
         foreach (GameboardObject gbo in gameboardObjects) {
             foreach (Hex h in gbo.GetOccupiedHexes()) {
-                if (h == hex) return gbo;
+                if (h == hex) gbos.Add(gbo);
             }
         }
+
+        foreach (GameboardObject gbo in gbos) {
+            if (gbo.GetGboType() != Types.TRAP) return gbo;
+        }
+
+        if (gbos.Count > 0) return gbos[0];
 
         return null;
     }
 
+    public void UseActivatedTraps() {
+        List<GameboardObject> traps = new List<GameboardObject>();
+
+        foreach (GameboardObject gbo in gameboardObjects) {
+            if (gbo.IsTrap()) traps.Add(gbo);
+        }
+
+        foreach (GameboardObject gbo in traps) {
+            if (gbo != null) gbo.UseActivatedTrapAtBeginningOfOpponentTurn();
+        }
+    }
+
     public void ResetActions(Players player) {
         List<GameboardObject> gboListSpawnGhoulEveryTurn = new List<GameboardObject>();
+        List<GameboardObject> gbosToRemove = new List<GameboardObject>();
+
         if (GameManager.Instance.GetCurrentPlayer() == player) {
             foreach (GameboardObject gbo in gameboardObjects) {
-                if (gbo.IsOwner) {
-                    gbo.ResetActions();
-                    if (gbo.GetSpawnGhoulEveryTurn()) gboListSpawnGhoulEveryTurn.Add(gbo);
+                try {
+                    if (gbo.IsOwner) {
+                        gbo.ResetActions();
+                        if (gbo.GetSpawnGhoulEveryTurn()) gboListSpawnGhoulEveryTurn.Add(gbo);
+                    }
+                } catch {
+                    gbosToRemove.Add(gbo);
                 }
+            }
+
+            foreach (GameboardObject gbo in gbosToRemove) {
+                // Destroyed by the other client
+                gameboardObjects.Remove(gbo);
             }
         }
 

@@ -113,12 +113,13 @@ public class TurnManager: NetworkSingleton<TurnManager> {
                 ResourceManager.Instance.SetPlayerResourcesForTurn();
             }
 
-            if (Application.isEditor && gameStateServer.Value == GameState.PLAYER_TWO_TURN) {
+            if (Application.isEditor && !GameManager.Instance.allowMultiplayerInEditor && gameStateServer.Value == GameState.PLAYER_TWO_TURN) {
                 SetGameStateServerRpc(GameState.PLAYER_ONE_TURN);
             }
 
             // Ensure nothing is selected on turn change
             GameboardObjectManager.Instance.ResetSelection();
+            GameboardObjectManager.Instance.UseActivatedTraps();
         }
     }
 

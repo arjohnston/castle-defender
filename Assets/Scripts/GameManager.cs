@@ -23,6 +23,8 @@ public class GameManager : NetworkSingleton<GameManager> {
     public TextMeshProUGUI currentPlayerResources;
     public TextMeshProUGUI opposingPlayerResources;
 
+    public bool allowMultiplayerInEditor = false;
+
     void Awake() {
         // Cap the frame rate
         Application.targetFrameRate = 60;
@@ -33,7 +35,7 @@ public class GameManager : NetworkSingleton<GameManager> {
         // Don't display waiting for others if:
         // Unity is in editor mode
         // or the client is joining (e.g., Player 2)
-        if (Application.isEditor || !string.IsNullOrEmpty(GameSettings.clientJoinCode)) {
+        if ((Application.isEditor && !allowMultiplayerInEditor) || !string.IsNullOrEmpty(GameSettings.clientJoinCode)) {
             waitingForOthersPanel.SetActive(false);
         }
     }
@@ -53,7 +55,7 @@ public class GameManager : NetworkSingleton<GameManager> {
 
     // Start is called before the first frame update
     async void Start() {
-        if (RelayManager.Instance.IsRelayEnabled && !Application.isEditor) {
+        if (RelayManager.Instance.IsRelayEnabled && (!Application.isEditor || allowMultiplayerInEditor)) {
             if (GameSettings.isLaunchingAsHost) {
                 await RelayManager.Instance.SetupRelay();
                 NetworkManager.Singleton.StartHost();

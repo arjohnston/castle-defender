@@ -17,6 +17,7 @@ public struct Attributes : INetworkSerializable {
     public bool ethereal; // whether or not the card goes to the graveyard when creature is destroyed
 
     // trap mechanics
+    public float speedModifier;
 
     // spell mechanics
 
@@ -34,7 +35,8 @@ public struct Attributes : INetworkSerializable {
         int permanentDamageModifier = 0,
         int firstAttackDamageModifier = 0,
         bool spawnGhoulEveryTurn = false,
-        bool ethereal = false
+        bool ethereal = false,
+        float speedModifier = 1.0f
         ) {
         this.hp = hp;
         this.cost = cost;
@@ -48,6 +50,7 @@ public struct Attributes : INetworkSerializable {
         this.firstAttackDamageModifier = firstAttackDamageModifier;
         this.spawnGhoulEveryTurn = spawnGhoulEveryTurn;
         this.ethereal = ethereal;
+        this.speedModifier = speedModifier;
     }
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter {
@@ -63,5 +66,6 @@ public struct Attributes : INetworkSerializable {
         serializer.SerializeValue(ref firstAttackDamageModifier);
         serializer.SerializeValue(ref spawnGhoulEveryTurn);
         serializer.SerializeValue(ref ethereal);
+        serializer.SerializeValue(ref speedModifier);
     }
 }

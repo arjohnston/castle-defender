@@ -3,6 +3,7 @@ using UnityEngine;
 using Unity.Netcode.Samples;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 [RequireComponent(typeof(NetworkObject))]
 [RequireComponent(typeof(ClientNetworkTransform))]
@@ -28,6 +29,9 @@ public class GameboardObject : NetworkBehaviour {
 
     [SerializeField] private NetworkVariable<int> remainingMoveActions = new NetworkVariable<int>(0);
     [SerializeField] private NetworkVariable<int> remainingAttackActions = new NetworkVariable<int>(0);
+
+    [SerializeField] private NetworkVariable<bool> isTrapActivated = new NetworkVariable<bool>(false);
+    [SerializeField] private NetworkVariable<bool> isInActivatedTrap = new NetworkVariable<bool>(false);
 
     private Card card;
 
@@ -91,14 +95,23 @@ public class GameboardObject : NetworkBehaviour {
     public void CheckIfDestroyed() {
         if (!isInstantiated.Value) return;
 
-        if (hp <= 0 && (GetGboType() == Types.CREATURE || GetGboType() == Types.PERMANENT)) {
+        if (hp <= 0) {
             GameboardObjectManager.Instance.DestroyGameObject(gameObject);
         }
 
-        // TODO: Can use this once stepped on
-        // if (GetGboType() == Types.TRAP) {
-        //     GameboardObjectManager.Instance.DestroyGameObject(gameObject);
-        // }
+        // Destroy if there are no enemies in trap
+        if (IsTrap() && IsTrapActivated()) {
+            List<Hex> hexesInRange = Gameboard.Instance.GetHexesWithinRange(GetHexPosition(), attributes.Value.range, true);
+            bool hasEnemyInRange = false;
+            
+            foreach (Hex hex in hexesInRange) {
+                GameboardObject gbo = GameboardObjectManager.Instance.GetGboAtHex(hex);
+                
+                if (gbo != null && !gbo.IsOwner) hasEnemyInRange = true;
+            }
+
+            if (!hasEnemyInRange) GameboardObjectManager.Instance.DestroyGameObject(gameObject);
+        }
     }
 
     public List<Hex> GetOccupiedHexes() {
@@ -124,8 +137,21 @@ public class GameboardObject : NetworkBehaviour {
         return attributes.Value.cost;
     }
 
+    public float GetSpeedModifier() {
+        return attributes.Value.speedModifier;
+    }
+
     public int GetSpeed() {
-        return attributes.Value.speed;
+        // Check if trapped, if so then multiply by speed modifier
+        List<Hex> area = Gameboard.Instance.GetHexesWithinRange(GetHexPosition(), attributes.Value.speed, true);
+        float speedModifier = attributes.Value.speedModifier;
+
+        foreach (Hex hex in area) {
+            GameboardObject gbo = GameboardObjectManager.Instance.GetGboAtHex(hex);
+            if (gbo != null && gbo.IsTrap() && !gbo.IsOwner && gbo.IsTrapActivated()) speedModifier *= gbo.GetSpeedModifier();
+        }
+
+        return (int)Math.Floor(attributes.Value.speed * speedModifier);
     }
 
     public int GetRange() {
@@ -245,6 +271,60 @@ public class GameboardObject : NetworkBehaviour {
 
         SetRemainingAttackActionsServerRpc(remainingAttackActions.Value - 1);
         hasAttacked = true;
+    }
+
+    public bool IsTrap() {
+        return GetGboType() == Types.TRAP;
+    }
+
+    public bool IsTrapActivated() {
+        return isTrapActivated.Value;
+    }
+
+    public void ActivateTrap() {
+        if (!IsTrap()) return;
+
+        SetTrapIsActivatedServerRpc(true);
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    public void SetTrapIsActivatedServerRpc(bool isActivated) {
+        isTrapActivated.Value = isActivated;
+        ActivateTrapClientRpc();
+    }
+
+    [ClientRpc]
+    public void ActivateTrapClientRpc() {
+        UseActivatedTrap();
+    }
+
+    public void UseActivatedTrapAtBeginningOfOpponentTurn() {
+        if (
+            IsSpawned &&
+            IsTrap() && 
+            !IsOwner && 
+            IsTrapActivated() && 
+            TurnManager.Instance.IsMyTurn()
+        ) UseActivatedTrap();
+    }
+
+    private void UseActivatedTrap() {
+        List<Hex> area = Gameboard.Instance.GetHexesWithinRange(GetHexPosition(), GetRange(), true);
+        List<GameboardObject> affectedCreatures = new List<GameboardObject>();
+
+        foreach (Hex hex in area) {
+            GameboardObject gbo = GameboardObjectManager.Instance.GetGboAtHex(hex);
+
+            if (gbo != null && gbo.GetGboType() == Types.CREATURE) affectedCreatures.Add(gbo);
+        }
+
+        foreach (GameboardObject creature in affectedCreatures) {
+            int targetHp = creature.GetHp() - (GetDamage());
+            creature.SetHp(targetHp);
+        }
+
+        // Trap life determines the amount of turns its active for
+        SetHp(GetHp() - 1);
     }
 
     public void ResetActions() {

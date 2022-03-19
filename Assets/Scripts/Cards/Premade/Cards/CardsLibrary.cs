@@ -33,6 +33,7 @@ public static class CardsLibrary {
                 range = 8,
                 damage = 1,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -52,6 +53,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 2,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -71,6 +73,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 2,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -90,6 +93,7 @@ public static class CardsLibrary {
                 range = 6,
                 damage = 1,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -109,6 +113,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 1,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -128,6 +133,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 2,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -147,6 +153,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 3,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -166,6 +173,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 1,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -185,6 +193,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 4,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -204,6 +213,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 2,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -236,6 +246,8 @@ public static class CardsLibrary {
                 hp = 1,
                 cost = 2,
                 damage = 3,
+                range = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -252,6 +264,8 @@ public static class CardsLibrary {
                 hp = 1,
                 cost = 2,
                 damage = 2,
+                range = 1,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -295,8 +309,11 @@ public static class CardsLibrary {
                 description = "Target creature is stuck and cannot move for one turn",
             },
             new Attributes{
-                hp = 1,
+                hp = 2,
                 cost = 1,
+                damage = 0,
+                range = 0,
+                speedModifier = 0.0f,
             }
         );
     }
@@ -392,6 +409,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 2,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -411,6 +429,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 2,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -430,6 +449,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 2,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -450,6 +470,7 @@ public static class CardsLibrary {
                 damage = 2,
                 occupiedRadius = 0,
                 flying = true,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -470,6 +491,7 @@ public static class CardsLibrary {
                 damage = 1,
                 occupiedRadius = 0,
                 permanentDamageModifier = 3,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -490,6 +512,7 @@ public static class CardsLibrary {
                 damage = 2,
                 occupiedRadius = 0,
                 firstAttackDamageModifier = 2,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -589,6 +612,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 1,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -608,6 +632,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 2,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -627,6 +652,7 @@ public static class CardsLibrary {
                 range = 3,
                 damage = 2,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -647,6 +673,7 @@ public static class CardsLibrary {
                 damage = 2,
                 occupiedRadius = 0,
                 flying = true,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -666,6 +693,7 @@ public static class CardsLibrary {
                 range = 1,
                 damage = 1,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -686,6 +714,7 @@ public static class CardsLibrary {
                 damage = 0,
                 occupiedRadius = 0,
                 spawnGhoulEveryTurn = true,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -706,6 +735,7 @@ public static class CardsLibrary {
                 damage = 1,
                 occupiedRadius = 0,
                 ethereal = true,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -726,6 +756,7 @@ public static class CardsLibrary {
                 damage = 2,
                 occupiedRadius = 0,
                 flying = true,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -745,6 +776,7 @@ public static class CardsLibrary {
                 range = 2,
                 damage = 3,
                 occupiedRadius = 0,
+                speedModifier = 1.0f,
             }
         );
     }
@@ -760,6 +792,8 @@ public static class CardsLibrary {
             new Attributes{
                 hp = 1,
                 cost = 2,
+                range = 0,
+                speedModifier = 0.5f,
             }
         );
     }
