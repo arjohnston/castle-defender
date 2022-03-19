@@ -34,8 +34,8 @@ public class Wizard : Deck {
         for (int i = 0; i < 1; i++)
             d.Push(CardsLibrary.CreateMinions());
 
-        // for (int i = 0; i < 1; i++)
-        //     d.Push(CardsLibrary.CreateNecroticPlague());
+        for (int i = 0; i < 1; i++)
+            d.Push(CardsLibrary.CreateNecroticPlague());
 
         // for (int i = 0; i < 2; i++)
         //     d.Push(CardsLibrary.CreateLightningBolt());

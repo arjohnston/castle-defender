@@ -4273,7 +4273,7 @@ MonoBehaviour:
   playerTwoCastleHealth:
     m_InternalValue: 0
   CreatureToken: {fileID: 902822864000634048, guid: 860ca49d79718f14291680c953e92303, type: 3}
-  WallPrefab: {fileID: 8561377651853254154, guid: 0291290527487364eb51b02914806a3c, type: 3}
+  WallPrefab: {fileID: 902822864000634048, guid: f435394e371d1f449b558ccf0b829671, type: 3}
   _castle: {fileID: 0}
   _selectedGameboardObject: {fileID: 0}
   _leftClickMouseChanged: 0
@@ -8201,6 +8201,11 @@ MonoBehaviour:
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
       Prefab: {fileID: 902822864000634048, guid: 860ca49d79718f14291680c953e92303, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 902822864000634048, guid: f435394e371d1f449b558ccf0b829671, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}

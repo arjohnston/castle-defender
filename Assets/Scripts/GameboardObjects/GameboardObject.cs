@@ -37,11 +37,11 @@ public class GameboardObject : NetworkBehaviour {
     }
 
     public void SetupGboDetails(Card card) {
+        this.card = card;
+
         SetGboTypeServerRpc(card.type);
         SetupGboDetailsServerRpc(card.meta, card.attributes);
         SetHpServerRpc(card.attributes.hp);
-
-        this.card = card;
 
         if (card.attributes.flying) defaultHeight = 0.75f;
     }
@@ -89,11 +89,16 @@ public class GameboardObject : NetworkBehaviour {
     }
 
     public void CheckIfDestroyed() {
-        if (hp <= 0) {
-            NetworkObject networkObject = gameObject.GetComponent<NetworkObject>();
-            if (!attributes.Value.ethereal) DeckManager.Instance.AddToGrave(card);
-            GameboardObjectManager.Instance.DestroyServerRpc(networkObject.NetworkObjectId);
+        if (!isInstantiated.Value) return;
+
+        if (hp <= 0 && (GetGboType() == Types.CREATURE || GetGboType() == Types.PERMANENT)) {
+            GameboardObjectManager.Instance.DestroyGameObject(gameObject);
         }
+
+        // TODO: Can use this once stepped on
+        // if (GetGboType() == Types.TRAP) {
+        //     GameboardObjectManager.Instance.DestroyGameObject(gameObject);
+        // }
     }
 
     public List<Hex> GetOccupiedHexes() {
@@ -137,6 +142,14 @@ public class GameboardObject : NetworkBehaviour {
 
     public bool GetSpawnGhoulEveryTurn() {
         return attributes.Value.spawnGhoulEveryTurn;
+    }
+
+    public bool IsEthereal() {
+        return attributes.Value.ethereal;
+    }
+
+    public Card GetCard() {
+        return card;
     }
 
     public bool IsValidMovement(Hex target) {
@@ -215,7 +228,7 @@ public class GameboardObject : NetworkBehaviour {
             List<Hex> hexesInRange = Gameboard.Instance.GetHexesWithinRange(GetHexPosition(), attributes.Value.range, true);
             foreach (Hex hex in hexesInRange) {
                 GameboardObject gbo = GameboardObjectManager.Instance.GetGboAtHex(hex);
-                if (gbo != null && !gbo.IsOwner) return true;
+                if (gbo != null && !gbo.IsOwner && gbo.GetGboType() != Types.TRAP) return true;
             }
         }
 
@@ -235,7 +248,6 @@ public class GameboardObject : NetworkBehaviour {
     }
 
     public void ResetActions() {
-        // Reset actions
         SetRemainingMoveActionsServerRpc(1); // only 1 movement per round
         SetRemainingAttackActionsServerRpc(1); // only one attack per round
     }

@@ -40,11 +40,11 @@ public class Ranger : Deck {
         // for (int i = 0; i < 1; i++)
         //     d.Push(CardsLibrary.CreateKelensDagger());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateBearTrap());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateBearTrap());
         
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateSpikePit());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateSpikePit());
 
         // for (int i = 0; i < 1; i++)
         //     d.Push(CardsLibrary.CreatePurge());
@@ -52,8 +52,8 @@ public class Ranger : Deck {
         // for (int i = 0; i < 1; i++)
         //     d.Push(CardsLibrary.CreateElytrianBlessing());
 
-        // for (int i = 0; i < 1; i++)
-        //     d.Push(CardsLibrary.CreateSwamp());
+        for (int i = 0; i < 1; i++)
+            d.Push(CardsLibrary.CreateSwamp());
 
         // for (int i = 0; i < 1; i++)
         //     d.Push(CardsLibrary.CreateElvenLongbow());

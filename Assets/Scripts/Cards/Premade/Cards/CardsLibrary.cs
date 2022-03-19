@@ -217,6 +217,7 @@ public static class CardsLibrary {
                 description = "Equipped creature gains +2 Attack. Equipped creature can attack from up to 3 units away, however battle is conducted normally as if both units are engaging from melee range.",
             },
             new Attributes{
+                hp = 1,
                 cost = 2,
                 damage = 2,
             }
@@ -232,6 +233,7 @@ public static class CardsLibrary {
                 description = "Deals 3 damage to an enemy unit that steps on it.",
             },
             new Attributes{
+                hp = 1,
                 cost = 2,
                 damage = 3,
             }
@@ -247,6 +249,7 @@ public static class CardsLibrary {
                 description = "Deals 2 damage in a 2 unit wide aoe to any unit(s) that step on it.",
             },
             new Attributes{
+                hp = 1,
                 cost = 2,
                 damage = 2,
             }
@@ -262,6 +265,7 @@ public static class CardsLibrary {
                 description = "Remove all enchantments on target creature.",
             },
             new Attributes{
+                hp = 1,
                 cost = 3,
             }
         );
@@ -276,6 +280,7 @@ public static class CardsLibrary {
                 description = "Equipped creature gains flying.",
             },
             new Attributes{
+                hp = 1,
                 cost = 2,
             }
         );
@@ -290,6 +295,7 @@ public static class CardsLibrary {
                 description = "Target creature is stuck and cannot move for one turn",
             },
             new Attributes{
+                hp = 1,
                 cost = 1,
             }
         );
@@ -304,6 +310,7 @@ public static class CardsLibrary {
                 description = "Equipped creature gets +2 ATK. Equipped creature can forfeit moving on a turn to deal 1 damage to target creature.",
             },
             new Attributes{
+                hp = 1,
                 cost = 2,
                 damage = 2,
             }
@@ -319,6 +326,7 @@ public static class CardsLibrary {
                 description = "Place this spell on a monster to order them to charge a wall",
             },
             new Attributes{
+                hp = 1,
                 cost = 1,
             }
         );
@@ -348,6 +356,7 @@ public static class CardsLibrary {
                 description = "Increase speed on equipped creature. The creature can now move twice as fast",
             },
             new Attributes{
+                hp = 1,
                 cost = 3,
             }
         );
@@ -362,6 +371,7 @@ public static class CardsLibrary {
                 description = "Shoot down a flying creature. Creature is a ground unit for four turns",
             },
             new Attributes{
+                hp = 1,
                 cost = 1,
             }
         );
@@ -510,6 +520,7 @@ public static class CardsLibrary {
                 description = "Equipped castle does 1 damage to all creatures within 3 spaces of castle each turn",
             },
             new Attributes{
+                hp = 1,
                 cost = 4,
                 range = 3,
                 damage = 1,
@@ -526,6 +537,7 @@ public static class CardsLibrary {
                 description = "For the next 3 turns (including this one) all your creatures cost 1 less resource to summon.",
             },
             new Attributes{
+                hp = 1,
                 cost = 0,
             }
         );
@@ -540,6 +552,7 @@ public static class CardsLibrary {
                 description = "Equipped creature gets +2 ATK",
             },
             new Attributes{
+                hp = 1,
                 cost = 2,
                 damage = 2,
             }
@@ -745,6 +758,7 @@ public static class CardsLibrary {
                 description = "Create a trap that deals 1 damage per turn for each monster in the trap. Creatures move at half speed while trapped. Destroyed once no creatures are in the activated trap.",
             },
             new Attributes{
+                hp = 1,
                 cost = 2,
             }
         );
@@ -759,6 +773,7 @@ public static class CardsLibrary {
                 description = "Do 1 damage to target creature and 1 damage to two surrounding creatures. Creatures must be within 1 tile to receive damage",
             },
             new Attributes{
+                hp = 1,
                 cost = 2,
                 damage = 1,
             }
@@ -774,6 +789,7 @@ public static class CardsLibrary {
                 description = "Cast down a meteor for 3 damage to all creatures within 1 space",
             },
             new Attributes{
+                hp = 1,
                 cost = 3,
                 damage = 3,
             }
@@ -789,6 +805,7 @@ public static class CardsLibrary {
                 description = "Cause a storm of lightning in an area around the target, dealing 2 damage to each target",
             },
             new Attributes{
+                hp = 1,
                 cost = 4,
                 damage = 2,
             }
@@ -804,6 +821,7 @@ public static class CardsLibrary {
                 description = "Deals 1 damage in a 3 unit wide aoe. Enemies are stunned for one turn and cannot move or attack.",
             },
             new Attributes{
+                hp = 1,
                 cost = 2,
                 damage = 1,
             }
@@ -819,6 +837,7 @@ public static class CardsLibrary {
                 description = "Freezes all units in a 6 unit wide aoe. Units cannot move or attack for 3 enemy turns.",
             },
             new Attributes{
+                hp = 1,
                 cost = 4,
             }
         );
@@ -833,6 +852,7 @@ public static class CardsLibrary {
                 description = "Blast a fireball at any enemy or permanent for 2 damage",
             },
             new Attributes{
+                hp = 1,
                 cost = 1,
                 damage = 2,
             }
@@ -848,6 +868,7 @@ public static class CardsLibrary {
                 description = "Equipped creature can deal 1 damage per turn to any opposing creature",
             },
             new Attributes{
+                hp = 1,
                 cost = 3,
             }
         );
@@ -862,7 +883,7 @@ public static class CardsLibrary {
                 description = "Target creature gets + 2 ATK and -1 HP while equipped",
             },
             new Attributes{
-                hp = -1,
+                hp = 1,
                 cost = 1,
                 damage = 2,
             }

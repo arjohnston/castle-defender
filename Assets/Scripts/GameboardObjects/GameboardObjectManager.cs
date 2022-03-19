@@ -146,13 +146,13 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 GameboardObject gbo = gameboardObjectRayCast.GetComponent<GameboardObject>();
                 NetworkObject networkObject = gameboardObjectRayCast.GetComponent<NetworkObject>();
 
-                if (networkObject.IsOwner && gbo.CanMoveOrAttack()) {
+                if (networkObject.IsOwner && gbo.CanMoveOrAttack() && gbo.GetGboType() != Types.TRAP) {
                     _selectedGameboardObject = gameboardObjectRayCast;
                     gbo.Select();
                 }
 
             // Game object already selected, and I'm clicking on another gameboard object
-            } else if (_selectedGameboardObject != null && gameboardObjectRayCast != null) {
+            } else if (_selectedGameboardObject != null && (gameboardObjectRayCast != null && !IsEnemyTrap(gameboardObjectRayCast))) {
                 // Clicking on the same gameboard object I already have selected -> deselect it
                 GameboardObject targetGbo = gameboardObjectRayCast.GetComponent<GameboardObject>();
                 if (_selectedGameboardObject == gameboardObjectRayCast) {
@@ -163,20 +163,32 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 else if (gameboardObjectRayCast.GetComponent<NetworkObject>().IsOwner && targetGbo.CanMoveOrAttack()) {
                     GameboardObject currentGbo = _selectedGameboardObject.GetComponent<GameboardObject>();
                     if (currentGbo != null) currentGbo.Deselect();
-                    _selectedGameboardObject = gameboardObjectRayCast;
-                    targetGbo.Select();
+                    
+                    if (targetGbo.GetGboType() != Types.TRAP) {
+                        _selectedGameboardObject = gameboardObjectRayCast;
+                        targetGbo.Select();
+                    } else {
+                        _selectedGameboardObject = null;
+                    }
                 } else {
                     // I am not the owner, and I'm trying to select another game object -> attack
                     TryAttack(_selectedGameboardObject.GetComponent<GameboardObject>(), gameboardObjectRayCast.GetComponent<GameboardObject>());
                 }
 
             // Since we're not targeting another gameboard object, we're targeting a hex to try and move
-            } else if (_selectedGameboardObject != null && hexRayCast != null) {
+            } else if (_selectedGameboardObject != null && (hexRayCast != null || gameboardObjectRayCast != null && IsEnemyTrap(gameboardObjectRayCast))) {
                 if (_selectedGameboardObject.GetComponent<NetworkObject>().IsOwner) {
                     TryMovement(_selectedGameboardObject.GetComponent<GameboardObject>(), hexRayCast);
                 }
             }
         }
+    }
+
+    private bool IsEnemyTrap(GameObject gameObject) {
+        if (gameObject == null) return false;
+
+        GameboardObject gbo = gameObject.GetComponent<GameboardObject>();
+        return gbo.GetGboType() == Types.TRAP && !gbo.IsOwner;
     }
 
     public void UseCard(Hex location, Card card) {
@@ -190,7 +202,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 break;
 
             case Types.TRAP:
-                SpawnTrap();
+                SpawnTrap(location, card);
                 break;
 
             case Types.PERMANENT:
@@ -227,8 +239,16 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         SpawnPermanentServerRpc(location.Position(), clientId);
     }
 
-    public void SpawnTrap() {
-        // TODO: Mechanics for trap
+    public void SpawnTrap(Hex location, Card card) {
+        if (!TurnManager.Instance.IsMyTurn()) return;
+        if (GetGboAtHex(location) != null) return;
+        if (!ResourceManager.Instance.HaveEnoughResources(card.attributes.cost)) return;
+
+        _spawnLocation = location;
+        _spawnCard = card;
+
+        ulong clientId = NetworkManager.Singleton.LocalClientId;
+        SpawnTrapServerRpc(location.Position(), clientId);
     }
 
     public void CastSpell() {
@@ -263,33 +283,33 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             hitSpots.Add(gbo.GetHexPosition(), new HitSpot(HexColors.AVAILABLE_MOVES, gbo.GetSpeed(), true));
 
             if (gbo.GetGboType() == Types.PERMANENT && raycastHitSpot != null) {
-                
-                if(gbo.IsValidMovement(raycastHitSpot)) {
+                if (gbo.IsValidMovement(raycastHitSpot)) {
                     if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_MOVE, gbo.GetOccupiedRadius()));
                     _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
                     return;
-                }
-
-                else {
+                } else {
                     if (raycastHitSpot != null && !hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.INVALID_MOVE, gbo.GetOccupiedRadius()));
                     
                     _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
                     return;
                 }
-
             }
         }
 
-        if (raycastHitSpot != null && GetGboAtHex(raycastHitSpot) != null && gbo.IsValidAttack(GetGboAtHex(raycastHitSpot)) && !GetGboAtHex(raycastHitSpot).IsOwner) {
-            if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_ATTACK, gbo.GetOccupiedRadius()));
-            _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
-            return;
-        }
+        if (raycastHitSpot != null) {
+            GameboardObject target = GetGboAtHex(raycastHitSpot);
+            
+            if (target != null && gbo.IsValidAttack(target) && !target.IsOwner && target.GetGboType() != Types.TRAP) {
+                if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_ATTACK, gbo.GetOccupiedRadius()));
+                _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+                return;
+            }
 
-        if (raycastHitSpot != null && GetGboAtHex(raycastHitSpot) == null && gbo.IsValidMovement(raycastHitSpot)) {
-            if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_MOVE, gbo.GetOccupiedRadius()));
-            _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
-            return;
+            if ((target == null || target.GetGboType() == Types.TRAP && !target.IsOwner) && gbo.IsValidMovement(raycastHitSpot)) {
+                if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_MOVE, gbo.GetOccupiedRadius()));
+                _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+                return;
+            }
         }
 
         if (raycastHitSpot != null && !hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.INVALID_MOVE, gbo.GetOccupiedRadius()));
@@ -305,7 +325,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             return;
         }
         GameboardObject targetGbo = GetGboAtHex(target);
-        if (targetGbo != null) {
+        if (targetGbo != null && !IsEnemyTrap(targetGbo.gameObject)) {
             // If I'm the owner, then select that gbo
             if (targetGbo.gameObject.GetComponent<NetworkObject>().IsOwner) {
                 _selectedGameboardObject.GetComponent<GameboardObject>().Deselect();
@@ -316,12 +336,19 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             }
         } else {
             if (gbo.IsValidMovement(target)) {
-                gbo.MoveToPosition(target);    
+                gbo.MoveToPosition(target);
+
+                if (IsEnemyTrap(targetGbo.gameObject)) ActivateTrap(targetGbo);
             }
 
             gbo.Deselect();
             _selectedGameboardObject = null;
         }
+    }
+
+    private void ActivateTrap(GameboardObject trap) {
+        // Get all creatures in range of the trap
+        // do trap things to those creatures
     }
 
     private void TryAttack(GameboardObject gbo, GameboardObject target) {
@@ -345,10 +372,25 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         }
     }
 
+    public void DestroyGameObject(GameObject gameObject) {
+        NetworkObject networkObject = gameObject.GetComponent<NetworkObject>();
+        DestroyServerRpc(networkObject.NetworkObjectId);
+    }
+
     [ServerRpc(RequireOwnership=false)]
     public void DestroyServerRpc(ulong objectId) {
+        DestroyClientRpc(objectId);
         NetworkObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId];
         go.Despawn();
+    }
+
+    [ClientRpc]
+    public void DestroyClientRpc(ulong objectId) {
+        GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
+        GameboardObject gbo = go.GetComponent<GameboardObject>();
+        if (!gbo.IsEthereal() && gbo.IsOwner) DeckManager.Instance.AddToGrave(gbo.GetCard());
+        gameboardObjects.Remove(gbo);
+        
     }
 
     public GameboardObject GetGboAtHex(Hex hex) {
@@ -409,9 +451,9 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         GameboardObject gbo = go.GetComponent<GameboardObject>();
         
         gameboardObjects.Add(gbo);
-        gbo.SetPosition(_spawnLocation);
+        if (_spawnLocation != null) gbo.SetPosition(_spawnLocation);
 
-        gbo.SetupGboDetails(_spawnCard);
+        if (_spawnCard != null) gbo.SetupGboDetails(_spawnCard);
 
         _spawnCard = null;
         _spawnLocation = null;
@@ -431,11 +473,40 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     private void SpawnPermanentClientRpc(ulong objectId) {
         GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
         GameboardObject gbo = go.GetComponent<GameboardObject>();
+
+        gameboardObjects.Add(gbo);
+
+        if (_spawnLocation != null) gbo.SetPosition(_spawnLocation);
+
+        if (_spawnCard != null) gbo.SetupGboDetails(_spawnCard);
+
+        _spawnCard = null;
+        _spawnLocation = null;
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    private void SpawnTrapServerRpc(Vector3 position, ulong clientId) {
+        GameObject go = Instantiate(CreatureToken, position, Quaternion.identity);
+        NetworkObject networkObject = go.GetComponent<NetworkObject>();
+        networkObject.Spawn();
+        networkObject.ChangeOwnership(clientId);
+
+        // TODO: Set the material
+
+        SpawnTrapClientRpc(networkObject.NetworkObjectId);
+    }
+
+    [ClientRpc]
+    private void SpawnTrapClientRpc(ulong objectId) {
+        GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
+        GameboardObject gbo = go.GetComponent<GameboardObject>();
         
         gameboardObjects.Add(gbo);
-        gbo.SetPosition(_spawnLocation);
+        if (_spawnLocation != null) gbo.SetPosition(_spawnLocation);
 
-        gbo.SetupGboDetails(_spawnCard);
+        if (_spawnCard != null) gbo.SetupGboDetails(_spawnCard);
+
+        if (!gbo.IsOwner) gbo.gameObject.SetActive(false);
 
         _spawnCard = null;
         _spawnLocation = null;
