@@ -13,6 +13,7 @@ public class GameboardObject : NetworkBehaviour {
     private float animationSpeed = 8.0f;
     private float floatingHeight = 0.5f;
     private float defaultHeight = 0.0f;
+    private float flyingHeight = 0.75f;
     private bool hasAttacked = false;
 
     private NetworkVariable<bool> isSelected = new NetworkVariable<bool>(false);
@@ -25,7 +26,6 @@ public class GameboardObject : NetworkBehaviour {
     [SerializeField] private NetworkVariable<Types> gboType = new NetworkVariable<Types>();
 
     [SerializeField] private NetworkVariable<int> hpServer = new NetworkVariable<int>();
-    private int hp = 1; // client cache
 
     [SerializeField] private NetworkVariable<int> remainingMoveActions = new NetworkVariable<int>(0);
     [SerializeField] private NetworkVariable<int> remainingAttackActions = new NetworkVariable<int>(0);
@@ -33,7 +33,18 @@ public class GameboardObject : NetworkBehaviour {
     [SerializeField] private NetworkVariable<bool> isTrapActivated = new NetworkVariable<bool>(false);
     [SerializeField] private NetworkVariable<bool> isInActivatedTrap = new NetworkVariable<bool>(false);
 
+    [SerializeField] private NetworkList<Enchantment> enchantments;
+
     private Card card;
+
+    void Awake() {
+        SetEnchantmentListServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    public void SetEnchantmentListServerRpc() {
+        enchantments = new NetworkList<Enchantment>(); // TODO: invalid RPC call
+    }
 
     void Update() {
         CheckIfDestroyed();
@@ -47,7 +58,19 @@ public class GameboardObject : NetworkBehaviour {
         SetupGboDetailsServerRpc(card.meta, card.attributes);
         SetHpServerRpc(card.attributes.hp);
 
-        if (card.attributes.flying) defaultHeight = 0.75f;
+        if (GetFlying()) defaultHeight = flyingHeight;
+    }
+
+    public bool GetFlying() {
+        if (!isInstantiated.Value) return false;
+
+        if (enchantments != null) {
+            foreach (Enchantment enchantment in enchantments) {
+                if (enchantment.flying) return true;
+            }
+        }
+
+        return card != null ? card.attributes.flying : false;
     }
 
     public void SetPosition(Hex hex) {
@@ -79,6 +102,12 @@ public class GameboardObject : NetworkBehaviour {
     public void UpdatePosition() {
         if (!isInstantiated.Value) return;
 
+        if (GetFlying()) {
+            defaultHeight = flyingHeight;
+        } else {
+            defaultHeight = 0.0f;
+        }
+
         Vector3 currentPosition = transform.position;
         float newHeight = defaultHeight;
     
@@ -95,13 +124,13 @@ public class GameboardObject : NetworkBehaviour {
     public void CheckIfDestroyed() {
         if (!isInstantiated.Value) return;
 
-        if (hp <= 0) {
+        if (GetModifiedHp() <= 0) {
             GameboardObjectManager.Instance.DestroyGameObject(gameObject);
         }
 
         // Destroy if there are no enemies in trap
         if (IsTrap() && IsTrapActivated()) {
-            List<Hex> hexesInRange = Gameboard.Instance.GetHexesWithinRange(GetHexPosition(), attributes.Value.range, true);
+            List<Hex> hexesInRange = Gameboard.Instance.GetHexesWithinRange(GetHexPosition(), GetRange(), true);
             bool hasEnemyInRange = false;
             
             foreach (Hex hex in hexesInRange) {
@@ -125,6 +154,11 @@ public class GameboardObject : NetworkBehaviour {
         return Gameboard.Instance.GetHexAt(hexPosition.Value);
     }
 
+    public int GetModifiedHp() {
+        int modifier = GetEnchantmentModifier("health");
+        return hpServer.Value + modifier;
+    }
+
     public int GetHp() {
         return hpServer.Value;
     }
@@ -141,7 +175,19 @@ public class GameboardObject : NetworkBehaviour {
         return attributes.Value.speedModifier;
     }
 
+    public bool HasTrapImmunity() {
+        if (enchantments != null) {
+            foreach (Enchantment enchantment in enchantments) {
+                if (enchantment.trapImmunity) return true;
+            }
+        }
+
+        return false;
+    }
+
     public int GetSpeed() {
+        int modifier = GetEnchantmentModifier("speed");
+
         // Check if trapped, if so then multiply by speed modifier
         List<Hex> area = Gameboard.Instance.GetHexesWithinRange(GetHexPosition(), attributes.Value.speed, true);
         float speedModifier = attributes.Value.speedModifier;
@@ -151,15 +197,18 @@ public class GameboardObject : NetworkBehaviour {
             if (gbo != null && gbo.IsTrap() && !gbo.IsOwner && gbo.IsTrapActivated()) speedModifier *= gbo.GetSpeedModifier();
         }
 
-        return (int)Math.Floor(attributes.Value.speed * speedModifier);
+        return (int)Math.Floor(attributes.Value.speed * speedModifier * (modifier == 0 ? 1 : modifier));
     }
 
     public int GetRange() {
-        return attributes.Value.range;
+        int modifier = GetEnchantmentModifier("range");
+        return attributes.Value.range + modifier;
     }
 
     public int GetDamage() {
-        return attributes.Value.damage;
+        int modifier = GetEnchantmentModifier("damage");
+        int enchantMod = GetEnchantmentModifier("enchantmentDamage");
+        return attributes.Value.damage + modifier + (enchantMod * enchantments.Count);
     }
 
     public int GetOccupiedRadius() {
@@ -176,6 +225,66 @@ public class GameboardObject : NetworkBehaviour {
 
     public Card GetCard() {
         return card;
+    }
+
+    public void AddEnchantment(Enchantment enchantment) {
+        if (enchantments == null) enchantments = new NetworkList<Enchantment>();
+        AddEnchantmentServerRpc(enchantment);
+    }
+
+    public void RemoveEnchantment(Enchantment enchantment) {
+        RemoveEnchantmentServerRpc(enchantment);
+    }
+
+    public void RemoveAllEnchantments() {
+        RemoveAllEnchantmentsServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    public void AddEnchantmentServerRpc(Enchantment enchantment) {
+        enchantments.Add(enchantment);
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    public void RemoveEnchantmentServerRpc(Enchantment enchantment) {
+        enchantments.Remove(enchantment);
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    public void RemoveAllEnchantmentsServerRpc() {
+        NetworkList<Enchantment> newList = new NetworkList<Enchantment>();
+        enchantments = newList;
+    }
+
+    public int GetEnchantmentModifier(string modifier) {
+        int mod = 0;
+        if (enchantments == null) return mod;
+
+        foreach (Enchantment enchantment in enchantments) {
+            switch (modifier) {
+                case "damage":
+                    mod += enchantment.damageModifier;
+                    break;
+
+                case "health":
+                    mod += enchantment.healthModifier;
+                    break;
+
+                case "range":
+                    mod += enchantment.rangeModifier;
+                    break;
+
+                case "speed":
+                    mod += enchantment.speedModifier;
+                    break;
+
+                case "enchantmentDamage":
+                    mod += enchantment.enchantmentDamageModifier;
+                    break;
+            }
+        }
+
+        return mod;
     }
 
     public bool IsValidMovement(Hex target) {
@@ -199,8 +308,8 @@ public class GameboardObject : NetworkBehaviour {
             Players player = GameManager.Instance.GetCurrentPlayer();
             
             foreach (Hex h in Gameboard.Instance.GetHexesWithinRange(target, GetOccupiedRadius())) {
-                if(player == Players.PLAYER_ONE && h.R <= 0) return false;
-                if(player == Players.PLAYER_TWO && h.R >= 0) return false;
+                if (player == Players.PLAYER_ONE && h.R <= 0) return false;
+                if (player == Players.PLAYER_TWO && h.R >= 0) return false;
             }
         }
         
@@ -209,7 +318,7 @@ public class GameboardObject : NetworkBehaviour {
 
     public bool IsValidAttack(GameboardObject target) {
         if (!TurnManager.Instance.IsMyTurn()) return false;
-        if (remainingAttackActions.Value <= 0) return false;
+        if (remainingAttackActions.Value <= 0 && (!HasDoubleStrike() || remainingMoveActions.Value <= 0 )) return false;
 
         // Check entire radius of target. If any of the tiles are within range, then
         // its a valid attack
@@ -219,8 +328,18 @@ public class GameboardObject : NetworkBehaviour {
         }
 
         // Ground creatures cannot attack flying creatures by default
-        if (!attributes.Value.flying && target.attributes.Value.flying) {
+        if (!GetFlying() && target.GetFlying()) {
             return false;
+        }
+
+        return false;
+    }
+
+    public bool HasDoubleStrike() {
+        if (enchantments != null) {
+            foreach (Enchantment enchantment in enchantments) {
+                if (enchantment.doubleStrike) return true;
+            }
         }
 
         return false;
@@ -248,10 +367,10 @@ public class GameboardObject : NetworkBehaviour {
         } else {
             if (gboType.Value == Types.PERMANENT) return false;
 
-            if (remainingAttackActions.Value <= 0) return false;
+            if (remainingAttackActions.Value <= 0 && (!HasDoubleStrike() || remainingMoveActions.Value <= 0 )) return false;
 
             // If there are no creatures in range, return false
-            List<Hex> hexesInRange = Gameboard.Instance.GetHexesWithinRange(GetHexPosition(), attributes.Value.range, true);
+            List<Hex> hexesInRange = Gameboard.Instance.GetHexesWithinRange(GetHexPosition(), GetRange(), true);
             foreach (Hex hex in hexesInRange) {
                 GameboardObject gbo = GameboardObjectManager.Instance.GetGboAtHex(hex);
                 if (gbo != null && !gbo.IsOwner && gbo.GetGboType() != Types.TRAP) return true;
@@ -266,7 +385,7 @@ public class GameboardObject : NetworkBehaviour {
         if (target.GetGboType() == Types.PERMANENT) damageModifier += attributes.Value.permanentDamageModifier;
         if (!hasAttacked) damageModifier += attributes.Value.firstAttackDamageModifier;
 
-        int targetHp = target.GetHp() - (attributes.Value.damage + damageModifier);
+        int targetHp = target.GetHp() - (damageModifier + GetDamage());
         target.SetHp(targetHp);
 
         SetRemainingAttackActionsServerRpc(remainingAttackActions.Value - 1);
@@ -315,7 +434,7 @@ public class GameboardObject : NetworkBehaviour {
         foreach (Hex hex in area) {
             GameboardObject gbo = GameboardObjectManager.Instance.GetGboAtHex(hex);
 
-            if (gbo != null && gbo.GetGboType() == Types.CREATURE) affectedCreatures.Add(gbo);
+            if (gbo != null && gbo.GetGboType() == Types.CREATURE && !gbo.HasTrapImmunity()) affectedCreatures.Add(gbo);
         }
 
         foreach (GameboardObject creature in affectedCreatures) {
@@ -325,6 +444,35 @@ public class GameboardObject : NetworkBehaviour {
 
         // Trap life determines the amount of turns its active for
         SetHp(GetHp() - 1);
+    }
+
+    public void UseDoesDamageAtStartOfTurn() {
+        if (IsSpawned && IsOwner && TurnManager.Instance.IsMyTurn()) {
+            int modifier = 0;
+
+            // Get all creatures in range
+            List<Hex> hexesInRange = Gameboard.Instance.GetHexesWithinRange(GetHexPosition(), GetRange(), true);
+            List<GameboardObject> gbos = new List<GameboardObject>();
+
+            foreach (Hex hex in hexesInRange) {
+                GameboardObject gbo = GameboardObjectManager.Instance.GetGboAtHex(hex);
+                if (gbo != null && !gbo.IsOwner) gbos.Add(gbo);
+            }
+
+            if (enchantments != null) {
+                foreach (Enchantment enchantment in enchantments) {
+                    if (enchantment.doesDamageEachTurn) modifier += enchantment.damageModifier;
+                }
+            }
+
+            if (modifier <= 0) return;
+
+            // Do damage to the 0th index of creatures in range
+            if (gbos.Count > 0) {
+                int targetHp = gbos[0].GetHp() - modifier;
+                gbos[0].SetHp(targetHp);
+            }
+        }
     }
 
     public void ResetActions() {
@@ -375,12 +523,6 @@ public class GameboardObject : NetworkBehaviour {
     [ServerRpc(RequireOwnership = false)]
     public void SetHpServerRpc(int health) {
         hpServer.Value = health;
-        SetHpClientRpc(health);
-    }
-
-    [ClientRpc]
-    public void SetHpClientRpc(int health) {
-        hp = health;
     }
 
     [ServerRpc]

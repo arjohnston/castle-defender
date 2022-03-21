@@ -15,6 +15,10 @@ public struct Attributes : INetworkSerializable {
     public int firstAttackDamageModifier;
     public bool spawnGhoulEveryTurn;
     public bool ethereal; // whether or not the card goes to the graveyard when creature is destroyed
+    public bool trapImmunity;
+    public int meleeHealthModifier; // takes X amount more dmg when attacked in melee
+    public int rangedHealthModifier; // takes X amount more dmg when attacked in range
+    public int spellModifier; // takes X amount more damage from spells
 
     // trap mechanics
     public float speedModifier;
@@ -36,7 +40,11 @@ public struct Attributes : INetworkSerializable {
         int firstAttackDamageModifier = 0,
         bool spawnGhoulEveryTurn = false,
         bool ethereal = false,
-        float speedModifier = 1.0f
+        float speedModifier = 1.0f,
+        bool trapImmunity = false,
+        int meleeHealthModifier = 0,
+        int rangedHealthModifier = 0,
+        int spellModifier = 0
         ) {
         this.hp = hp;
         this.cost = cost;
@@ -51,6 +59,10 @@ public struct Attributes : INetworkSerializable {
         this.spawnGhoulEveryTurn = spawnGhoulEveryTurn;
         this.ethereal = ethereal;
         this.speedModifier = speedModifier;
+        this.trapImmunity = trapImmunity;
+        this.meleeHealthModifier = meleeHealthModifier;
+        this.rangedHealthModifier = rangedHealthModifier;
+        this.spellModifier = spellModifier;
     }
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter {
@@ -67,5 +79,9 @@ public struct Attributes : INetworkSerializable {
         serializer.SerializeValue(ref spawnGhoulEveryTurn);
         serializer.SerializeValue(ref ethereal);
         serializer.SerializeValue(ref speedModifier);
+        serializer.SerializeValue(ref trapImmunity);
+        serializer.SerializeValue(ref meleeHealthModifier);
+        serializer.SerializeValue(ref rangedHealthModifier);
+        serializer.SerializeValue(ref spellModifier);
     }
 }

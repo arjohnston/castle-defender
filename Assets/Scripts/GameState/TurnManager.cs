@@ -117,9 +117,7 @@ public class TurnManager: NetworkSingleton<TurnManager> {
                 SetGameStateServerRpc(GameState.PLAYER_ONE_TURN);
             }
 
-            // Ensure nothing is selected on turn change
-            GameboardObjectManager.Instance.ResetSelection();
-            GameboardObjectManager.Instance.UseActivatedTraps();
+            GameboardObjectManager.Instance.DoStartOfTurnActions();
         }
     }
 

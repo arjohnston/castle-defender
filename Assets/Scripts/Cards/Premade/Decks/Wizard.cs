@@ -55,17 +55,17 @@ public class Wizard : Deck {
         // for (int i = 0; i < 2; i++)
         //     d.Push(CardsLibrary.CreateFireball());
 
-        // for (int i = 0; i < 1; i++)
-        //     d.Push(CardsLibrary.CreateSoulRing());
+        for (int i = 0; i < 1; i++)
+            d.Push(CardsLibrary.CreateSoulRing());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateDevilsCollar());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateDevilsCollar());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateClericsRobe());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateClericsRobe());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateFieryGreaves());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateFieryGreaves());
 
         base.SetDeck(d);
     }

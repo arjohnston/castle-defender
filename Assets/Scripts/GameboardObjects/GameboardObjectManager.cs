@@ -25,8 +25,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     private Card _spawnCard;
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         if (!TurnManager.Instance.IsMyTurn()) _selectedGameboardObject = null;
 
         CheckOnLeftClick();
@@ -60,7 +59,9 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                         range = 10,
                         damage = 0,
                         occupiedRadius = 1,
-                    }
+                    },
+                    new Enchantment{},
+                    new Spell{}
                 )
             );
 
@@ -198,7 +199,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 break;
 
             case Types.ENCHANTMENT:
-                CastEnchantment();
+                CastEnchantment(location, card);
                 break;
 
             case Types.TRAP:
@@ -255,8 +256,12 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         // TODO: Mechanics for casting a spell
     }
 
-    public void CastEnchantment() {
-        // TODO: Mechanics for casting enchantment
+    public void CastEnchantment(Hex location, Card card) {
+        GameboardObject gbo = GetGboAtHex(location);
+
+        if (gbo == null || !gbo.IsOwner) return;
+
+        gbo.AddEnchantment(card.enchantment);
     }
 
     public void ResetSelection() {
@@ -407,15 +412,12 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         return null;
     }
 
-    public void UseActivatedTraps() {
-        List<GameboardObject> traps = new List<GameboardObject>();
+    public void DoStartOfTurnActions() {
+        ResetSelection();
 
         foreach (GameboardObject gbo in gameboardObjects) {
-            if (gbo.IsTrap()) traps.Add(gbo);
-        }
-
-        foreach (GameboardObject gbo in traps) {
-            if (gbo != null) gbo.UseActivatedTrapAtBeginningOfOpponentTurn();
+            if (gbo.IsTrap() && !TurnManager.Instance.IsMyTurn()) gbo.UseActivatedTrapAtBeginningOfOpponentTurn();
+            if (TurnManager.Instance.IsMyTurn()) gbo.UseDoesDamageAtStartOfTurn();
         }
     }
 

@@ -14,7 +14,9 @@ public static class CardsLibrary {
                 hp = 5,
                 cost = 0,
                 occupiedRadius = 0,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -34,7 +36,9 @@ public static class CardsLibrary {
                 damage = 1,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -54,7 +58,9 @@ public static class CardsLibrary {
                 damage = 2,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -74,7 +80,9 @@ public static class CardsLibrary {
                 damage = 2,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -94,7 +102,9 @@ public static class CardsLibrary {
                 damage = 1,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -114,7 +124,9 @@ public static class CardsLibrary {
                 damage = 1,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -134,7 +146,9 @@ public static class CardsLibrary {
                 damage = 2,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -154,7 +168,9 @@ public static class CardsLibrary {
                 damage = 3,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -174,7 +190,9 @@ public static class CardsLibrary {
                 damage = 1,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -194,7 +212,9 @@ public static class CardsLibrary {
                 damage = 4,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -214,7 +234,9 @@ public static class CardsLibrary {
                 damage = 2,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -230,7 +252,13 @@ public static class CardsLibrary {
                 hp = 1,
                 cost = 2,
                 damage = 2,
-            }
+            },
+            new Enchantment{
+                validTarget = Types.CREATURE,
+                damageModifier = 2,
+                rangeModifier = 3
+            }, 
+            new Spell{}
         );
     }
 
@@ -248,7 +276,9 @@ public static class CardsLibrary {
                 damage = 3,
                 range = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -266,7 +296,9 @@ public static class CardsLibrary {
                 damage = 2,
                 range = 1,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -281,6 +313,11 @@ public static class CardsLibrary {
             new Attributes{
                 hp = 1,
                 cost = 3,
+                isRestrictedToMyTurn = false,
+            },
+            new Enchantment{}, 
+            new Spell{
+                spellType = SpellTypes.REMOVE_ENCHANTMENTS
             }
         );
     }
@@ -296,7 +333,12 @@ public static class CardsLibrary {
             new Attributes{
                 hp = 1,
                 cost = 2,
-            }
+            },
+            new Enchantment{
+                validTarget = Types.CREATURE,
+                flying = true,
+            }, 
+            new Spell{}
         );
     }
 
@@ -314,7 +356,9 @@ public static class CardsLibrary {
                 damage = 0,
                 range = 0,
                 speedModifier = 0.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -330,7 +374,13 @@ public static class CardsLibrary {
                 hp = 1,
                 cost = 2,
                 damage = 2,
-            }
+            },
+            new Enchantment{
+                validTarget = Types.CREATURE,
+                damageModifier = 2,
+                doubleStrike = true,
+            }, 
+            new Spell{}
         );
     }
 
@@ -345,6 +395,11 @@ public static class CardsLibrary {
             new Attributes{
                 hp = 1,
                 cost = 1,
+                isRestrictedToMyTurn = false,
+            },
+            new Enchantment{}, 
+            new Spell{
+                spellType = SpellTypes.CHARGE_WALL,
             }
         );
     }
@@ -360,6 +415,12 @@ public static class CardsLibrary {
             new Attributes{
                 hp = 4,
                 cost = 3,
+                isRestrictedToMyTurn = false,
+            },
+            new Enchantment{}, 
+            new Spell{
+                spellType = SpellTypes.HEAL,
+                effectAmount = 4,
             }
         );
     }
@@ -375,7 +436,12 @@ public static class CardsLibrary {
             new Attributes{
                 hp = 1,
                 cost = 3,
-            }
+            },
+            new Enchantment{
+                validTarget = Types.CREATURE,
+                speedModifier = 2,
+            }, 
+            new Spell{}
         );
     }
 
@@ -390,6 +456,12 @@ public static class CardsLibrary {
             new Attributes{
                 hp = 1,
                 cost = 1,
+                isRestrictedToMyTurn = false,
+            },
+            new Enchantment{}, 
+            new Spell{
+                spellType = SpellTypes.GROUND_FLYING_CREATURE,
+                effectDuration = 4,
             }
         );
     }
@@ -410,7 +482,9 @@ public static class CardsLibrary {
                 damage = 2,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -430,7 +504,9 @@ public static class CardsLibrary {
                 damage = 2,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -450,7 +526,9 @@ public static class CardsLibrary {
                 damage = 2,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -471,7 +549,9 @@ public static class CardsLibrary {
                 occupiedRadius = 0,
                 flying = true,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -492,7 +572,9 @@ public static class CardsLibrary {
                 occupiedRadius = 0,
                 permanentDamageModifier = 3,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
  
@@ -513,7 +595,9 @@ public static class CardsLibrary {
                 occupiedRadius = 0,
                 firstAttackDamageModifier = 2,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
  
@@ -530,7 +614,13 @@ public static class CardsLibrary {
                 cost = 2,
                 speed = 1,
                 damage = 1,
-            }
+            },
+            new Enchantment{
+                validTarget = Types.CREATURE,
+                healthModifier = 1,
+                damageModifier = 1,
+            }, 
+            new Spell{}
         );
     }
 
@@ -547,7 +637,13 @@ public static class CardsLibrary {
                 cost = 4,
                 range = 3,
                 damage = 1,
-            }
+            },
+            new Enchantment{
+                validTarget = Types.PERMANENT,
+                damageModifier = 1,
+                doesDamageEachTurn = true,
+            }, 
+            new Spell{}
         );
     }
 
@@ -562,6 +658,13 @@ public static class CardsLibrary {
             new Attributes{
                 hp = 1,
                 cost = 0,
+                isRestrictedToMyTurn = false,
+            },
+            new Enchantment{}, 
+            new Spell{
+                spellType = SpellTypes.REDUCE_RESOURCE_COST_CREATURES,
+                effectAmount = 1,
+                effectDuration = 3,
             }
         );
     }
@@ -578,7 +681,12 @@ public static class CardsLibrary {
                 hp = 1,
                 cost = 2,
                 damage = 2,
-            }
+            },
+            new Enchantment{
+                validTarget = Types.CREATURE,
+                damageModifier = 2,
+            }, 
+            new Spell{}
         );
     }
 
@@ -593,7 +701,12 @@ public static class CardsLibrary {
             new Attributes{
                 hp = 2,
                 cost = 2,
-            }
+            },
+            new Enchantment{
+                validTarget = Types.CREATURE,
+                healthModifier = 2,
+            }, 
+            new Spell{}
         );
     }
 
@@ -613,7 +726,9 @@ public static class CardsLibrary {
                 damage = 1,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -633,7 +748,9 @@ public static class CardsLibrary {
                 damage = 2,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -653,7 +770,9 @@ public static class CardsLibrary {
                 damage = 2,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -674,7 +793,9 @@ public static class CardsLibrary {
                 occupiedRadius = 0,
                 flying = true,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -694,7 +815,9 @@ public static class CardsLibrary {
                 damage = 1,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -715,7 +838,9 @@ public static class CardsLibrary {
                 occupiedRadius = 0,
                 spawnGhoulEveryTurn = true,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -736,7 +861,9 @@ public static class CardsLibrary {
                 occupiedRadius = 0,
                 ethereal = true,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -757,7 +884,9 @@ public static class CardsLibrary {
                 occupiedRadius = 0,
                 flying = true,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -777,7 +906,9 @@ public static class CardsLibrary {
                 damage = 3,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -794,7 +925,9 @@ public static class CardsLibrary {
                 cost = 2,
                 range = 0,
                 speedModifier = 0.5f,
-            }
+            },
+            new Enchantment{}, 
+            new Spell{}
         );
     }
 
@@ -810,6 +943,13 @@ public static class CardsLibrary {
                 hp = 1,
                 cost = 2,
                 damage = 1,
+                isRestrictedToMyTurn = false,
+            },
+            new Enchantment{}, 
+            new Spell{
+                spellType = SpellTypes.DAMAGE,
+                effectAmount = 1,
+                occupiedRadius = 1,
             }
         );
     }
@@ -826,6 +966,13 @@ public static class CardsLibrary {
                 hp = 1,
                 cost = 3,
                 damage = 3,
+                isRestrictedToMyTurn = false,
+            },
+            new Enchantment{}, 
+            new Spell{
+                spellType = SpellTypes.DAMAGE,
+                effectAmount = 3,
+                occupiedRadius = 1,
             }
         );
     }
@@ -842,6 +989,13 @@ public static class CardsLibrary {
                 hp = 1,
                 cost = 4,
                 damage = 2,
+                isRestrictedToMyTurn = false,
+            },
+            new Enchantment{}, 
+            new Spell{
+                spellType = SpellTypes.DAMAGE,
+                effectAmount = 2,
+                occupiedRadius = 1,
             }
         );
     }
@@ -858,6 +1012,14 @@ public static class CardsLibrary {
                 hp = 1,
                 cost = 2,
                 damage = 1,
+                isRestrictedToMyTurn = false,
+            },
+            new Enchantment{}, 
+            new Spell{
+                spellType = SpellTypes.DAMAGE_AND_STUN,
+                effectAmount = 1,
+                occupiedRadius = 1,
+                effectDuration = 1,
             }
         );
     }
@@ -868,11 +1030,18 @@ public static class CardsLibrary {
             Sprites.DEEPFREEZE,
             new Meta{
                 title = "Deep Freeze",
-                description = "Freezes all units in a 6 unit wide aoe. Units cannot move or attack for 3 enemy turns.",
+                description = "Freezes all units in a 5 unit wide aoe. Units cannot move or attack for 3 turns.",
             },
             new Attributes{
                 hp = 1,
                 cost = 4,
+                isRestrictedToMyTurn = false,
+            },
+            new Enchantment{}, 
+            new Spell{
+                spellType = SpellTypes.STUN,
+                occupiedRadius = 2,
+                effectDuration = 3,
             }
         );
     }
@@ -889,6 +1058,13 @@ public static class CardsLibrary {
                 hp = 1,
                 cost = 1,
                 damage = 2,
+                isRestrictedToMyTurn = false,
+            },
+            new Enchantment{}, 
+            new Spell{
+                spellType = SpellTypes.DAMAGE,
+                effectAmount = 2,
+                occupiedRadius = 0,
             }
         );
     }
@@ -904,7 +1080,12 @@ public static class CardsLibrary {
             new Attributes{
                 hp = 1,
                 cost = 3,
-            }
+            },
+            new Enchantment{
+                validTarget = Types.CREATURE,
+                doesDamageEachTurn = true,
+            }, 
+            new Spell{}
         );
     }
 
@@ -920,7 +1101,13 @@ public static class CardsLibrary {
                 hp = 1,
                 cost = 1,
                 damage = 2,
-            }
+            },
+            new Enchantment{
+                validTarget = Types.CREATURE,
+                damageModifier = 2,
+                healthModifier = -1,
+            }, 
+            new Spell{}
         );
     }
 

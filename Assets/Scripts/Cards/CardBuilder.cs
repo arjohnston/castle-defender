@@ -70,8 +70,20 @@ public class CardBuilder : Singleton<CardBuilder> {
         TextMeshProUGUI[] playerCardText = gameObject.GetComponentsInChildren<TextMeshProUGUI>();
         playerCardText[0].text = card.meta.title;
         playerCardText[1].text = card.meta.description;
-        playerCardText[2].text = card.attributes.hp.ToString();
-        playerCardText[3].text = card.attributes.damage.ToString();
+
+        if (card.type == Types.SPELL || card.type == Types.ENCHANTMENT) {
+            // Card is light, so increase contrast
+            playerCardText[0].color = Color.black; // title
+            playerCardText[4].color = Color.black; // cost
+
+            // Spells & enchantments do not have HP/DMG since they're ethereal
+            playerCardText[2].text = "";
+            playerCardText[3].text = "";
+        } else {
+            playerCardText[2].text = card.attributes.hp.ToString();
+            playerCardText[3].text = card.attributes.damage.ToString();
+        }
+        
         playerCardText[4].text = card.attributes.cost.ToString();
 
         Image[] playerCardImages = gameObject.GetComponentsInChildren<Image>();
