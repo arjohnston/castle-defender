@@ -40,8 +40,8 @@ public class Warrior : Deck {
         for (int i = 0; i < 1; i++)
             d.Push(CardsLibrary.CreateTowerArcher());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateCallToArms());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateCallToArms());
 
         for (int i = 0; i < 2; i++)
             d.Push(CardsLibrary.CreateFieryGreaves());
@@ -52,11 +52,11 @@ public class Warrior : Deck {
         for (int i = 0; i < 1; i++)
             d.Push(CardsLibrary.CreateClericsRobe());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateHeal());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateHeal());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateArrowStorm());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateArrowStorm());
 
         base.SetDeck(d);
     }

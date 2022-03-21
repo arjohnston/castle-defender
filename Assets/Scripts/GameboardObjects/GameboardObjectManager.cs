@@ -211,7 +211,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 break;
 
             case Types.SPELL:
-                CastSpell();
+                CastSpell(location, card);
                 break;
         }
     }
@@ -252,8 +252,13 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         SpawnTrapServerRpc(location.Position(), clientId);
     }
 
-    public void CastSpell() {
+    public void CastSpell(Hex location, Card card) {
         // TODO: Mechanics for casting a spell
+
+        // foreach valid target in occupied radius
+        // cast the spell
+
+        // switch/case to handle spell types
     }
 
     public void CastEnchantment(Hex location, Card card) {
@@ -377,7 +382,6 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         NetworkObject networkObject = gameObject.GetComponent<NetworkObject>();
 
         GameboardObject gbo = gameObject.GetComponent<GameboardObject>();
-        if (!gbo.IsEthereal() && gbo.IsOwner) DeckManager.Instance.AddToGrave(gbo.GetCard());
         RemoveGameObjectClientRpc(networkObject.NetworkObjectId);
         DestroyServerRpc(networkObject.NetworkObjectId);
     }
@@ -386,6 +390,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     public void RemoveGameObjectClientRpc(ulong objectId) {
         GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
         GameboardObject gbo = go.GetComponent<GameboardObject>();
+        if (!gbo.IsEthereal() && gbo.IsOwner) DeckManager.Instance.AddToGrave(gbo.GetCard());
         gameboardObjects.Remove(gbo);
     }
 

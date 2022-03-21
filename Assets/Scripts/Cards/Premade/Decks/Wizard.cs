@@ -37,23 +37,23 @@ public class Wizard : Deck {
         for (int i = 0; i < 1; i++)
             d.Push(CardsLibrary.CreateNecroticPlague());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateLightningBolt());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateLightningBolt());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateMeteor());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateMeteor());
 
-        // for (int i = 0; i < 1; i++)
-        //     d.Push(CardsLibrary.CreateLightningStorm());
+        for (int i = 0; i < 1; i++)
+            d.Push(CardsLibrary.CreateLightningStorm());
 
-        // for (int i = 0; i < 1; i++)
-        //     d.Push(CardsLibrary.CreateEarthShatter());
+        for (int i = 0; i < 1; i++)
+            d.Push(CardsLibrary.CreateEarthShatter());
 
-        // for (int i = 0; i < 1; i++)
-        //     d.Push(CardsLibrary.CreateDeepFreeze());
+        for (int i = 0; i < 1; i++)
+            d.Push(CardsLibrary.CreateDeepFreeze());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateFireball());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateFireball());
 
         for (int i = 0; i < 1; i++)
             d.Push(CardsLibrary.CreateSoulRing());

@@ -314,10 +314,12 @@ public static class CardsLibrary {
                 hp = 1,
                 cost = 3,
                 isRestrictedToMyTurn = false,
+                occupiedRadius = 0,
             },
             new Enchantment{}, 
             new Spell{
-                spellType = SpellTypes.REMOVE_ENCHANTMENTS
+                spellType = SpellTypes.REMOVE_ENCHANTMENTS,
+                validTarget = Targets.ENEMY,
             }
         );
     }
@@ -396,10 +398,12 @@ public static class CardsLibrary {
                 hp = 1,
                 cost = 1,
                 isRestrictedToMyTurn = false,
+                occupiedRadius = 0,
             },
             new Enchantment{}, 
             new Spell{
                 spellType = SpellTypes.CHARGE_WALL,
+                validTarget = Targets.ALLY,
             }
         );
     }
@@ -410,16 +414,18 @@ public static class CardsLibrary {
             Sprites.HEAL,
             new Meta{
                 title = "Heal",
-                description = "Gives a damaged monster 4 HP",
+                description = "Heals a target for 4 HP",
             },
             new Attributes{
                 hp = 4,
                 cost = 3,
                 isRestrictedToMyTurn = false,
+                occupiedRadius = 0,
             },
             new Enchantment{}, 
             new Spell{
                 spellType = SpellTypes.HEAL,
+                validTarget = Targets.ALLY,
                 effectAmount = 4,
             }
         );
@@ -457,10 +463,12 @@ public static class CardsLibrary {
                 hp = 1,
                 cost = 1,
                 isRestrictedToMyTurn = false,
+                occupiedRadius = 0,
             },
             new Enchantment{}, 
             new Spell{
                 spellType = SpellTypes.GROUND_FLYING_CREATURE,
+                validTarget = Targets.ENEMY,
                 effectDuration = 4,
             }
         );
@@ -663,6 +671,7 @@ public static class CardsLibrary {
             new Enchantment{}, 
             new Spell{
                 spellType = SpellTypes.REDUCE_RESOURCE_COST_CREATURES,
+                validTarget = Targets.ANY,
                 effectAmount = 1,
                 effectDuration = 3,
             }
@@ -944,12 +953,13 @@ public static class CardsLibrary {
                 cost = 2,
                 damage = 1,
                 isRestrictedToMyTurn = false,
+                occupiedRadius = 1,
             },
             new Enchantment{}, 
             new Spell{
                 spellType = SpellTypes.DAMAGE,
+                validTarget = Targets.ENEMY,
                 effectAmount = 1,
-                occupiedRadius = 1,
             }
         );
     }
@@ -967,12 +977,13 @@ public static class CardsLibrary {
                 cost = 3,
                 damage = 3,
                 isRestrictedToMyTurn = false,
+                occupiedRadius = 1,
             },
             new Enchantment{}, 
             new Spell{
                 spellType = SpellTypes.DAMAGE,
+                validTarget = Targets.ENEMY,
                 effectAmount = 3,
-                occupiedRadius = 1,
             }
         );
     }
@@ -990,12 +1001,13 @@ public static class CardsLibrary {
                 cost = 4,
                 damage = 2,
                 isRestrictedToMyTurn = false,
+                occupiedRadius = 1,
             },
             new Enchantment{}, 
             new Spell{
                 spellType = SpellTypes.DAMAGE,
+                validTarget = Targets.ENEMY,
                 effectAmount = 2,
-                occupiedRadius = 1,
             }
         );
     }
@@ -1013,12 +1025,13 @@ public static class CardsLibrary {
                 cost = 2,
                 damage = 1,
                 isRestrictedToMyTurn = false,
+                occupiedRadius = 1,
             },
             new Enchantment{}, 
             new Spell{
                 spellType = SpellTypes.DAMAGE_AND_STUN,
+                validTarget = Targets.ENEMY,
                 effectAmount = 1,
-                occupiedRadius = 1,
                 effectDuration = 1,
             }
         );
@@ -1036,11 +1049,12 @@ public static class CardsLibrary {
                 hp = 1,
                 cost = 4,
                 isRestrictedToMyTurn = false,
+                occupiedRadius = 2,
             },
             new Enchantment{}, 
             new Spell{
                 spellType = SpellTypes.STUN,
-                occupiedRadius = 2,
+                validTarget = Targets.ENEMY,
                 effectDuration = 3,
             }
         );
@@ -1059,12 +1073,13 @@ public static class CardsLibrary {
                 cost = 1,
                 damage = 2,
                 isRestrictedToMyTurn = false,
+                occupiedRadius = 0,
             },
             new Enchantment{}, 
             new Spell{
                 spellType = SpellTypes.DAMAGE,
+                validTarget = Targets.ENEMY,
                 effectAmount = 2,
-                occupiedRadius = 0,
             }
         );
     }

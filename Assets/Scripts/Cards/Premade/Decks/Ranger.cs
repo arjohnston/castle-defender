@@ -46,8 +46,8 @@ public class Ranger : Deck {
         for (int i = 0; i < 2; i++)
             d.Push(CardsLibrary.CreateSpikePit());
 
-        // for (int i = 0; i < 1; i++)
-        //     d.Push(CardsLibrary.CreatePurge());
+        for (int i = 0; i < 1; i++)
+            d.Push(CardsLibrary.CreatePurge());
 
         for (int i = 0; i < 1; i++)
             d.Push(CardsLibrary.CreateElytrianBlessing());
@@ -58,17 +58,17 @@ public class Ranger : Deck {
         for (int i = 0; i < 1; i++)
             d.Push(CardsLibrary.CreateElvenLongbow());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateCharge());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateCharge());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateHeal());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateHeal());
 
         for (int i = 0; i < 1; i++)
             d.Push(CardsLibrary.CreateFieryGreaves());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateArrowStorm());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateArrowStorm());
 
         base.SetDeck(d);
     }
