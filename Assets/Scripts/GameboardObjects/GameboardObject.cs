@@ -35,6 +35,10 @@ public class GameboardObject : NetworkBehaviour {
 
     [SerializeField] private NetworkList<Enchantment> enchantments;
 
+    // Greater than 0 == in effect
+    [SerializeField] private NetworkVariable<int> isStunnedDuration = new NetworkVariable<int>(0);
+    [SerializeField] private NetworkVariable<int> isGroundedDuration = new NetworkVariable<int>(0);
+
     private Card card;
 
     void Awake() {
@@ -73,6 +77,28 @@ public class GameboardObject : NetworkBehaviour {
         return card != null ? card.attributes.flying : false;
     }
 
+    public void SetStunnedDuration(int duration) {
+        SetStunnedDurationServerRpc(duration);
+    }
+
+    public void SetGroundedDuration(int duration) {
+        SetGroundedDurationServerRpc(duration);
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    public void SetStunnedDurationServerRpc(int duration) {
+        if (isStunnedDuration.Value <= 0 && duration < 0) return;
+
+        isStunnedDuration.Value = duration;
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    public void SetGroundedDurationServerRpc(int duration) {
+        if (isGroundedDuration.Value <= 0 && duration < 0) return;
+
+        isGroundedDuration.Value = duration;
+    }
+
     public void SetPosition(Hex hex) {
         transform.position = hex.Position();
         SetTargetPositionServerRpc(hex.Position());
@@ -91,7 +117,7 @@ public class GameboardObject : NetworkBehaviour {
     }
 
     public void Select() {
-        if (!TurnManager.Instance.IsMyTurn()) return;
+        if (!TurnManager.Instance.IsMyTurn() || isStunnedDuration.Value > 0) return;
         SetIsSelectedServerRpc(true);
     }
 
@@ -102,7 +128,7 @@ public class GameboardObject : NetworkBehaviour {
     public void UpdatePosition() {
         if (!isInstantiated.Value) return;
 
-        if (GetFlying()) {
+        if (GetFlying() && isGroundedDuration.Value <= 0) {
             defaultHeight = flyingHeight;
         } else {
             defaultHeight = 0.0f;

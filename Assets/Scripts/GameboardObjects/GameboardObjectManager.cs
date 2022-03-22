@@ -259,6 +259,66 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         // cast the spell
 
         // switch/case to handle spell types
+        List<Hex> targetHexes = Gameboard.Instance.GetHexesWithinRange(location, card.attributes.occupiedRadius, true);
+        List<GameboardObject> gbos = new List<GameboardObject>();
+
+        foreach (Hex hex in targetHexes) {
+            GameboardObject gbo = GameboardObjectManager.Instance.GetGboAtHex(hex);
+            if (gbo != null) {
+                if (card.spell.validTarget == Targets.ALLY && gbo.IsOwner) gbos.Add(gbo);
+                if (card.spell.validTarget == Targets.ENEMY && !gbo.IsOwner) gbos.Add(gbo);
+                if (card.spell.validTarget == Targets.ANY) gbos.Add(gbo);
+            }
+        }
+
+        switch(card.spell.spellType) {
+            case SpellTypes.REMOVE_ENCHANTMENTS:
+                foreach(GameboardObject gbo in gbos) {
+                    gbo.RemoveAllEnchantments();
+                }
+                break;
+
+            case SpellTypes.CHARGE_WALL:
+                // TODO: Charge the nearest wall
+                break;
+
+            case SpellTypes.HEAL:
+                foreach(GameboardObject gbo in gbos) {
+                    gbo.SetHp(gbo.GetHp() + card.spell.effectAmount);
+                }
+                break;
+
+            case SpellTypes.DAMAGE:
+                foreach(GameboardObject gbo in gbos) {
+                    gbo.SetHp(gbo.GetHp() - card.spell.effectAmount);
+                }
+                break;
+            
+            case SpellTypes.STUN:
+                foreach(GameboardObject gbo in gbos) {
+                    gbo.SetHp(gbo.GetHp() - card.spell.effectAmount);
+                    gbo.SetStunnedDuration(card.spell.effectDuration);
+                }
+                break;
+
+            case SpellTypes.GROUND_FLYING_CREATURE:
+                foreach(GameboardObject gbo in gbos) {
+                    gbo.SetGroundedDuration(card.spell.effectDuration);
+                }
+                break;
+
+            case SpellTypes.REDUCE_RESOURCE_COST_CREATURES:
+                // TODO: Reduce the resource cost of all cards
+                // Update prefabs in playerhand for duration, etc.
+                break;
+
+            case SpellTypes.DAMAGE_AND_STUN:
+                foreach(GameboardObject gbo in gbos) {
+                    gbo.SetHp(gbo.GetHp() - card.spell.effectAmount);
+                    gbo.SetStunnedDuration(card.spell.effectDuration);
+                }
+                break;
+        }
     }
 
     public void CastEnchantment(Hex location, Card card) {
@@ -422,7 +482,11 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
         foreach (GameboardObject gbo in gameboardObjects) {
             if (gbo.IsTrap() && !TurnManager.Instance.IsMyTurn()) gbo.UseActivatedTrapAtBeginningOfOpponentTurn();
-            if (TurnManager.Instance.IsMyTurn()) gbo.UseDoesDamageAtStartOfTurn();
+            if (TurnManager.Instance.IsMyTurn()) {
+                gbo.UseDoesDamageAtStartOfTurn();
+                gbo.SetGroundedDuration(-1);
+                gbo.SetStunnedDuration(-1);
+            }
         }
     }
 
