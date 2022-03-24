@@ -19,8 +19,8 @@ public class MainMenu : MonoBehaviour
         #endif
     }
 
-    // TODO: Logic to forfeit a game
     public void QuitToMainMenu() {
+        GameManager.Instance.PlayerQuitServerRpc(NetworkManager.Singleton.LocalClientId);
         GameManager.Instance.ResetScene();
         GameSettings.isLaunchingAsHost = false;
         GameSettings.clientJoinCode = "";

@@ -106,6 +106,15 @@ public class DeckManager : NetworkSingleton<DeckManager> {
         P2DeckGameObject.SetActive(playerTwoDeckCountServer.Value > 0);
         P1GraveGameObject.SetActive(playerOneGraveCountServer.Value > 0);
         P2GraveGameObject.SetActive(playerTwoGraveCountServer.Value > 0);
+
+        P1DeckGameObject.transform.localScale = new Vector3(1.0f, SetHeightScale(playerOneDeckCountServer.Value), 1.0f);
+        P2DeckGameObject.transform.localScale = new Vector3(1.0f, SetHeightScale(playerTwoDeckCountServer.Value), 1.0f);
+        P1GraveGameObject.transform.localScale = new Vector3(1.0f, SetHeightScale(playerOneGraveCountServer.Value), 1.0f);
+        P2GraveGameObject.transform.localScale = new Vector3(1.0f, SetHeightScale(playerTwoGraveCountServer.Value), 1.0f);
+    }
+
+    private float SetHeightScale(int deckCount) {
+        return 0.06f + (deckCount - 1) * 0.06f;
     }
 
     private void CheckOnLeftClick() {

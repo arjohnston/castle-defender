@@ -19,7 +19,7 @@ public class CameraController : Singleton<CameraController> {
 	[Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
 	public GameObject CinemachineCameraTarget;
 	[Tooltip("How far in degrees can you move the camera up")]
-	public float TopClamp = 70.0f;
+	public float TopClamp = 89.0f;
 	[Tooltip("How far in degrees can you move the camera down")]
 	public float BottomClamp = 5.0f;
 	[Tooltip("Additional degress to override the camera. Useful for fine tuning camera position when locked")]
@@ -114,7 +114,9 @@ public class CameraController : Singleton<CameraController> {
 		// Cinemachine will follow this target
 		CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride, _cinemachineTargetYaw, 0.0f);
 
-		// Debug.Log("Y: " + Mouse.current.scroll.ReadValue().y / 120.0f);
+		Vector2 mousePosition = Camera.main.ScreenToViewportPoint(Mouse.current.position.ReadValue());
+		if (mousePosition.x <= 0 || mousePosition.y <= 0 || mousePosition.x > 1 || mousePosition.y > 1) return;
+
 		float zoom = Mouse.current.scroll.ReadValue().y;
 		if (zoom != 0) {
 			float fov = _virtualCamera.m_Lens.FieldOfView;

@@ -7,6 +7,7 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 {
     Hex hexRayCast;
     private Vector3 origin;
+    private bool isPlacementValid = true;
 
     public void OnBeginDrag(PointerEventData eventData) {
         if (!TurnManager.Instance.IsMyTurn()) return;
@@ -25,13 +26,6 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         if (hexRayCast != null) {
             GameboardObject gbo = GameboardObjectManager.Instance.GetGboAtHex(hexRayCast);
-
-            // TODO: If hex ray cast with occupied radius intersects with a valid target, then hit
-            // Probably need a helper function for spells to determine if the target is appropriate:
-            // enemy versus ally, correct type, etc.
-
-            // TODO: At spell end, if at least one valid target exists in occupied radius, then
-            // do the effect on that target but not invalid targets (enemy vs ally) in the radius
 
             if (card.type == Types.ENCHANTMENT) {
                 if (gbo != null && gbo.IsOwner && card.enchantment.validTarget == gbo.GetGboType()) {
@@ -56,14 +50,29 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
                 if (card.spell.validTarget == Targets.ANY || targets.Count > 0) {
                     hitSpots.Add(hexRayCast, new HitSpot(HexColors.VALID_SPELL, card.attributes.occupiedRadius));
+                    isPlacementValid = true;
                 } else {
                     hitSpots.Add(hexRayCast, new HitSpot(HexColors.INVALID_MOVE, card.attributes.occupiedRadius));
+                    isPlacementValid = false;
                 }
             } else {
-                if (gbo != null && (!gbo.IsTrap() || gbo.IsOwner)) {
+                bool isValidMovement = true;
+
+                if (card.type == Types.PERMANENT || card.type == Types.TRAP) {
+                    Players player = GameManager.Instance.GetCurrentPlayer();
+            
+                    foreach (Hex h in Gameboard.Instance.GetHexesWithinRange(hexRayCast, card.attributes.occupiedRadius)) {
+                        if (player == Players.PLAYER_ONE && h.R <= 0) isValidMovement = false;
+                        if (player == Players.PLAYER_TWO && h.R >= 0) isValidMovement = false;
+                    }
+                }
+
+                if ((gbo != null && (!gbo.IsTrap() || gbo.IsOwner)) || !isValidMovement) {
                     hitSpots.Add(hexRayCast, new HitSpot(HexColors.INVALID_MOVE, card.attributes.occupiedRadius));
+                    isPlacementValid = false;
                 } else {
                     hitSpots.Add(hexRayCast, new HitSpot(HexColors.VALID_MOVE, card.attributes.occupiedRadius));
+                    isPlacementValid = true;
                 }
             }
         }
@@ -78,44 +87,15 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         
         Card card = PlayerHand.Instance.GetCardForGameObject(gameObject);
 
-        bool returnToHand = false;
-
         if (
             hexRayCast == null || // not on gameboard
             (card.attributes.isRestrictedToMyTurn && !TurnManager.Instance.IsMyTurn()) || // not my turn
             !ResourceManager.Instance.HaveEnoughResources(card.attributes.cost) // dont have enough resources
-        ) returnToHand = true;
-
-        GameboardObject target = GameboardObjectManager.Instance.GetGboAtHex(hexRayCast);
-
-        if (card.type == Types.ENCHANTMENT && (target == null || !target.IsOwner || card.enchantment.validTarget != target.GetGboType())) {
-            returnToHand = true;
+        ) {
+            isPlacementValid = false;
         }
 
-        List<Hex> targetHexes = Gameboard.Instance.GetHexesWithinRange(hexRayCast, card.attributes.occupiedRadius, true);
-        List<GameboardObject> targets = new List<GameboardObject>();
-
-        foreach (Hex hex in targetHexes) {
-            GameboardObject gameboardObject = GameboardObjectManager.Instance.GetGboAtHex(hex);
-
-            // if I'm the owner and target is ally
-            // or I'm not the owner and target is enemy
-            if (gameboardObject != null) {
-                if ((gameboardObject.IsOwner && card.spell.validTarget == Targets.ALLY) || (!gameboardObject.IsOwner && card.spell.validTarget == Targets.ENEMY)) 
-                    targets.Add(gameboardObject);
-            }
-        }
-
-        if (card.type == Types.SPELL && card.spell.validTarget != Targets.ANY && targets.Count <= 0) {
-            // Allied versus enemy spells
-            returnToHand = true;
-        }
-
-        if ((card.type == Types.CREATURE || card.type == Types.PERMANENT || card.type == Types.TRAP)) {
-            if (target != null && (!target.IsTrap() || target.IsOwner)) returnToHand = true;
-        }
-
-        if (returnToHand) {
+        if (!isPlacementValid) {
             transform.position = origin;
             transform.localScale = new Vector3(1f, 1f, 1f);
         } else {

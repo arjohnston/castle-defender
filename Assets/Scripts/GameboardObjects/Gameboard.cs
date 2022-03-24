@@ -162,7 +162,17 @@ public class Gameboard : Singleton<Gameboard> {
         List<Hex> hexesInRange = GetHexesWithinRange(center, hitSpot.radius, hitSpot.ignoreEdgeOfMap);
 
         foreach (Hex hex in hexesInRange) {
-            if (_isRaycastRangeValid) HighlightHex(hex, hitSpot.color);
+            if (_isRaycastRangeValid) {
+                // TODO: This doesn't handle Available moves well, see moving castle
+                // TODO: Also doesn't play well with spells - disabling for now.
+                // GameboardObject centerGbo = GameboardObjectManager.Instance.GetGboAtHex(center);
+                // GameboardObject gbo = GameboardObjectManager.Instance.GetGboAtHex(hex);
+                // if (gbo != null && (gbo.IsOwner || (!gbo.IsOwner && !gbo.IsTrap())) && centerGbo != gbo) {
+                //     HighlightHex(hex, HexColors.INVALID_MOVE);
+                // } else {
+                    HighlightHex(hex, hitSpot.color);
+                // }   
+            }
             else HighlightHex(hex, HexColors.INVALID_MOVE);
         }
 

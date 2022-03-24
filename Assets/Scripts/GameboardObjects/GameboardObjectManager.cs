@@ -265,9 +265,9 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         foreach (Hex hex in targetHexes) {
             GameboardObject gbo = GameboardObjectManager.Instance.GetGboAtHex(hex);
             if (gbo != null) {
-                if (card.spell.validTarget == Targets.ALLY && gbo.IsOwner) gbos.Add(gbo);
-                if (card.spell.validTarget == Targets.ENEMY && !gbo.IsOwner) gbos.Add(gbo);
-                if (card.spell.validTarget == Targets.ANY) gbos.Add(gbo);
+                if (card.spell.validTarget == Targets.ALLY && gbo.IsOwner && !gbos.Contains(gbo)) gbos.Add(gbo);
+                if (card.spell.validTarget == Targets.ENEMY && !gbo.IsOwner && !gbos.Contains(gbo)) gbos.Add(gbo);
+                if (card.spell.validTarget == Targets.ANY && !gbos.Contains(gbo)) gbos.Add(gbo);
             }
         }
 

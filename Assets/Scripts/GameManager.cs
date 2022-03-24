@@ -13,9 +13,9 @@ public class GameManager : NetworkSingleton<GameManager> {
     public GameObject errorJoiningPanel;
     public GameObject waitingForOthersPanel;
     public GameObject winConditionPanel;
-    public GameObject playerDisconnectedPanel;
     public TextMeshProUGUI waitingForOthersPanelJoinCodeText;
     public TextMeshProUGUI winConditionText;
+    public TextMeshProUGUI winConditionSubText;
     private int _playersConnected = 0;
 
     public TextMeshProUGUI currentPlayerHp;
@@ -100,7 +100,9 @@ public class GameManager : NetworkSingleton<GameManager> {
 
             if (id == 0 || id == 1) {
                 TurnManager.Instance.SetGameState(GameState.WIN_CONDITION);
-                playerDisconnectedPanel.SetActive(true);
+
+                winConditionSubText.text = "Opponent disconnected";
+                winConditionPanel.SetActive(true);
             }
         };
     }
@@ -153,10 +155,26 @@ public class GameManager : NetworkSingleton<GameManager> {
                 winConditionText.text = "You won!";
                 winConditionPanel.SetActive(true);
             }
+
+            // TODO: Handle spectator message
         }
     }
 
     public void ResetScene() {
         waitingForOthersPanel.SetActive(true);
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    public void PlayerQuitServerRpc(ulong clientId) {
+        SetPlayerQuitClientRpc(clientId);
+    }
+
+    [ClientRpc]
+    public void SetPlayerQuitClientRpc(ulong clientId) {
+        // TODO: Handle spectator leaving
+        if (NetworkManager.Singleton.LocalClientId != clientId) {
+            winConditionSubText.text = "Opponent forfeited";
+            winConditionPanel.SetActive(true);
+        }
     }
 }

@@ -321,7 +321,7 @@ public class GameboardObject : NetworkBehaviour {
         
         // Permanent objects can only move during SETUP phase and placement
         // Otherwise creatures are free to move at any time
-        if (GetGboType() == Types.PERMANENT && IsValidPermanentMovement(target)) {
+        if ((GetGboType() == Types.PERMANENT || GetGboType() == Types.TRAP) && IsValidPermanentMovement(target)) {
             return TurnManager.Instance.GetGameState() == GameState.SETUP;
         }
 
@@ -329,6 +329,7 @@ public class GameboardObject : NetworkBehaviour {
 
         return distanceToTarget <= GetSpeed();
     }
+
     private bool IsValidPermanentMovement(Hex target) {
         if (target != null) {
             Players player = GameManager.Instance.GetCurrentPlayer();
@@ -379,7 +380,7 @@ public class GameboardObject : NetworkBehaviour {
         if (TurnManager.Instance.GetGameState() == GameState.SETUP) {
             return true;
         } else {
-            if (gboType.Value == Types.PERMANENT) return false;
+            if (gboType.Value == Types.PERMANENT || gboType.Value == Types.TRAP) return false;
 
             if (remainingMoveActions.Value <= 0) return false;
         }

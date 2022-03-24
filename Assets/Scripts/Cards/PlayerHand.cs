@@ -73,7 +73,7 @@ public class PlayerHand : Singleton<PlayerHand> {
                     kvp.Key.transform.SetAsLastSibling(); // Move to front most so its not obscured by other cards
                     kvp.Key.transform.localScale = new Vector3(1.3f, 1.3f, 1.3f); // zoom in
                     kvp.Key.transform.eulerAngles = Vector3.zero; // remove rotation
-                    kvp.Key.transform.localPosition = new Vector3((CardWidth + PlayerHandCardTranslateXAmount) * distanceFromCenter, 15.0f, 0f); // move up
+                    kvp.Key.transform.localPosition = new Vector3((CardWidth + PlayerHandCardTranslateXAmount) * distanceFromCenter, 30.0f, 0f); // move up
                 } else {
                     kvp.Key.transform.SetSiblingIndex(renderedPlayerHandCards.ToArray().ToList().IndexOf(kvp));
                     kvp.Key.transform.localScale = new Vector3(1f, 1f, 1f);
