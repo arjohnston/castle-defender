@@ -65,6 +65,18 @@ public class PlayerHand : Singleton<PlayerHand> {
     private void TransformPositionIntoFan() {
         float center = renderedPlayerHandCards.Count / 2;
 
+        int indexOfHoveredCard = -1;
+
+        foreach (KeyValuePair<GameObject, Card> kvp in renderedPlayerHandCards) {
+            float distanceFromCenter = GetDistanceAwayFromCenter(center, kvp);
+
+            if (!kvp.Key.Equals(cardDragged)) {
+                if (kvp.Key.Equals(cardHovered)) {
+                    indexOfHoveredCard = renderedPlayerHandCards.ToArray().ToList().IndexOf(kvp);
+                }
+            }
+        }
+
         foreach (KeyValuePair<GameObject, Card> kvp in renderedPlayerHandCards) {
             float distanceFromCenter = GetDistanceAwayFromCenter(center, kvp);
 
@@ -75,7 +87,10 @@ public class PlayerHand : Singleton<PlayerHand> {
                     kvp.Key.transform.eulerAngles = Vector3.zero; // remove rotation
                     kvp.Key.transform.localPosition = new Vector3((CardWidth + PlayerHandCardTranslateXAmount) * distanceFromCenter, 30.0f, 0f); // move up
                 } else {
-                    kvp.Key.transform.SetSiblingIndex(renderedPlayerHandCards.ToArray().ToList().IndexOf(kvp));
+                    int index = renderedPlayerHandCards.ToArray().ToList().IndexOf(kvp);
+                    if (indexOfHoveredCard > -1 && index >= indexOfHoveredCard) index -= 1;
+
+                    kvp.Key.transform.SetSiblingIndex(index);
                     kvp.Key.transform.localScale = new Vector3(1f, 1f, 1f);
                     kvp.Key.transform.eulerAngles = new Vector3(0f, 0f, -(distanceFromCenter * PlayerHandCardRotationAmount));
                     kvp.Key.transform.localPosition = new Vector3((CardWidth + PlayerHandCardTranslateXAmount) * distanceFromCenter, -PlayerHandCardTranslateYAmount * 3.0f - Mathf.Abs(PlayerHandCardTranslateYAmount * distanceFromCenter * 1.4f), 0f);

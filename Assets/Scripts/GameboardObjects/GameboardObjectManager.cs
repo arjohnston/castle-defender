@@ -218,7 +218,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
     public void SpawnCreature(Hex location, Card card) {
         if (!TurnManager.Instance.IsMyTurn()) return;
-        if (GetGboAtHex(location) != null) return;
+        GameboardObject gbo = GetGboAtHex(location);
+        if (gbo != null && (!gbo.IsTrap() || (gbo.IsTrap() && gbo.IsOwner))) return;
         if (!ResourceManager.Instance.HaveEnoughResources(card.attributes.cost)) return;
 
         _spawnLocation = location;
@@ -253,12 +254,6 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     }
 
     public void CastSpell(Hex location, Card card) {
-        // TODO: Mechanics for casting a spell
-
-        // foreach valid target in occupied radius
-        // cast the spell
-
-        // switch/case to handle spell types
         List<Hex> targetHexes = Gameboard.Instance.GetHexesWithinRange(location, card.attributes.occupiedRadius, true);
         List<GameboardObject> gbos = new List<GameboardObject>();
 
@@ -296,6 +291,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             
             case SpellTypes.STUN:
                 foreach(GameboardObject gbo in gbos) {
+                    Logger.Instance.LogInfo("Setting effect" + card.spell.effectDuration);
                     gbo.SetHp(gbo.GetHp() - card.spell.effectAmount);
                     gbo.SetStunnedDuration(card.spell.effectDuration);
                 }
@@ -303,6 +299,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
             case SpellTypes.GROUND_FLYING_CREATURE:
                 foreach(GameboardObject gbo in gbos) {
+                    Logger.Instance.LogInfo("Setting effect" + card.spell.effectDuration);
                     gbo.SetGroundedDuration(card.spell.effectDuration);
                 }
                 break;
@@ -314,6 +311,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
             case SpellTypes.DAMAGE_AND_STUN:
                 foreach(GameboardObject gbo in gbos) {
+                    Logger.Instance.LogInfo("Setting effect" + card.spell.effectDuration);
                     gbo.SetHp(gbo.GetHp() - card.spell.effectAmount);
                     gbo.SetStunnedDuration(card.spell.effectDuration);
                 }
@@ -460,7 +458,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         go.Despawn();
     }
 
-    public GameboardObject GetGboAtHex(Hex hex) {
+    public GameboardObject GetGboAtHex(Hex hex, bool getTrap = false) {
         List<GameboardObject> gbos = new List<GameboardObject>();
         foreach (GameboardObject gbo in gameboardObjects) {
             foreach (Hex h in gbo.GetOccupiedHexes()) {
@@ -469,7 +467,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         }
 
         foreach (GameboardObject gbo in gbos) {
-            if (gbo.GetGboType() != Types.TRAP) return gbo;
+            if (!getTrap && gbo.GetGboType() != Types.TRAP) return gbo;
+            else if (getTrap && gbo.GetGboType() == Types.TRAP) return gbo;
         }
 
         if (gbos.Count > 0) return gbos[0];
@@ -482,7 +481,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
         foreach (GameboardObject gbo in gameboardObjects) {
             if (gbo.IsTrap() && !TurnManager.Instance.IsMyTurn()) gbo.UseActivatedTrapAtBeginningOfOpponentTurn();
-            if (TurnManager.Instance.IsMyTurn()) {
+            
+            if (TurnManager.Instance.IsMyTurn() && gbo.IsOwner) {
                 gbo.UseDoesDamageAtStartOfTurn();
                 gbo.SetGroundedDuration(-1);
                 gbo.SetStunnedDuration(-1);
@@ -555,6 +555,10 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
         _spawnCard = null;
         _spawnLocation = null;
+
+        Hex location = gbo.GetHexPosition();
+        GameboardObject trap = GetGboAtHex(location, true);
+        if (trap != null) trap.ActivateTrap();
     }
 
     [ServerRpc(RequireOwnership=false)]

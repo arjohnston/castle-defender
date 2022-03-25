@@ -68,6 +68,8 @@ public class GameboardObject : NetworkBehaviour {
     public bool GetFlying() {
         if (!isInstantiated.Value) return false;
 
+        if (isGroundedDuration.Value > 0) return false;
+
         if (enchantments != null) {
             foreach (Enchantment enchantment in enchantments) {
                 if (enchantment.flying) return true;
@@ -89,14 +91,14 @@ public class GameboardObject : NetworkBehaviour {
     public void SetStunnedDurationServerRpc(int duration) {
         if (isStunnedDuration.Value <= 0 && duration < 0) return;
 
-        isStunnedDuration.Value = duration;
+        isStunnedDuration.Value += duration;
     }
 
     [ServerRpc(RequireOwnership=false)]
     public void SetGroundedDurationServerRpc(int duration) {
         if (isGroundedDuration.Value <= 0 && duration < 0) return;
 
-        isGroundedDuration.Value = duration;
+        isGroundedDuration.Value += duration;
     }
 
     public void SetPosition(Hex hex) {
@@ -128,7 +130,7 @@ public class GameboardObject : NetworkBehaviour {
     public void UpdatePosition() {
         if (!isInstantiated.Value) return;
 
-        if (GetFlying() && isGroundedDuration.Value <= 0) {
+        if (GetFlying()) {
             defaultHeight = flyingHeight;
         } else {
             defaultHeight = 0.0f;
@@ -190,7 +192,8 @@ public class GameboardObject : NetworkBehaviour {
     }
 
     public void SetHp(int hp) {
-        SetHpServerRpc(hp);
+        if (card != null && hp + GetHp() > card.attributes.hp) SetHpServerRpc(card.attributes.hp);
+        else SetHpServerRpc(GetHp() + hp);
     }
 
     public int GetCost() {
@@ -228,7 +231,7 @@ public class GameboardObject : NetworkBehaviour {
 
     public int GetRange() {
         int modifier = GetEnchantmentModifier("range");
-        return attributes.Value.range + modifier;
+        return Math.Max(attributes.Value.range, modifier);
     }
 
     public int GetDamage() {
@@ -377,6 +380,8 @@ public class GameboardObject : NetworkBehaviour {
     }
 
     public bool CanMove() {
+        if (isStunnedDuration.Value > 0) return false;
+
         if (TurnManager.Instance.GetGameState() == GameState.SETUP) {
             return true;
         } else {
@@ -412,8 +417,7 @@ public class GameboardObject : NetworkBehaviour {
         if (target.GetGboType() == Types.PERMANENT) damageModifier += attributes.Value.permanentDamageModifier;
         if (!hasAttacked) damageModifier += attributes.Value.firstAttackDamageModifier;
 
-        int targetHp = target.GetHp() - (damageModifier + GetDamage());
-        target.SetHp(targetHp);
+        target.SetHp(-(damageModifier + GetDamage()));
 
         SetRemainingAttackActionsServerRpc(remainingAttackActions.Value - 1);
         hasAttacked = true;
@@ -465,12 +469,11 @@ public class GameboardObject : NetworkBehaviour {
         }
 
         foreach (GameboardObject creature in affectedCreatures) {
-            int targetHp = creature.GetHp() - (GetDamage());
-            creature.SetHp(targetHp);
+            creature.SetHp(-GetDamage());
         }
 
         // Trap life determines the amount of turns its active for
-        SetHp(GetHp() - 1);
+        SetHp(-1);
     }
 
     public void UseDoesDamageAtStartOfTurn() {
@@ -496,8 +499,7 @@ public class GameboardObject : NetworkBehaviour {
 
             // Do damage to the 0th index of creatures in range
             if (gbos.Count > 0) {
-                int targetHp = gbos[0].GetHp() - modifier;
-                gbos[0].SetHp(targetHp);
+                gbos[0].SetHp(-modifier);
             }
         }
     }

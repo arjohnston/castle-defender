@@ -4107,7 +4107,7 @@ MonoBehaviour:
   opposingPlayerHp: {fileID: 1781537047}
   currentPlayerResources: {fileID: 831938265}
   opposingPlayerResources: {fileID: 850111900}
-  allowMultiplayerInEditor: 0
+  allowMultiplayerInEditor: 1
 --- !u!4 &983941248
 Transform:
   m_ObjectHideFlags: 0

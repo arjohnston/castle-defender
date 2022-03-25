@@ -30,8 +30,10 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             if (card.type == Types.ENCHANTMENT) {
                 if (gbo != null && gbo.IsOwner && card.enchantment.validTarget == gbo.GetGboType()) {
                     hitSpots.Add(hexRayCast, new HitSpot(HexColors.VALID_SPELL, card.attributes.occupiedRadius));
+                    isPlacementValid = true;
                 } else {
                     hitSpots.Add(hexRayCast, new HitSpot(HexColors.INVALID_MOVE, card.attributes.occupiedRadius));
+                    isPlacementValid = false;
                 }
             } else if (card.type == Types.SPELL) {
                 List<Hex> targetHexes = Gameboard.Instance.GetHexesWithinRange(hexRayCast, card.attributes.occupiedRadius, true);
