@@ -36,12 +36,12 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
     // Required to pass the player manually as GameSettings.player was encountering race conditions on awake
     public void SetPlayerCastle(GameObject castle, Players player) {
-        if (castle.GetComponent<NetworkObject>().IsOwner) Logger.Instance.LogInfo("Setting castle for player: " + player);
+        if (castle.GetComponent<NetworkObject>().IsOwner && ((player == Players.PLAYER_ONE) || (player == Players.PLAYER_TWO))) Logger.Instance.LogInfo("Setting castle for player: " + player);
         NetworkObject networkObject = castle.GetComponent<NetworkObject>();
         GameboardObject gbo = castle.GetComponent<GameboardObject>();
         gameboardObjects.Add(gbo);
 
-        if (networkObject.IsOwner) {
+        if (networkObject.IsOwner && ((player == Players.PLAYER_ONE) || (player == Players.PLAYER_TWO))) {
             _castle = gbo;
 
             gbo.SetupGboDetails(
@@ -65,11 +65,14 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 )
             );
 
-            if (player == Players.PLAYER_ONE) {
+            if (player == Players.PLAYER_ONE)
+            {
                 Hex hex = Gameboard.Instance.GetHexAt(-5, Gameboard.Instance.boardRadius - 2);
                 gbo.SetPosition(hex);
                 gbo.SetRotation(new Vector3(0, 180.0f, 0));
-            } else {
+            }
+            else if (player == Players.PLAYER_TWO)
+            {
                 Hex hex = Gameboard.Instance.GetHexAt(5, -(Gameboard.Instance.boardRadius - 2));
                 gbo.SetPosition(hex);
             }

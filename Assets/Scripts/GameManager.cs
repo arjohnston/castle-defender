@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using Utilities.Singletons;
 using Unity.Netcode;
 using TMPro;
@@ -87,9 +88,15 @@ public class GameManager : NetworkSingleton<GameManager> {
             Logger.Instance.LogInfo($"player {id + 1} just connected.");
             _playersConnected++;
 
-            if (NetworkManager.Singleton.IsHost) {
+            if (NetworkManager.Singleton.IsHost)
+            {
                 waitingForOthersPanel.SetActive(false);
             }
+            // code this
+            //if(_playersConnected > 1)
+            //{
+                
+            //}
 
             CameraController.Instance.SetStartingPosition(GetCurrentPlayer());
         };
@@ -103,6 +110,11 @@ public class GameManager : NetworkSingleton<GameManager> {
                 playerDisconnectedPanel.SetActive(true);
             }
         };
+    }
+    public void PlayGame()
+    {
+        SceneManager.LoadScene("MainMenu");
+        _playersConnected--;
     }
 
     // Update is called once per frame
