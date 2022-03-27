@@ -142,8 +142,7 @@ public class CardBuilder : Singleton<CardBuilder> {
                 return Orc;
 
             case Sprites.MINIONS:
-                // return Minions;
-                return Orc;
+                return Minions;
 
             case Sprites.WARGRIDER:
                 // return WargRider;
@@ -182,8 +181,7 @@ public class CardBuilder : Singleton<CardBuilder> {
                 return Orc;
 
             case Sprites.SWAMP:
-                // return Swamp;
-                return Orc;
+                return Swamp;
 
             case Sprites.ELVENLONGBOW:
                 // return ElvenLongbow;
@@ -194,16 +192,13 @@ public class CardBuilder : Singleton<CardBuilder> {
                 return Orc;
 
             case Sprites.HEAL:
-                // return Heal;
-                return Orc;
+                return Heal;
 
             case Sprites.FIERYGREAVES:
-                // return FieryGreaves;
-                return Orc;
+                return FieryGreaves;
 
             case Sprites.ARROWSTORM:
-                // return ArrowStorm;
-                return Orc;
+                return ArrowStorm;
 
             case Sprites.KNIGHT:
                 // return Knight;
@@ -234,16 +229,14 @@ public class CardBuilder : Singleton<CardBuilder> {
                 return Orc;
 
             case Sprites.TOWERARCHER:
-                // return TowerArcher;
-                return Orc;
+                return TowerArcher;
 
             case Sprites.CALLTOARMS:
                 // return CallToArms;
                 return Orc;
 
             case Sprites.COLOSSALHAMMER:
-                // return ColossalHammer;
-                return Orc;
+                return ColossalHammer;
 
             case Sprites.CLERICSROBE:
                 // return ClericsRobe;
@@ -282,12 +275,10 @@ public class CardBuilder : Singleton<CardBuilder> {
                 return Orc;
 
             case Sprites.NECROTICPLAGUE:
-                // return NecroticPlague;
-                return Orc;
+                return NecroticPlague;
 
             case Sprites.LIGHTNINGBOLT:
-                // return LightningBolt;
-                return Orc;
+                return LightningBolt;
 
             case Sprites.METEOR:
                 // return Meteor;
@@ -306,16 +297,14 @@ public class CardBuilder : Singleton<CardBuilder> {
                 return Orc;
 
             case Sprites.FIREBALL:
-                // return Fireball;
-                return Orc;
+                return Fireball;
 
             case Sprites.SOULRING:
                 // return SoulRing;
                 return Orc;
 
             case Sprites.DEVILSCOLLAR:
-                // return DevilsCollar;
-                return Orc;
+                return DevilsCollar;
 
             case Sprites.GHOUL:
                 // return Ghoul;
