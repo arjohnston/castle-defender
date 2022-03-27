@@ -3,10 +3,17 @@ using UnityEngine.UI;
 using Utilities.Singletons;
 using TMPro;
 using Unity.Netcode;
+using System.Collections;
 
 public class TurnManager: NetworkSingleton<TurnManager> {
     public TextMeshProUGUI GameStateText;
     public Button GameStateButton;
+    public GameObject banner;
+    public GameObject announcementArea;
+    public GameObject[] playerBanners;
+
+   
+
 
     [SerializeField] private NetworkVariable<GameState> gameStateServer = new NetworkVariable<GameState>(GameState.SETUP);
 
@@ -21,6 +28,20 @@ public class TurnManager: NetworkSingleton<TurnManager> {
         CheckOnPlayerTurnChange();
         UpdateClientGameState();
     }
+    private void Awake()
+    {
+        playerBanners = new GameObject[2];
+        playerBanners[0] = Instantiate(banner);
+        playerBanners[0].transform.SetParent(announcementArea.transform, false);
+        playerBanners[0].GetComponentInChildren<Canvas>().enabled = false;
+
+        playerBanners[1] = Instantiate(banner);
+        playerBanners[1].transform.SetParent(announcementArea.transform, false);
+        Text[] playerTurn = playerBanners[1].GetComponentsInChildren<Text>();
+        playerTurn[0].text = "Player Two's";
+        playerBanners[1].GetComponentInChildren<Canvas>().enabled = false;
+
+    }
 
     public void HandleTurnPhaseButtonClicked() {
         switch(gameStateServer.Value) {
@@ -30,7 +51,6 @@ public class TurnManager: NetworkSingleton<TurnManager> {
 
             case GameState.PLAYER_ONE_TURN:
                 SetGameState(GameState.PLAYER_TWO_TURN);
-                
                 break;
 
             case GameState.PLAYER_TWO_TURN:
@@ -78,24 +98,39 @@ public class TurnManager: NetworkSingleton<TurnManager> {
     public bool IsMyTurn() {
         if (gameStateServer.Value == GameState.SETUP) return true;
 
-        if (gameStateServer.Value == GameState.PLAYER_ONE_TURN && GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) return true;
-
-        if (gameStateServer.Value == GameState.PLAYER_TWO_TURN && GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO) return true;
-
+        if (gameStateServer.Value == GameState.PLAYER_ONE_TURN && GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE)
+        {
+            return true;
+        }
+        if (gameStateServer.Value == GameState.PLAYER_TWO_TURN && GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO)
+        {
+            return true;
+        }
         return false;
     }
 
     public void UpdateClientGameState() {
         switch(gameStateServer.Value) {
             case GameState.PLAYER_ONE_TURN:
-                if (_hasTurnChanged) GameboardObjectManager.Instance.ResetActions(Players.PLAYER_ONE);
+                if (_hasTurnChanged)
+                {
+                    GameboardObjectManager.Instance.ResetActions(Players.PLAYER_ONE);
+                    playerBanners[0].GetComponentInChildren<Canvas>().enabled = true; // player one's turn banner
+                    playerBanners[1].GetComponentInChildren<Canvas>().enabled = false;
+                }
                 GameStateText.text = "Player One";
                 GameStateButton.GetComponentInChildren<TextMeshProUGUI>().text = "End Turn";
                 GameStateButton.interactable = GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE;
+
                 break;
 
             case GameState.PLAYER_TWO_TURN:
-                if (_hasTurnChanged) GameboardObjectManager.Instance.ResetActions(Players.PLAYER_TWO);
+                if (_hasTurnChanged)
+                {
+                    GameboardObjectManager.Instance.ResetActions(Players.PLAYER_TWO);
+                    playerBanners[1].GetComponentInChildren<Canvas>().enabled = true; // player two's turn banner
+                    playerBanners[0].GetComponentInChildren<Canvas>().enabled = false;
+                }
                 GameStateText.text = "Player Two";
                 GameStateButton.GetComponentInChildren<TextMeshProUGUI>().text = "End Turn";
                 GameStateButton.interactable = GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO;
@@ -154,5 +189,27 @@ public class TurnManager: NetworkSingleton<TurnManager> {
     [ClientRpc]
     public void StartGameClientRpc() {
         StartGameIfBothPlayersReady();
+    }
+
+    IEnumerator fadeBanner(GameObject banner1)
+    {
+        Color c = banner1.GetComponent<SpriteRenderer>().material.color;
+        for(float alpha = 1f; alpha >= 0; alpha -= .1f)
+        {
+            c.a = alpha;
+            banner1.GetComponent<SpriteRenderer>().material.color = c;
+            yield return new WaitForSeconds(.1f);
+        }
+        banner1.SetActive(false);
+    }
+    IEnumerator fadeInBanner(GameObject banner1)
+    {
+        Color c = banner1.GetComponent<SpriteRenderer>().material.color;
+        for (float alpha = 0; alpha >= 1f; alpha += .1f)
+        {
+            c.a = alpha;
+            banner1.GetComponent<SpriteRenderer>().material.color = c;
+            yield return new WaitForSeconds(.1f);
+        }
     }
 }
