@@ -8,12 +8,11 @@ using System.Collections;
 public class TurnManager: NetworkSingleton<TurnManager> {
     public TextMeshProUGUI GameStateText;
     public Button GameStateButton;
-    public GameObject banner;
-    public GameObject announcementArea;
-    public GameObject[] playerBanners;
-
-   
-
+    public GameObject Banner;
+    private bool _bannerIsAnimatingFadeIn = false;
+    private float _bannerFadeAnimationSpeed = 1.3f;
+    private float _bannerOpenTime = 2.0f;
+    private float _bannerState = 0.0f;
 
     [SerializeField] private NetworkVariable<GameState> gameStateServer = new NetworkVariable<GameState>(GameState.SETUP);
 
@@ -27,20 +26,7 @@ public class TurnManager: NetworkSingleton<TurnManager> {
     void Update() {
         CheckOnPlayerTurnChange();
         UpdateClientGameState();
-    }
-    private void Awake()
-    {
-        playerBanners = new GameObject[2];
-        playerBanners[0] = Instantiate(banner);
-        playerBanners[0].transform.SetParent(announcementArea.transform, false);
-        playerBanners[0].GetComponentInChildren<Canvas>().enabled = false;
-
-        playerBanners[1] = Instantiate(banner);
-        playerBanners[1].transform.SetParent(announcementArea.transform, false);
-        Text[] playerTurn = playerBanners[1].GetComponentsInChildren<Text>();
-        playerTurn[0].text = "Player Two's";
-        playerBanners[1].GetComponentInChildren<Canvas>().enabled = false;
-
+        FadeBanner();
     }
 
     public void HandleTurnPhaseButtonClicked() {
@@ -98,39 +84,30 @@ public class TurnManager: NetworkSingleton<TurnManager> {
     public bool IsMyTurn() {
         if (gameStateServer.Value == GameState.SETUP) return true;
 
-        if (gameStateServer.Value == GameState.PLAYER_ONE_TURN && GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE)
-        {
+        if (gameStateServer.Value == GameState.PLAYER_ONE_TURN && GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
             return true;
         }
-        if (gameStateServer.Value == GameState.PLAYER_TWO_TURN && GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO)
-        {
+
+        if (gameStateServer.Value == GameState.PLAYER_TWO_TURN && GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO) {
             return true;
         }
+
         return false;
     }
 
     public void UpdateClientGameState() {
         switch(gameStateServer.Value) {
             case GameState.PLAYER_ONE_TURN:
-                if (_hasTurnChanged)
-                {
-                    GameboardObjectManager.Instance.ResetActions(Players.PLAYER_ONE);
-                    playerBanners[0].GetComponentInChildren<Canvas>().enabled = true; // player one's turn banner
-                    playerBanners[1].GetComponentInChildren<Canvas>().enabled = false;
-                }
+                if (_hasTurnChanged) GameboardObjectManager.Instance.ResetActions(Players.PLAYER_ONE);
+
                 GameStateText.text = "Player One";
                 GameStateButton.GetComponentInChildren<TextMeshProUGUI>().text = "End Turn";
                 GameStateButton.interactable = GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE;
-
                 break;
 
             case GameState.PLAYER_TWO_TURN:
-                if (_hasTurnChanged)
-                {
-                    GameboardObjectManager.Instance.ResetActions(Players.PLAYER_TWO);
-                    playerBanners[1].GetComponentInChildren<Canvas>().enabled = true; // player two's turn banner
-                    playerBanners[0].GetComponentInChildren<Canvas>().enabled = false;
-                }
+                if (_hasTurnChanged)  GameboardObjectManager.Instance.ResetActions(Players.PLAYER_TWO);
+
                 GameStateText.text = "Player Two";
                 GameStateButton.GetComponentInChildren<TextMeshProUGUI>().text = "End Turn";
                 GameStateButton.interactable = GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO;
@@ -139,6 +116,12 @@ public class TurnManager: NetworkSingleton<TurnManager> {
 
             default:
                 break;
+        }
+
+        if (IsMyTurn()) {
+            Banner.GetComponentInChildren<TextMeshProUGUI>().text = "Your Turn";
+        } else {
+            Banner.GetComponentInChildren<TextMeshProUGUI>().text = "Opponent's Turn";
         }
 
         if (_hasTurnChanged) {
@@ -153,6 +136,8 @@ public class TurnManager: NetworkSingleton<TurnManager> {
             }
 
             GameboardObjectManager.Instance.DoStartOfTurnActions();
+
+            FadeBanner(true);
         }
     }
 
@@ -191,25 +176,55 @@ public class TurnManager: NetworkSingleton<TurnManager> {
         StartGameIfBothPlayersReady();
     }
 
-    IEnumerator fadeBanner(GameObject banner1)
-    {
-        Color c = banner1.GetComponent<SpriteRenderer>().material.color;
-        for(float alpha = 1f; alpha >= 0; alpha -= .1f)
-        {
-            c.a = alpha;
-            banner1.GetComponent<SpriteRenderer>().material.color = c;
-            yield return new WaitForSeconds(.1f);
+    private void FadeOutBanner() {
+        Image image = Banner.GetComponentInChildren<Image>();
+        TextMeshProUGUI text = Banner.GetComponentInChildren<TextMeshProUGUI>();
+        Color color = image.color;
+        Color textColor = text.color;
+
+        if (_bannerState > 0) {
+            _bannerState -= Time.deltaTime * _bannerFadeAnimationSpeed;
+
+            if (_bannerState <= 1.0f) {
+                color.a = _bannerState;
+                image.color = color;
+                textColor.a = _bannerState;
+                text.color = textColor;
+            }
+        } else {
+            Banner.SetActive(false);
         }
-        banner1.SetActive(false);
     }
-    IEnumerator fadeInBanner(GameObject banner1)
-    {
-        Color c = banner1.GetComponent<SpriteRenderer>().material.color;
-        for (float alpha = 0; alpha >= 1f; alpha += .1f)
-        {
-            c.a = alpha;
-            banner1.GetComponent<SpriteRenderer>().material.color = c;
-            yield return new WaitForSeconds(.1f);
+
+    private void FadeInBanner() {
+        Image image = Banner.GetComponentInChildren<Image>();
+        TextMeshProUGUI text = Banner.GetComponentInChildren<TextMeshProUGUI>();
+        Color color = image.color;
+        Color textColor = text.color;
+
+        Banner.SetActive(true);
+
+        if (_bannerState <= _bannerOpenTime) {
+            _bannerState += Time.deltaTime * _bannerFadeAnimationSpeed;
+
+            if (_bannerState <= 1.0f) {
+                color.a = _bannerState;
+                image.color = color;
+                textColor.a = _bannerState;
+                text.color = textColor;
+            }
+        } else {
+            _bannerIsAnimatingFadeIn = false;
+        }
+    }
+
+    private void FadeBanner(bool startFade = false) {
+        if (startFade) _bannerIsAnimatingFadeIn = true;
+
+        if (_bannerIsAnimatingFadeIn) {
+            FadeInBanner();
+        } else {
+            FadeOutBanner();
         }
     }
 }
