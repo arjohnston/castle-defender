@@ -10,8 +10,7 @@ public class TurnManager: NetworkSingleton<TurnManager> {
     public Button GameStateButton;
     public GameObject Banner;
     private bool _bannerIsAnimatingFadeIn = false;
-    private float _bannerFadeAnimationSpeed = 1.3f;
-    private float _bannerOpenTime = 2.0f;
+    private float _bannerFadeAnimationTiming = 1.3f;
     private float _bannerState = 0.0f;
 
     [SerializeField] private NetworkVariable<GameState> gameStateServer = new NetworkVariable<GameState>(GameState.SETUP);
@@ -183,7 +182,7 @@ public class TurnManager: NetworkSingleton<TurnManager> {
         Color textColor = text.color;
 
         if (_bannerState > 0) {
-            _bannerState -= Time.deltaTime * _bannerFadeAnimationSpeed;
+            _bannerState -= Time.deltaTime * _bannerFadeAnimationTiming;
 
             if (_bannerState <= 1.0f) {
                 color.a = _bannerState;
@@ -204,8 +203,8 @@ public class TurnManager: NetworkSingleton<TurnManager> {
 
         Banner.SetActive(true);
 
-        if (_bannerState <= _bannerOpenTime) {
-            _bannerState += Time.deltaTime * _bannerFadeAnimationSpeed;
+        if (_bannerState <= _bannerFadeAnimationTiming) {
+            _bannerState += Time.deltaTime * _bannerFadeAnimationTiming;
 
             if (_bannerState <= 1.0f) {
                 color.a = _bannerState;

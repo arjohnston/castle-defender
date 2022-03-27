@@ -7,6 +7,7 @@ using Unity.Netcode;
 using TMPro;
 using System.IO;
 using System;
+using UnityEngine.UI;
 
 public class GameManager : NetworkSingleton<GameManager> {
     public GameObject inGameMenu;
@@ -17,6 +18,12 @@ public class GameManager : NetworkSingleton<GameManager> {
     public TextMeshProUGUI winConditionText;
     public TextMeshProUGUI winConditionSubText;
     private int _playersConnected = 0;
+
+    public GameObject ToastMessage;
+    private bool _messageIsAnimatingFadeIn = false;
+    private float _messageFadeAnimationTiming = 6.0f;
+    private float _messageState = 0.0f;
+    private float _messageAlphaDefault = 0.6f;
 
     public TextMeshProUGUI currentPlayerHp;
     public TextMeshProUGUI opposingPlayerHp;
@@ -115,6 +122,7 @@ public class GameManager : NetworkSingleton<GameManager> {
 
         UpdatePlayerStats();
         CheckWinCondition();
+        FadeMessage();
     }
 
     private void UpdatePlayerStats() {
@@ -175,6 +183,73 @@ public class GameManager : NetworkSingleton<GameManager> {
         if (NetworkManager.Singleton.LocalClientId != clientId) {
             winConditionSubText.text = "Opponent forfeited";
             winConditionPanel.SetActive(true);
+        }
+    }
+
+    public void ShowToastMessage(String message) {
+        TextMeshProUGUI text = ToastMessage.GetComponentInChildren<TextMeshProUGUI>();
+        text.text = message;
+
+        FadeMessage(true);
+    }
+
+    private void FadeOutMessage() {
+        Image image = ToastMessage.GetComponentInChildren<Image>();
+        TextMeshProUGUI text = ToastMessage.GetComponentInChildren<TextMeshProUGUI>();
+        Color color = image.color;
+        Color textColor = text.color;
+
+        if (_messageState > 0) {
+            _messageState -= Time.deltaTime * _messageFadeAnimationTiming;
+
+            if (_messageState <= _messageAlphaDefault) {
+                color.a = _messageState;
+                image.color = color;
+            }
+
+            // Text should always go from 0 -> 100%
+            if (_messageState <= 1.0f) {
+                textColor.a = _messageState;
+                text.color = textColor;
+            }
+        } else {
+            ToastMessage.SetActive(false);
+        }
+    }
+
+    private void FadeInMessage() {
+        Image image = ToastMessage.GetComponentInChildren<Image>();
+        TextMeshProUGUI text = ToastMessage.GetComponentInChildren<TextMeshProUGUI>();
+        Color color = image.color;
+        Color textColor = text.color;
+
+        ToastMessage.SetActive(true);
+
+        if (_messageState <= _messageFadeAnimationTiming) {
+            _messageState += Time.deltaTime * _messageFadeAnimationTiming;
+
+            if (_messageState <= _messageAlphaDefault) {
+                color.a = _messageState;
+                image.color = color;
+            }
+
+            // Text should always go from 0 -> 100%
+            if (_messageState <= 1.0f) {
+                textColor.a = _messageState;
+                text.color = textColor;
+            }
+        } else {
+            _messageIsAnimatingFadeIn = false;
+        }
+    }
+
+    private void FadeMessage(bool startFade = false) {
+        if (startFade) _messageIsAnimatingFadeIn = true;
+
+        if (_messageIsAnimatingFadeIn) {
+            FadeInMessage();
+        } else {
+            FadeOutMessage();
         }
     }
 }

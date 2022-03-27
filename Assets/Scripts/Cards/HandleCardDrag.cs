@@ -18,7 +18,10 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     }
 
     public void OnDrag(PointerEventData eventData) {
-        if (!TurnManager.Instance.IsMyTurn()) return;
+        if (!TurnManager.Instance.IsMyTurn()) {
+            GameManager.Instance.ShowToastMessage("Not your turn");
+            return;
+        }
 
         Card card = PlayerHand.Instance.GetCardForGameObject(gameObject);
         hexRayCast = Gameboard.Instance.GetHexRayCastHit();
@@ -89,11 +92,18 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         
         Card card = PlayerHand.Instance.GetCardForGameObject(gameObject);
 
-        if (
-            hexRayCast == null || // not on gameboard
-            (card.attributes.isRestrictedToMyTurn && !TurnManager.Instance.IsMyTurn()) || // not my turn
-            !ResourceManager.Instance.HaveEnoughResources(card.attributes.cost) // dont have enough resources
-        ) {
+        if (hexRayCast == null) {
+            GameManager.Instance.ShowToastMessage("Invalid placement");
+            isPlacementValid = false;
+        }
+
+        if (card.attributes.isRestrictedToMyTurn && !TurnManager.Instance.IsMyTurn()) {
+            GameManager.Instance.ShowToastMessage("Not your turn");
+            isPlacementValid = false;
+        }
+
+        if (!ResourceManager.Instance.HaveEnoughResources(card.attributes.cost)) {
+            GameManager.Instance.ShowToastMessage("Not enough resources");
             isPlacementValid = false;
         }
 

@@ -427,8 +427,10 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             _selectedGameboardObject = target.gameObject;
             _selectedGameboardObject.GetComponent<GameboardObject>().Select();
         } else {
-            if (gbo.IsValidAttack(target)) { // this is returning 2 hexes away
+            if (gbo.IsValidAttack(target)) {
                 gbo.Attack(target);
+            } else {
+                GameManager.Instance.ShowToastMessage("Invalid attack");
             }
 
             _selectedGameboardObject.GetComponent<GameboardObject>().Deselect();
