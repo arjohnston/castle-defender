@@ -227,6 +227,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
         ulong clientId = NetworkManager.Singleton.LocalClientId;
         SpawnCreatureServerRpc(location.Position(), clientId);
+
+        SoundManager.Instance.Play(Sounds.SPAWN);
     }
 
     public void SpawnPermanent(Hex location, Card card) {
@@ -239,6 +241,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
         ulong clientId = NetworkManager.Singleton.LocalClientId;
         SpawnPermanentServerRpc(location.Position(), clientId);
+
+        SoundManager.Instance.Play(Sounds.SPAWN);
     }
 
     public void SpawnTrap(Hex location, Card card) {
@@ -251,6 +255,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
         ulong clientId = NetworkManager.Singleton.LocalClientId;
         SpawnTrapServerRpc(location.Position(), clientId);
+
+        SoundManager.Instance.Play(Sounds.SPAWN);
     }
 
     public void CastSpell(Hex location, Card card) {
@@ -317,6 +323,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 }
                 break;
         }
+
+        SoundManager.Instance.Play(Sounds.SPELL);
     }
 
     public void CastEnchantment(Hex location, Card card) {
@@ -325,6 +333,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         if (gbo == null || !gbo.IsOwner) return;
 
         gbo.AddEnchantment(card.enchantment);
+
+        SoundManager.Instance.Play(Sounds.ENCHANT);
     }
 
     public void ResetSelection() {

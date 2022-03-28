@@ -112,6 +112,8 @@ public class GameManager : NetworkSingleton<GameManager> {
                 winConditionPanel.SetActive(true);
             }
         };
+
+        SoundManager.Instance.Play(Sounds.BACKGROUND_GAME);
     }
 
     // Update is called once per frame
