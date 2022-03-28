@@ -184,7 +184,6 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                     TryMovement(_selectedGameboardObject.GetComponent<GameboardObject>(), hexRayCast);
                 }
             }
-            lineScript.ClearAttackLines();
         }
     }
 
@@ -384,12 +383,6 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_ATTACK, gbo.GetOccupiedRadius()));
                 _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
 
-                points = new Transform[2];
-                    points[0] = _selectedGameboardObject.transform;
-                    points[1] = target.transform;
-                
-                lineScript.SetUpLine(points);
-
                 return;
             }
 
@@ -449,6 +442,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         } else {
             if (gbo.IsValidAttack(target)) {
                 gbo.Attack(target);
+                LineController.Instance.DrawAttackLine(_selectedGameboardObject.gameObject, target.gameObject);
             } else {
                 GameManager.Instance.ShowToastMessage("Invalid attack");
             }

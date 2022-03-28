@@ -4,6 +4,7 @@ using Unity.Netcode.Samples;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+ using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(NetworkObject))]
 [RequireComponent(typeof(ClientNetworkTransform))]

@@ -99,6 +99,14 @@ MonoBehaviour:
     m_InternalValue: 0
   remainingAttackActions:
     m_InternalValue: 0
+  isTrapActivated:
+    m_InternalValue: 0
+  isInActivatedTrap:
+    m_InternalValue: 0
+  isStunnedDuration:
+    m_InternalValue: 0
+  isGroundedDuration:
+    m_InternalValue: 0
 --- !u!1001 &8374602613387096020
 PrefabInstance:
   m_ObjectHideFlags: 0
