@@ -14,6 +14,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     [SerializeField] public GameObject CreatureToken;
     [SerializeField] public GameObject WallPrefab;
     [SerializeField] private GameboardObject _castle;
+    [SerializeField] private Transform[] points;
+    [SerializeField] private LineController lineScript;
 
     [SerializeField] private GameObject _selectedGameboardObject = null;
     [SerializeField] private bool _leftClickMouseChanged = false;
@@ -182,6 +184,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                     TryMovement(_selectedGameboardObject.GetComponent<GameboardObject>(), hexRayCast);
                 }
             }
+            lineScript.ClearAttackLines();
         }
     }
 
@@ -380,6 +383,13 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             if (target != null && gbo.IsValidAttack(target) && !target.IsOwner && target.GetGboType() != Types.TRAP) {
                 if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_ATTACK, gbo.GetOccupiedRadius()));
                 _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+
+                points = new Transform[2];
+                    points[0] = _selectedGameboardObject.transform;
+                    points[1] = target.transform;
+                
+                lineScript.SetUpLine(points);
+
                 return;
             }
 
