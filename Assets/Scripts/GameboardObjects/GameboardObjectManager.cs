@@ -190,9 +190,6 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 if (_selectedGameboardObject.GetComponent<NetworkObject>().IsOwner) {
                     TryMovement(_selectedGameboardObject.GetComponent<GameboardObject>(), hexRayCast);
                 }
-            } else if (_selectedGameboardObject != null) {
-                _selectedGameboardObject.GetComponent<GameboardObject>().Deselect();
-                _selectedGameboardObject = null;
             }
         }
     }
@@ -460,8 +457,14 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             // If I'm the owner, then select that gbo
             if (targetGbo.gameObject.GetComponent<NetworkObject>().IsOwner) {
                 _selectedGameboardObject.GetComponent<GameboardObject>().Deselect();
-                _selectedGameboardObject = targetGbo.gameObject;
-                _selectedGameboardObject.GetComponent<GameboardObject>().Select();
+
+                if (targetGbo.gameObject != _selectedGameboardObject) {
+                    _selectedGameboardObject = targetGbo.gameObject;
+                    _selectedGameboardObject.GetComponent<GameboardObject>().Select();
+                } else {
+                    _selectedGameboardObject = null;
+                }
+                
             } else {
                 TryAttack(gbo, targetGbo);
             }
