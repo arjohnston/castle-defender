@@ -43,8 +43,13 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         GameboardObject gbo = castle.GetComponent<GameboardObject>();
         gameboardObjects.Add(gbo);
 
+<<<<<<< Updated upstream
         if (networkObject.IsOwner) {
             _castle = gbo;
+=======
+        if (networkObject.IsOwner && ((player == Players.PLAYER_ONE) || (player == Players.PLAYER_TWO))) {
+            _castle = gbo;        
+>>>>>>> Stashed changes
 
             gbo.SetupGboDetails(
                 new Card(
@@ -66,6 +71,9 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                     new Spell{}
                 )
             );
+            if(player == Players.PLAYER_ONE || player == Players.PLAYER_TWO)){
+                gbo.gameObject.transform.GetChild(0).gameObject.SetActive(true);
+            }
 
             if (player == Players.PLAYER_ONE) {
                 Hex hex = Gameboard.Instance.GetHexAt(-5, Gameboard.Instance.boardRadius - 2);
