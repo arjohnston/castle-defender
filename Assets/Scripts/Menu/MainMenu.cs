@@ -4,9 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
 
-public class MainMenu : MonoBehaviour
-{
-
+public class MainMenu : MonoBehaviour {
     public void HostGame() {
         GameSettings.isLaunchingAsHost = true;
         SceneManager.LoadScene(Scenes.GAME);
