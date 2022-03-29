@@ -5,4 +5,5 @@ public enum Sounds {
     SPAWN,
     SPELL,
     ENCHANT,
+    ATTACK,
 }

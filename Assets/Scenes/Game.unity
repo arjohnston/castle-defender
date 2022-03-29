@@ -4306,7 +4306,7 @@ MonoBehaviour:
   opposingPlayerHp: {fileID: 1781537047}
   currentPlayerResources: {fileID: 831938265}
   opposingPlayerResources: {fileID: 850111900}
-  allowMultiplayerInEditor: 1
+  allowMultiplayerInEditor: 0
 --- !u!4 &983941248
 Transform:
   m_ObjectHideFlags: 0
@@ -4397,6 +4397,7 @@ MonoBehaviour:
   spawn: {fileID: 8300000, guid: ecab17a917cf2f14f84d1e1c189025a2, type: 3}
   spell: {fileID: 8300000, guid: 6c41e3b3b6bd8e74caaad5a88a42e0c9, type: 3}
   enchant: {fileID: 8300000, guid: d16d3a90b711a824180a079d00be3025, type: 3}
+  attack: {fileID: 8300000, guid: a07b5e5ab87bbb84a9266c365f1d7376, type: 3}
 --- !u!114 &983941253
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -26,14 +26,21 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     private Hex _spawnLocation;
     private Card _spawnCard;
 
+    private GameObject _tooltip;
+    private Card _cardHovered;
+
     // Update is called once per frame
     void Update() {
-        if (!TurnManager.Instance.IsMyTurn()) _selectedGameboardObject = null;
+        if (!TurnManager.Instance.IsMyTurn() && _selectedGameboardObject != null) {
+            _selectedGameboardObject.GetComponent<GameboardObject>().Deselect();
+            _selectedGameboardObject = null;
+        }
 
         CheckOnLeftClick();
         HighlightRaycastIfSelected();
         SelectObjectAtRayCastHit();
         UpdateCastleHealth();
+        ShowTooltipOnHover();
     }
 
     // Required to pass the player manually as GameSettings.player was encountering race conditions on awake
@@ -183,6 +190,9 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 if (_selectedGameboardObject.GetComponent<NetworkObject>().IsOwner) {
                     TryMovement(_selectedGameboardObject.GetComponent<GameboardObject>(), hexRayCast);
                 }
+            } else if (_selectedGameboardObject != null) {
+                _selectedGameboardObject.GetComponent<GameboardObject>().Deselect();
+                _selectedGameboardObject = null;
             }
         }
     }
@@ -398,6 +408,45 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
     }
 
+    private void ShowTooltipOnHover() {
+        Hex raycastHitSpot = Gameboard.Instance.GetHexRayCastHit();
+        GameboardObject gbo = GetGboAtHex(raycastHitSpot);
+
+        if (gbo == null || PlayerHand.Instance.IsCardDragged() || (_cardHovered != null && !_cardHovered.Equals(gbo.GetCard()))) {
+            if (_tooltip != null) {
+                Destroy(_tooltip);
+            }
+
+            _tooltip = null;
+            _cardHovered = null;
+
+            return;
+        }
+
+        if (_tooltip == null && gbo != null) {
+            Card card = gbo.GetCard();
+
+            if (card != null) {
+                _tooltip = (GameObject)Instantiate(PlayerHand.Instance.CardHandPrefab, Vector3.zero, Quaternion.identity);
+                _tooltip.transform.SetParent(PlayerHand.Instance.playerHandArea.transform, false);
+
+                _cardHovered = card;
+                card.attributes.damage = gbo.GetDamage();
+                card.attributes.hp = gbo.GetModifiedHp();
+                CardBuilder.Instance.BuildCard(_tooltip, card);
+            }
+            
+        }
+
+        if (_tooltip != null) {
+            Vector2 mousePosition = Camera.main.ScreenToViewportPoint(Mouse.current.position.ReadValue());
+            mousePosition.x *= Screen.width;
+            mousePosition.y *= Screen.height;
+
+            _tooltip.transform.position = mousePosition + new Vector2(70f, -100f);
+        }
+    }
+
     private void TryMovement(GameboardObject gbo, Hex target) {
         // If target is off, or partially off the map
         if (!_isRaycastRangeValid) {
@@ -421,6 +470,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 gbo.MoveToPosition(target);
 
                 if (targetGbo != null && IsEnemyTrap(targetGbo.gameObject)) targetGbo.ActivateTrap();
+            } else {
+                GameManager.Instance.ShowToastMessage("Invalid move");
             }
 
             gbo.Deselect();
@@ -443,6 +494,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             if (gbo.IsValidAttack(target)) {
                 gbo.Attack(target);
                 LineController.Instance.DrawAttackLine(_selectedGameboardObject.gameObject, target.gameObject);
+                SoundManager.Instance.Play(Sounds.ATTACK);
             } else {
                 GameManager.Instance.ShowToastMessage("Invalid attack");
             }

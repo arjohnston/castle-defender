@@ -117,6 +117,10 @@ public class PlayerHand : Singleton<PlayerHand> {
         GameboardObjectManager.Instance.SetIsCardBeingDragged(true);
     }
 
+    public bool IsCardDragged() {
+        return cardDragged != null;
+    }
+
     public void RemoveCardIsDragged() {
         cardDragged = null;
         GameboardObjectManager.Instance.SetIsCardBeingDragged(false);
