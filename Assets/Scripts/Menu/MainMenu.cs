@@ -6,6 +6,14 @@ using Unity.Netcode;
 
 public class MainMenu : MonoBehaviour
 {
+    public void PlayGame()
+    {
+        GameManager.Instance.PlayerQuitServerRpc(NetworkManager.Singleton.LocalClientId);
+        GameManager.Instance.ResetScene();
+        GameSettings.isLaunchingAsHost = false;
+        GameSettings.clientJoinCode = "";
+        SceneManager.LoadScene(Scenes.MAIN_MENU);
+    }
     public void HostGame() {
         GameSettings.isLaunchingAsHost = true;
         SceneManager.LoadScene(Scenes.GAME);
