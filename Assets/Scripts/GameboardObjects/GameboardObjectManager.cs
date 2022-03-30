@@ -4,6 +4,7 @@ using Utilities.Singletons;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 {
@@ -242,7 +243,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         _spawnCard = card;
 
         ulong clientId = NetworkManager.Singleton.LocalClientId;
-        SpawnCreatureServerRpc(location.Position(), clientId);
+        SpawnCreatureServerRpc(location.Position(), clientId, card.type, card.sprite, card.meta, card.attributes, card.enchantment, card.spell);
 
         SoundManager.Instance.Play(Sounds.SPAWN);
     }
@@ -256,7 +257,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         _spawnCard = card;
 
         ulong clientId = NetworkManager.Singleton.LocalClientId;
-        SpawnPermanentServerRpc(location.Position(), clientId);
+        SpawnPermanentServerRpc(location.Position(), clientId, card.type, card.sprite, card.meta, card.attributes, card.enchantment, card.spell);
 
         SoundManager.Instance.Play(Sounds.SPAWN);
     }
@@ -270,7 +271,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         _spawnCard = card;
 
         ulong clientId = NetworkManager.Singleton.LocalClientId;
-        SpawnTrapServerRpc(location.Position(), clientId);
+        SpawnTrapServerRpc(location.Position(), clientId, card.type, card.sprite, card.meta, card.attributes, card.enchantment, card.spell);
 
         SoundManager.Instance.Play(Sounds.SPAWN);
     }
@@ -437,7 +438,15 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 _cardHovered = card;
                 card.attributes.damage = gbo.GetDamage();
                 card.attributes.hp = gbo.GetModifiedHp();
-                CardBuilder.Instance.BuildCard(_tooltip, card);
+                CardBuilder.Instance.BuildCard(_tooltip, card, false);
+
+                Image[] panels = _tooltip.GetComponentsInChildren<Image>();
+
+                // Stunned
+                panels[2].gameObject.SetActive(gbo.IsStunned());
+
+                // Grounded
+                panels[3].gameObject.SetActive(gbo.IsGrounded());
             }
             
         }
@@ -610,28 +619,34 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     }
 
     [ServerRpc(RequireOwnership=false)]
-    private void SpawnCreatureServerRpc(Vector3 position, ulong clientId) {
-        GameObject go = Instantiate(CreatureToken, position, Quaternion.identity);
+    private void SpawnCreatureServerRpc(Vector3 position, ulong clientId, Types type, Sprites sprite, Meta meta, Attributes attributes, Enchantment enchantment, Spell spell) {
+        GameObject go = Instantiate(CreatureToken, position, Quaternion.Euler(new Vector3(0, clientId == 1 ? 180.0f : 0.0f, 0)));
+        GameboardObject gbo = go.GetComponent<GameboardObject>();
         NetworkObject networkObject = go.GetComponent<NetworkObject>();
         networkObject.Spawn();
         networkObject.ChangeOwnership(clientId);
 
+        // Player 2
+        // if (clientId == 1) {
+        //     gbo.SetRotation(new Vector3(0, 180.0f, 0));
+        // }
+
         // TODO: Set the material
 
-        SpawnCreatureClientRpc(networkObject.NetworkObjectId);
+        SpawnCreatureClientRpc(networkObject.NetworkObjectId, type, sprite, meta, attributes, enchantment, spell);
     }
 
     [ClientRpc]
-    private void SpawnCreatureClientRpc(ulong objectId) {
+    private void SpawnCreatureClientRpc(ulong objectId, Types type, Sprites sprite, Meta meta, Attributes attributes, Enchantment enchantment, Spell spell) {
         GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
         GameboardObject gbo = go.GetComponent<GameboardObject>();
         
         gameboardObjects.Add(gbo);
         if (_spawnLocation != null) gbo.SetPosition(_spawnLocation);
 
-        if (_spawnCard != null) gbo.SetupGboDetails(_spawnCard);
+        Card card = new Card(type, sprite, meta, attributes, enchantment, spell);
+        gbo.SetupGboDetails(card);
 
-        _spawnCard = null;
         _spawnLocation = null;
 
         Hex location = gbo.GetHexPosition();
@@ -640,17 +655,17 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     }
 
     [ServerRpc(RequireOwnership=false)]
-    private void SpawnPermanentServerRpc(Vector3 position, ulong clientId) {
-        GameObject go = Instantiate(WallPrefab, position, Quaternion.identity);
+    private void SpawnPermanentServerRpc(Vector3 position, ulong clientId, Types type, Sprites sprite, Meta meta, Attributes attributes, Enchantment enchantment, Spell spell) {
+        GameObject go = Instantiate(WallPrefab, position, Quaternion.Euler(new Vector3(0, clientId == 1 ? 180.0f : 0.0f, 0)));
         NetworkObject networkObject = go.GetComponent<NetworkObject>();
         networkObject.Spawn();
         networkObject.ChangeOwnership(clientId);
 
-        SpawnPermanentClientRpc(networkObject.NetworkObjectId);
+        SpawnPermanentClientRpc(networkObject.NetworkObjectId, type, sprite, meta, attributes, enchantment, spell);
     }
 
     [ClientRpc]
-    private void SpawnPermanentClientRpc(ulong objectId) {
+    private void SpawnPermanentClientRpc(ulong objectId, Types type, Sprites sprite, Meta meta, Attributes attributes, Enchantment enchantment, Spell spell) {
         GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
         GameboardObject gbo = go.GetComponent<GameboardObject>();
 
@@ -658,33 +673,34 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
         if (_spawnLocation != null) gbo.SetPosition(_spawnLocation);
 
-        if (_spawnCard != null) gbo.SetupGboDetails(_spawnCard);
+        Card card = new Card(type, sprite, meta, attributes, enchantment, spell);
+        gbo.SetupGboDetails(card);
 
-        _spawnCard = null;
         _spawnLocation = null;
     }
 
     [ServerRpc(RequireOwnership=false)]
-    private void SpawnTrapServerRpc(Vector3 position, ulong clientId) {
-        GameObject go = Instantiate(CreatureToken, position, Quaternion.identity);
+    private void SpawnTrapServerRpc(Vector3 position, ulong clientId, Types type, Sprites sprite, Meta meta, Attributes attributes, Enchantment enchantment, Spell spell) {
+        GameObject go = Instantiate(CreatureToken, position, Quaternion.Euler(new Vector3(0, clientId == 1 ? 180.0f : 0.0f, 0)));
         NetworkObject networkObject = go.GetComponent<NetworkObject>();
         networkObject.Spawn();
         networkObject.ChangeOwnership(clientId);
 
         // TODO: Set the material
 
-        SpawnTrapClientRpc(networkObject.NetworkObjectId);
+        SpawnTrapClientRpc(networkObject.NetworkObjectId, type, sprite, meta, attributes, enchantment, spell);
     }
 
     [ClientRpc]
-    private void SpawnTrapClientRpc(ulong objectId) {
+    private void SpawnTrapClientRpc(ulong objectId, Types type, Sprites sprite, Meta meta, Attributes attributes, Enchantment enchantment, Spell spell) {
         GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
         GameboardObject gbo = go.GetComponent<GameboardObject>();
         
         gameboardObjects.Add(gbo);
         if (_spawnLocation != null) gbo.SetPosition(_spawnLocation);
 
-        if (_spawnCard != null) gbo.SetupGboDetails(_spawnCard);
+        Card card = new Card(type, sprite, meta, attributes, enchantment, spell);
+        gbo.SetupGboDetails(card);
 
         if (!gbo.IsOwner) gbo.gameObject.SetActive(false);
 

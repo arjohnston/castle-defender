@@ -66,7 +66,7 @@ public class CardBuilder : Singleton<CardBuilder> {
 
 
 
-    public void BuildCard(GameObject gameObject, Card card) {
+    public void BuildCard(GameObject gameObject, Card card, bool ignoreSpellEffects = true) {
         TextMeshProUGUI[] playerCardText = gameObject.GetComponentsInChildren<TextMeshProUGUI>();
         playerCardText[0].text = card.meta.title;
         playerCardText[1].text = card.meta.description;
@@ -110,6 +110,11 @@ public class CardBuilder : Singleton<CardBuilder> {
         }
 
         playerCardImages[1].sprite = GetSpriteForCard(card);
+
+        if (ignoreSpellEffects) {
+            playerCardImages[2].gameObject.SetActive(false); // Stunned
+            playerCardImages[3].gameObject.SetActive(false); // Grounded
+        }
     }
 
     public Sprite GetSpriteForCard(Card card) {

@@ -80,7 +80,7 @@ public class DeckManager : NetworkSingleton<DeckManager> {
         P2DeckGameObject = Instantiate(
             GameboardDeckPrefab, 
             Gameboard.Instance.GetPlayerTwoDeckArea().transform.position,
-            Quaternion.identity
+            Quaternion.Euler(new Vector3(0, 180.0f, 0))
         );
         P2DeckGameObject.name = "Deck_p2";
         meshRenderer = P2DeckGameObject.GetComponentInChildren<MeshRenderer>();
@@ -89,7 +89,7 @@ public class DeckManager : NetworkSingleton<DeckManager> {
         P2GraveGameObject = Instantiate(
             GameboardDeckPrefab, 
             Gameboard.Instance.GetPlayerTwoGraveArea().transform.position,
-            Quaternion.identity
+            Quaternion.Euler(new Vector3(0, 180.0f, 0))
         );
         P2GraveGameObject.name = "Grave_p2";
         meshRenderer = P2GraveGameObject.GetComponentInChildren<MeshRenderer>();

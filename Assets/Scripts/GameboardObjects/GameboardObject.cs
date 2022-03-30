@@ -102,6 +102,14 @@ public class GameboardObject : NetworkBehaviour {
         isGroundedDuration.Value += duration;
     }
 
+    public bool IsGrounded() {
+        return isGroundedDuration.Value > 0;
+    }
+
+    public bool IsStunned() {
+        return isStunnedDuration.Value > 0;
+    }
+
     public void SetPosition(Hex hex) {
         transform.position = hex.Position();
         SetTargetPositionServerRpc(hex.Position());
