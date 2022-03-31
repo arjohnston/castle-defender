@@ -626,13 +626,6 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         networkObject.Spawn();
         networkObject.ChangeOwnership(clientId);
 
-        // Player 2
-        // if (clientId == 1) {
-        //     gbo.SetRotation(new Vector3(0, 180.0f, 0));
-        // }
-
-        // TODO: Set the material
-
         SpawnCreatureClientRpc(networkObject.NetworkObjectId, type, sprite, meta, attributes, enchantment, spell);
     }
 
@@ -640,6 +633,9 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     private void SpawnCreatureClientRpc(ulong objectId, Types type, Sprites sprite, Meta meta, Attributes attributes, Enchantment enchantment, Spell spell) {
         GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
         GameboardObject gbo = go.GetComponent<GameboardObject>();
+
+        Sprite s = CardBuilder.Instance.GetSprite(sprite);
+        go.GetComponentInChildren<MeshRenderer>().material.mainTexture = s.texture;
         
         gameboardObjects.Add(gbo);
         if (_spawnLocation != null) gbo.SetPosition(_spawnLocation);
@@ -669,6 +665,9 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
         GameboardObject gbo = go.GetComponent<GameboardObject>();
 
+        Sprite s = CardBuilder.Instance.GetSprite(sprite);
+        go.GetComponentInChildren<MeshRenderer>().material.mainTexture = s.texture;
+
         gameboardObjects.Add(gbo);
 
         if (_spawnLocation != null) gbo.SetPosition(_spawnLocation);
@@ -686,8 +685,6 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         networkObject.Spawn();
         networkObject.ChangeOwnership(clientId);
 
-        // TODO: Set the material
-
         SpawnTrapClientRpc(networkObject.NetworkObjectId, type, sprite, meta, attributes, enchantment, spell);
     }
 
@@ -695,6 +692,9 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     private void SpawnTrapClientRpc(ulong objectId, Types type, Sprites sprite, Meta meta, Attributes attributes, Enchantment enchantment, Spell spell) {
         GameObject go = NetworkManager.SpawnManager.SpawnedObjects[objectId].gameObject;
         GameboardObject gbo = go.GetComponent<GameboardObject>();
+
+        Sprite s = CardBuilder.Instance.GetSprite(sprite);
+        go.GetComponentInChildren<MeshRenderer>().material.mainTexture = s.texture;
         
         gameboardObjects.Add(gbo);
         if (_spawnLocation != null) gbo.SetPosition(_spawnLocation);

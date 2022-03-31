@@ -109,7 +109,7 @@ public class CardBuilder : Singleton<CardBuilder> {
                 break;
         }
 
-        playerCardImages[1].sprite = GetSpriteForCard(card);
+        playerCardImages[1].sprite = GetSprite(card.sprite);
 
         if (ignoreSpellEffects) {
             playerCardImages[2].gameObject.SetActive(false); // Stunned
@@ -117,8 +117,8 @@ public class CardBuilder : Singleton<CardBuilder> {
         }
     }
 
-    public Sprite GetSpriteForCard(Card card) {
-        switch (card.sprite) {
+    public Sprite GetSprite(Sprites sprite) {
+        switch (sprite) {
             case Sprites.ORC:
                 return Orc;
 
