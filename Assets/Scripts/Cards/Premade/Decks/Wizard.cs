@@ -10,11 +10,11 @@ public class Wizard : Deck {
         for (int i = 0; i < 2; i++)
             d.Push(CardsLibrary.CreateManaElemental());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateAncientGolem());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateAncientGolem());
 
-        // for (int i = 0; i < 1; i++)
-        //     d.Push(CardsLibrary.CreateArchmage());
+        for (int i = 0; i < 1; i++)
+            d.Push(CardsLibrary.CreateArchmage());
 
         for (int i = 0; i < 2; i++)
             d.Push(CardsLibrary.CreateEternalDragon());

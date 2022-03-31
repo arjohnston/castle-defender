@@ -297,24 +297,55 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 break;
 
             case SpellTypes.CHARGE_WALL:
-                // TODO: Charge the nearest wall
+                List<GameboardObject> walls = new List<GameboardObject>();
+
+                foreach(GameboardObject gbo in gameboardObjects) {
+                    if (gbo.GetGboType() == Types.PERMANENT && !gbo.IsOwner && gbo.GetTitle() == "Wall") {
+                        walls.Add(gbo);
+                    }
+                }
+
+                if (walls.Count > 0) {
+                    GameboardObject closest = null;
+                    
+                    foreach (GameboardObject p in walls) {
+                        if (closest == null) closest = p;
+                        else if (Cube.GetDistanceToHex(p.GetHexPosition(), gbos[0].GetHexPosition()) < Cube.GetDistanceToHex(closest.GetHexPosition(), gbos[0].GetHexPosition())) {
+                            closest = p;
+                        }
+                    }
+
+                    foreach(GameboardObject gbo in gbos) {
+                        List<Hex> surroundingHexes = Gameboard.Instance.GetHexesWithinRange(closest.GetHexPosition(), 1, true);
+                        Hex closestUnoccupiedHex = null;
+
+                        foreach (Hex hex in surroundingHexes) {
+                            if (GetGboAtHex(hex) == null && closestUnoccupiedHex == null) {
+                                closestUnoccupiedHex = hex;
+                            } else if (GetGboAtHex(hex) == null && Cube.GetDistanceToHex(hex, gbo.GetHexPosition()) < Cube.GetDistanceToHex(closestUnoccupiedHex, gbo.GetHexPosition())) {
+                                closestUnoccupiedHex = hex;
+                            }
+                        }
+
+                        gbo.MoveToPosition(closestUnoccupiedHex);
+                    }
+                }
                 break;
 
             case SpellTypes.HEAL:
                 foreach(GameboardObject gbo in gbos) {
-                    gbo.SetHp(gbo.GetHp() + card.spell.effectAmount);
+                    gbo.SetHp(gbo.GetHp() + card.spell.effectAmount + gbo.GetSpellModifier());
                 }
                 break;
 
             case SpellTypes.DAMAGE:
                 foreach(GameboardObject gbo in gbos) {
-                    gbo.SetHp(gbo.GetHp() - card.spell.effectAmount);
+                    gbo.SetHp(gbo.GetHp() - card.spell.effectAmount + gbo.GetSpellModifier());
                 }
                 break;
             
             case SpellTypes.STUN:
                 foreach(GameboardObject gbo in gbos) {
-                    Logger.Instance.LogInfo("Setting effect" + card.spell.effectDuration);
                     gbo.SetHp(gbo.GetHp() - card.spell.effectAmount);
                     gbo.SetStunnedDuration(card.spell.effectDuration);
                 }
@@ -322,20 +353,17 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
             case SpellTypes.GROUND_FLYING_CREATURE:
                 foreach(GameboardObject gbo in gbos) {
-                    Logger.Instance.LogInfo("Setting effect" + card.spell.effectDuration);
                     gbo.SetGroundedDuration(card.spell.effectDuration);
                 }
                 break;
 
             case SpellTypes.REDUCE_RESOURCE_COST_CREATURES:
-                // TODO: Reduce the resource cost of all cards
-                // Update prefabs in playerhand for duration, etc.
+                PlayerHand.Instance.SetResourceCostModifier(card.spell.effectAmount, card.spell.effectDuration);
                 break;
 
             case SpellTypes.DAMAGE_AND_STUN:
                 foreach(GameboardObject gbo in gbos) {
-                    Logger.Instance.LogInfo("Setting effect" + card.spell.effectDuration);
-                    gbo.SetHp(gbo.GetHp() - card.spell.effectAmount);
+                    gbo.SetHp(gbo.GetHp() - card.spell.effectAmount + gbo.GetSpellModifier());
                     gbo.SetStunnedDuration(card.spell.effectDuration);
                 }
                 break;
@@ -365,50 +393,63 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     }
 
     public void HighlightRaycastIfSelected() {
+        Hex raycastHitSpot = Gameboard.Instance.GetHexRayCastHit();
+        Dictionary<Hex, HitSpot> hitSpots = new Dictionary<Hex, HitSpot>();
+
         if (_selectedGameboardObject == null) {
-            if (!_isCardBeingDragged) Gameboard.Instance.ClearHighlightedSpaces();
+            if (!_isCardBeingDragged && TurnManager.Instance.IsMyTurn()) {
+                foreach (GameboardObject gbo in gameboardObjects) {
+                    if (TurnManager.Instance.IsMyTurn() && gbo.IsOwner && gbo.CanMoveOrAttack()) {
+                        if (!hitSpots.ContainsKey(gbo.GetHexPosition())) hitSpots.Add(gbo.GetHexPosition(), new HitSpot(HexColors.CAN_MOVE, 0, true));
+                    }
+                }
+
+                _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+            }
+
             return;
         }
 
-        Hex raycastHitSpot = Gameboard.Instance.GetHexRayCastHit();
-        GameboardObject gbo = _selectedGameboardObject.GetComponent<GameboardObject>();
-        Dictionary<Hex, HitSpot> hitSpots = new Dictionary<Hex, HitSpot>();
+        if (_selectedGameboardObject != null) {
+            GameboardObject gbo = _selectedGameboardObject.GetComponent<GameboardObject>();
 
-        if (gbo.CanMove()) {
-            hitSpots.Add(gbo.GetHexPosition(), new HitSpot(HexColors.AVAILABLE_MOVES, gbo.GetSpeed(), true));
+            if (gbo.CanMove()) {
+                if (!hitSpots.ContainsKey(gbo.GetHexPosition())) hitSpots.Add(gbo.GetHexPosition(), new HitSpot(HexColors.AVAILABLE_MOVES, gbo.GetSpeed(), true));
+                else hitSpots[gbo.GetHexPosition()] = new HitSpot(HexColors.AVAILABLE_MOVES, gbo.GetSpeed(), true);
 
-            if (gbo.GetGboType() == Types.PERMANENT && raycastHitSpot != null) {
-                if (gbo.IsValidMovement(raycastHitSpot)) {
-                    if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_MOVE, gbo.GetOccupiedRadius()));
+                if (gbo.GetGboType() == Types.PERMANENT && raycastHitSpot != null) {
+                    if (gbo.IsValidMovement(raycastHitSpot)) {
+                        if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_MOVE, gbo.GetOccupiedRadius()));
+                        _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+                        return;
+                    } else {
+                        if (raycastHitSpot != null && !hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.INVALID_MOVE, gbo.GetOccupiedRadius()));
+                        
+                        _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+                        return;
+                    }
+                }
+            }
+
+            if (raycastHitSpot != null) {
+                GameboardObject target = GetGboAtHex(raycastHitSpot);
+                
+                if (target != null && gbo.IsValidAttack(target) && !target.IsOwner && target.GetGboType() != Types.TRAP) {
+                    if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_ATTACK, gbo.GetOccupiedRadius()));
                     _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+
                     return;
-                } else {
-                    if (raycastHitSpot != null && !hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.INVALID_MOVE, gbo.GetOccupiedRadius()));
-                    
+                }
+
+                if ((target == null || target.GetGboType() == Types.TRAP && !target.IsOwner) && gbo.IsValidMovement(raycastHitSpot)) {
+                    if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_MOVE, gbo.GetOccupiedRadius()));
                     _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
                     return;
                 }
             }
+
+            if (raycastHitSpot != null && !hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.INVALID_MOVE, gbo.GetOccupiedRadius()));
         }
-
-        if (raycastHitSpot != null) {
-            GameboardObject target = GetGboAtHex(raycastHitSpot);
-            
-            if (target != null && gbo.IsValidAttack(target) && !target.IsOwner && target.GetGboType() != Types.TRAP) {
-                if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_ATTACK, gbo.GetOccupiedRadius()));
-                _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
-
-                return;
-            }
-
-            if ((target == null || target.GetGboType() == Types.TRAP && !target.IsOwner) && gbo.IsValidMovement(raycastHitSpot)) {
-                if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_MOVE, gbo.GetOccupiedRadius()));
-                _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
-                return;
-            }
-        }
-
-        if (raycastHitSpot != null && !hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.INVALID_MOVE, gbo.GetOccupiedRadius()));
 
         _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
     }
@@ -575,6 +616,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 gbo.SetStunnedDuration(-1);
             }
         }
+
+        PlayerHand.Instance.DecrementResourceCostModifierDuration();
     }
 
     public void ResetActions(Players player) {

@@ -223,6 +223,10 @@ public class GameboardObject : NetworkBehaviour {
         return false;
     }
 
+    public String GetTitle() {
+        return meta.Value.title;
+    }
+
     public int GetSpeed() {
         int modifier = GetEnchantmentModifier("speed");
 
@@ -263,6 +267,18 @@ public class GameboardObject : NetworkBehaviour {
 
     public Card GetCard() {
         return card;
+    }
+
+    public int GetSpellModifier() {
+        return attributes.Value.spellModifier;
+    }
+
+    public int GetRangedHealthModifier() {
+        return attributes.Value.rangedHealthModifier;
+    }
+
+    public int GetMeleeHealthModifier() {
+        return attributes.Value.meleeHealthModifier;
     }
 
     public void AddEnchantment(Enchantment enchantment) {
@@ -425,6 +441,12 @@ public class GameboardObject : NetworkBehaviour {
         int damageModifier = 0;
         if (target.GetGboType() == Types.PERMANENT) damageModifier += attributes.Value.permanentDamageModifier;
         if (!hasAttacked) damageModifier += attributes.Value.firstAttackDamageModifier;
+
+        int distance = Cube.GetDistanceToHex(GetHexPosition(), target.GetHexPosition());
+        if (distance > 1) damageModifier += attributes.Value.rangedHealthModifier;
+        else damageModifier += attributes.Value.meleeHealthModifier;
+
+        if (damageModifier + GetDamage() <= 0) return;
 
         target.SetHp(-(damageModifier + GetDamage()));
 

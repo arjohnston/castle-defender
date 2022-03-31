@@ -58,8 +58,8 @@ public class Ranger : Deck {
         for (int i = 0; i < 1; i++)
             d.Push(CardsLibrary.CreateElvenLongbow());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateCharge());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateCharge());
 
         for (int i = 0; i < 2; i++)
             d.Push(CardsLibrary.CreateHeal());

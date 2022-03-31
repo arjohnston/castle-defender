@@ -392,7 +392,7 @@ public static class CardsLibrary {
             Sprites.CHARGE,
             new Meta{
                 title = "Charge",
-                description = "Place this spell on a monster to order them to charge a wall",
+                description = "Place this spell on a monster to order them to charge towards the nearest enemy wall",
             },
             new Attributes{
                 hp = 1,
@@ -672,7 +672,7 @@ public static class CardsLibrary {
             new Spell{
                 spellType = SpellTypes.REDUCE_RESOURCE_COST_CREATURES,
                 validTarget = Targets.ANY,
-                effectAmount = 1,
+                effectAmount = -1,
                 effectDuration = 3,
             }
         );
@@ -757,6 +757,10 @@ public static class CardsLibrary {
                 damage = 2,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
+                spellModifier = -1,
+                rangedHealthModifier = -1,
+                meleeHealthModifier = 1,
+                trapImmunity = true,
             },
             new Enchantment{}, 
             new Spell{}
@@ -779,6 +783,7 @@ public static class CardsLibrary {
                 damage = 2,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
+                spellModifier = 1,
             },
             new Enchantment{}, 
             new Spell{}

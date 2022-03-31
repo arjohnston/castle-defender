@@ -21,8 +21,40 @@ public class PlayerHand : Singleton<PlayerHand> {
     private GameObject cardHovered;
     private GameObject cardDragged;
 
+    private int _resourceCostModifier = 0;
+    private int _resourceCostModifierTurnDuration = 0;
+
+    void Update() {
+        SetCostModifierForPlayerHandCards();
+    }
+
     void LateUpdate() {
         TransformPositionIntoFan();
+    }
+
+    public int GetResourceCostModifier() {
+        return _resourceCostModifier;
+    }
+
+    public void SetResourceCostModifier(int modifier, int duration) {
+        _resourceCostModifier = modifier;
+        _resourceCostModifierTurnDuration = duration;
+    }
+
+    public void DecrementResourceCostModifierDuration() {
+        if (_resourceCostModifierTurnDuration > 0) _resourceCostModifierTurnDuration -= 1;
+        else {
+            _resourceCostModifier = 0;
+            _resourceCostModifierTurnDuration = 0;
+        }
+    }
+
+    private void SetCostModifierForPlayerHandCards() {
+        foreach (KeyValuePair<GameObject, Card> kvp in renderedPlayerHandCards) {
+            TextMeshProUGUI[] playerCardText = kvp.Key.GetComponentsInChildren<TextMeshProUGUI>();
+
+            playerCardText[4].text = (kvp.Value.attributes.cost + _resourceCostModifier).ToString();
+        }
     }
 
     public void AddCardToHand(Card card) {

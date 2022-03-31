@@ -40,8 +40,8 @@ public class Warrior : Deck {
         for (int i = 0; i < 1; i++)
             d.Push(CardsLibrary.CreateTowerArcher());
 
-        // for (int i = 0; i < 2; i++)
-        //     d.Push(CardsLibrary.CreateCallToArms());
+        for (int i = 0; i < 2; i++)
+            d.Push(CardsLibrary.CreateCallToArms());
 
         for (int i = 0; i < 2; i++)
             d.Push(CardsLibrary.CreateFieryGreaves());

@@ -102,7 +102,7 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             isPlacementValid = false;
         }
 
-        if (!ResourceManager.Instance.HaveEnoughResources(card.attributes.cost)) {
+        if (!ResourceManager.Instance.HaveEnoughResources(card.attributes.cost + PlayerHand.Instance.GetResourceCostModifier())) {
             GameManager.Instance.ShowToastMessage("Not enough resources");
             isPlacementValid = false;
         }
@@ -113,7 +113,7 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         } else {
             GameboardObjectManager.Instance.UseCard(hexRayCast, card);
             PlayerHand.Instance.RemoveCardFromHand(gameObject);
-            ResourceManager.Instance.UseResource(card.attributes.cost);
+            ResourceManager.Instance.UseResource(card.attributes.cost + PlayerHand.Instance.GetResourceCostModifier());
         }
 
         PlayerHand.Instance.RemoveCardIsDragged();
