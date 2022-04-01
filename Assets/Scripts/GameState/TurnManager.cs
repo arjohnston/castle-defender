@@ -128,6 +128,7 @@ public class TurnManager: NetworkSingleton<TurnManager> {
             if ((hasGameStarted.Value || gameStateServer.Value == GameState.PLAYER_TWO_TURN) && IsMyTurn()) {
                 DeckManager.Instance.DrawCard();
                 ResourceManager.Instance.SetPlayerResourcesForTurn();
+                AnalyticsManager.Instance.IncrementAnalytic(Analytics.AMOUNT_OF_TURNS, 1);
             }
 
             if (Application.isEditor && !GameManager.Instance.allowMultiplayerInEditor && gameStateServer.Value == GameState.PLAYER_TWO_TURN) {

@@ -32,6 +32,8 @@ public class GameManager : NetworkSingleton<GameManager> {
 
     public bool allowMultiplayerInEditor = false;
 
+    private DateTime _startTime;
+
     void Awake() {
         // Cap the frame rate
         Application.targetFrameRate = 60;
@@ -72,6 +74,7 @@ public class GameManager : NetworkSingleton<GameManager> {
                     await RelayManager.Instance.JoinRelay(GameSettings.clientJoinCode);
                     NetworkManager.Singleton.StartClient();
                     waitingForOthersPanel.SetActive(false);
+                    _startTime = DateTime.Now;
                 } catch {
                     Logger.Instance.LogError("Unable to start or join the relay server");
                     errorJoiningPanel.SetActive(true);
@@ -96,6 +99,7 @@ public class GameManager : NetworkSingleton<GameManager> {
 
             if (NetworkManager.Singleton.IsHost) {
                 waitingForOthersPanel.SetActive(false);
+                _startTime = DateTime.Now;
             }
 
             CameraController.Instance.SetStartingPosition(GetCurrentPlayer());
@@ -110,6 +114,11 @@ public class GameManager : NetworkSingleton<GameManager> {
 
                 winConditionSubText.text = "Opponent disconnected";
                 winConditionPanel.SetActive(true);
+
+                if (GetCurrentPlayer() == Players.PLAYER_ONE) AnalyticsManager.Instance.SetAnalytic(Analytics.PLAYER_WON, "Player One");
+                else AnalyticsManager.Instance.SetAnalytic(Analytics.PLAYER_WON, "Player Two");
+
+                FormatAndStoreTimeElapsed();
             }
         };
 
@@ -125,6 +134,17 @@ public class GameManager : NetworkSingleton<GameManager> {
         UpdatePlayerStats();
         CheckWinCondition();
         FadeMessage();
+    }
+
+    private void FormatAndStoreTimeElapsed() {
+        DateTime currentTime = DateTime.Now;
+        TimeSpan diff = currentTime - _startTime;
+
+        string hours = diff.Hours > 9 ? diff.Hours.ToString() : "0" + diff.Hours;
+        string minutes = diff.Minutes > 9 ? diff.Minutes.ToString() : "0" + diff.Minutes;
+        string seconds = diff.Seconds > 9 ? diff.Seconds.ToString() : "0" + diff.Seconds;
+
+        AnalyticsManager.Instance.SetAnalytic(Analytics.TOTAL_TIME, String.Format(hours + ":" + minutes + ":" + seconds));
     }
 
     private void UpdatePlayerStats() {
@@ -156,6 +176,11 @@ public class GameManager : NetworkSingleton<GameManager> {
 
                 winConditionText.text = "You lost.";
                 winConditionPanel.SetActive(true);
+
+                if (GetCurrentPlayer() == Players.PLAYER_ONE) AnalyticsManager.Instance.SetAnalytic(Analytics.PLAYER_WON, "Player Two");
+                else AnalyticsManager.Instance.SetAnalytic(Analytics.PLAYER_WON, "Player One");
+
+                FormatAndStoreTimeElapsed();
             }
 
             if (opposingPlayerCastleHealth <= 0) {
@@ -164,6 +189,11 @@ public class GameManager : NetworkSingleton<GameManager> {
 
                 winConditionText.text = "You won!";
                 winConditionPanel.SetActive(true);
+
+                if (GetCurrentPlayer() == Players.PLAYER_ONE) AnalyticsManager.Instance.SetAnalytic(Analytics.PLAYER_WON, "Player One");
+                else AnalyticsManager.Instance.SetAnalytic(Analytics.PLAYER_WON, "Player Two");
+
+                FormatAndStoreTimeElapsed();
             }
 
             // TODO: Handle spectator message
@@ -185,6 +215,11 @@ public class GameManager : NetworkSingleton<GameManager> {
         if (NetworkManager.Singleton.LocalClientId != clientId) {
             winConditionSubText.text = "Opponent forfeited";
             winConditionPanel.SetActive(true);
+
+            if (GetCurrentPlayer() == Players.PLAYER_ONE) AnalyticsManager.Instance.SetAnalytic(Analytics.PLAYER_WON, "Player One");
+            else AnalyticsManager.Instance.SetAnalytic(Analytics.PLAYER_WON, "Player Two");
+
+            FormatAndStoreTimeElapsed();
         }
     }
 

@@ -8,6 +8,11 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     Hex hexRayCast;
     private Vector3 origin;
     private bool isPlacementValid = true;
+    Dictionary<Hex, HitSpot> hitSpots = new Dictionary<Hex, HitSpot>();
+
+    void Update() {
+        Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+    }
 
     public void OnBeginDrag(PointerEventData eventData) {
         if (!TurnManager.Instance.IsMyTurn()) return;
@@ -25,7 +30,7 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         Card card = PlayerHand.Instance.GetCardForGameObject(gameObject);
         hexRayCast = Gameboard.Instance.GetHexRayCastHit();
-        Dictionary<Hex, HitSpot> hitSpots = new Dictionary<Hex, HitSpot>();
+        hitSpots = new Dictionary<Hex, HitSpot>();
 
         if (hexRayCast != null) {
             GameboardObject gbo = GameboardObjectManager.Instance.GetGboAtHex(hexRayCast);
@@ -81,13 +86,12 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
                 }
             }
         }
-    
-        Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
 
         transform.position = eventData.position + new Vector2(21f, -30f);
     }
 
     public void OnEndDrag(PointerEventData eventData) {
+        hitSpots = new Dictionary<Hex, HitSpot>();
         if (!TurnManager.Instance.IsMyTurn()) return;
         
         Card card = PlayerHand.Instance.GetCardForGameObject(gameObject);

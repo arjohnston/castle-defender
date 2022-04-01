@@ -21,8 +21,11 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     [SerializeField] private GameObject _selectedGameboardObject = null;
     [SerializeField] private bool _leftClickMouseChanged = false;
     [SerializeField] private bool _lastLeftMouseButtonStateIsClicked = false;
-    [SerializeField] private bool _isRaycastRangeValid = true;
     [SerializeField] private bool _isCardBeingDragged = false;
+
+    private Dictionary<Hex, int> activatedTraps = new Dictionary<Hex, int>();
+    private float _defaultTrapDuration = 2.0f;
+    private float _trapDuration = 0.0f;
 
     private Hex _spawnLocation;
     private Card _spawnCard;
@@ -38,10 +41,11 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         }
 
         CheckOnLeftClick();
-        HighlightRaycastIfSelected();
+        HighlightHexes();
         SelectObjectAtRayCastHit();
         UpdateCastleHealth();
         ShowTooltipOnHover();
+        ShowRadiusOfActivatedTraps();
     }
 
     // Required to pass the player manually as GameSettings.player was encountering race conditions on awake
@@ -276,6 +280,24 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         SoundManager.Instance.Play(Sounds.SPAWN);
     }
 
+    private void ShowRadiusOfActivatedTraps() {
+        Dictionary<Hex, HitSpot> hitSpots = new Dictionary<Hex, HitSpot>();
+
+        if (_trapDuration <= 0) {
+            activatedTraps = new Dictionary<Hex, int>();
+        }
+
+        foreach (KeyValuePair<Hex, int> kvp in activatedTraps) {
+            if (!hitSpots.ContainsKey(kvp.Key)) hitSpots.Add(kvp.Key, new HitSpot(HexColors.INVALID_MOVE, kvp.Value, true));
+        }
+
+        if (_trapDuration > 0) {
+            _trapDuration -= Time.deltaTime;
+        }
+
+        Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+    }
+
     public void CastSpell(Hex location, Card card) {
         List<Hex> targetHexes = Gameboard.Instance.GetHexesWithinRange(location, card.attributes.occupiedRadius, true);
         List<GameboardObject> gbos = new List<GameboardObject>();
@@ -392,19 +414,19 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         _selectedGameboardObject = null;
     }
 
-    public void HighlightRaycastIfSelected() {
+    public void HighlightHexes() {
         Hex raycastHitSpot = Gameboard.Instance.GetHexRayCastHit();
         Dictionary<Hex, HitSpot> hitSpots = new Dictionary<Hex, HitSpot>();
 
         if (_selectedGameboardObject == null) {
-            if (!_isCardBeingDragged && TurnManager.Instance.IsMyTurn()) {
+            if (TurnManager.Instance.IsMyTurn()) {
                 foreach (GameboardObject gbo in gameboardObjects) {
-                    if (TurnManager.Instance.IsMyTurn() && gbo.IsOwner && gbo.CanMoveOrAttack()) {
-                        if (!hitSpots.ContainsKey(gbo.GetHexPosition())) hitSpots.Add(gbo.GetHexPosition(), new HitSpot(HexColors.CAN_MOVE, 0, true));
+                    if (gbo != null && gbo.IsSpawned && TurnManager.Instance.IsMyTurn() && gbo.IsOwner && gbo.CanMoveOrAttack()) {
+                        if (!hitSpots.ContainsKey(gbo.GetHexPosition()) && !activatedTraps.ContainsKey(gbo.GetHexPosition())) hitSpots.Add(gbo.GetHexPosition(), new HitSpot(HexColors.CAN_MOVE, 0, true));
                     }
                 }
 
-                _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+                Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
             }
 
             return;
@@ -420,12 +442,12 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 if (gbo.GetGboType() == Types.PERMANENT && raycastHitSpot != null) {
                     if (gbo.IsValidMovement(raycastHitSpot)) {
                         if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_MOVE, gbo.GetOccupiedRadius()));
-                        _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+                        Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
                         return;
                     } else {
                         if (raycastHitSpot != null && !hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.INVALID_MOVE, gbo.GetOccupiedRadius()));
                         
-                        _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+                        Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
                         return;
                     }
                 }
@@ -436,14 +458,14 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 
                 if (target != null && gbo.IsValidAttack(target) && !target.IsOwner && target.GetGboType() != Types.TRAP) {
                     if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_ATTACK, gbo.GetOccupiedRadius()));
-                    _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+                    Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
 
                     return;
                 }
 
                 if ((target == null || target.GetGboType() == Types.TRAP && !target.IsOwner) && gbo.IsValidMovement(raycastHitSpot)) {
                     if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_MOVE, gbo.GetOccupiedRadius()));
-                    _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+                    Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
                     return;
                 }
             }
@@ -451,7 +473,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             if (raycastHitSpot != null && !hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.INVALID_MOVE, gbo.GetOccupiedRadius()));
         }
 
-        _isRaycastRangeValid = Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+        Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
     }
 
     private void ShowTooltipOnHover() {
@@ -469,7 +491,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             return;
         }
 
-        if (_tooltip == null && gbo != null) {
+        if (_tooltip == null && gbo != null && (!gbo.IsTrap() || gbo.IsOwner)) {
             Card card = gbo.GetCard();
 
             if (card != null) {
@@ -503,7 +525,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
     private void TryMovement(GameboardObject gbo, Hex target) {
         // If target is off, or partially off the map
-        if (!_isRaycastRangeValid) {
+        if (!Gameboard.Instance.IsValidRaycast(target, gbo.GetOccupiedRadius())) {
             gbo.Deselect();
             _selectedGameboardObject = null;
             return;
@@ -530,6 +552,9 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 gbo.MoveToPosition(target);
 
                 if (targetGbo != null && IsEnemyTrap(targetGbo.gameObject)) targetGbo.ActivateTrap();
+                _trapDuration = _defaultTrapDuration;
+                activatedTraps.Add(targetGbo.GetHexPosition(), targetGbo.GetRange());
+                SoundManager.Instance.Play(Sounds.TRAP);
             } else {
                 GameManager.Instance.ShowToastMessage("Invalid move");
             }
@@ -540,7 +565,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     }
 
     private void TryAttack(GameboardObject gbo, GameboardObject target) {
-        if (!_isRaycastRangeValid) {
+        if (!Gameboard.Instance.IsValidRaycast(target.GetHexPosition(), gbo.GetOccupiedRadius())) {
             if (gbo) gbo.Deselect();
             _selectedGameboardObject = null;
             return;

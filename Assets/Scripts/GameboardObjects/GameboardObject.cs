@@ -422,7 +422,7 @@ public class GameboardObject : NetworkBehaviour {
         if (TurnManager.Instance.GetGameState() == GameState.SETUP) {
             return true;
         } else {
-            if (gboType.Value == Types.PERMANENT) return false;
+            if (gboType.Value == Types.PERMANENT || gboType.Value == Types.TRAP) return false;
 
             if (remainingAttackActions.Value <= 0 && (!HasDoubleStrike() || remainingMoveActions.Value <= 0 )) return false;
 
