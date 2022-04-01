@@ -452,6 +452,12 @@ public class GameboardObject : NetworkBehaviour {
 
         SetRemainingAttackActionsServerRpc(remainingAttackActions.Value - 1);
         hasAttacked = true;
+
+        if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
+            AnalyticsManager.Instance.Track(Analytics.PLAYER_ONE_TOTAL_DAMAGE, damageModifier + GetDamage());
+        } else {
+            AnalyticsManager.Instance.Track(Analytics.PLAYER_ONE_TOTAL_DAMAGE, damageModifier + GetDamage());
+        }
     }
 
     public bool IsTrap() {

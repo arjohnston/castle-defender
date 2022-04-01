@@ -103,11 +103,13 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         if (card.attributes.isRestrictedToMyTurn && !TurnManager.Instance.IsMyTurn()) {
             GameManager.Instance.ShowToastMessage("Not your turn");
+            SoundManager.Instance.Play(Sounds.INVALID);
             isPlacementValid = false;
         }
 
         if (!ResourceManager.Instance.HaveEnoughResources(card.attributes.cost + PlayerHand.Instance.GetResourceCostModifier())) {
             GameManager.Instance.ShowToastMessage("Not enough resources");
+            SoundManager.Instance.Play(Sounds.INVALID);
             isPlacementValid = false;
         }
 

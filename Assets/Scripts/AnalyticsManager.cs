@@ -1,11 +1,13 @@
 using UnityEngine;
 using TMPro;
 using Utilities.Singletons;
+using Unity.Netcode;
 
-public class AnalyticsManager : Singleton<AnalyticsManager> {
+public class AnalyticsManager : NetworkSingleton<AnalyticsManager> {
     public TextMeshProUGUI totalTime;
     public TextMeshProUGUI amountOfTurns;
     public TextMeshProUGUI playerWon;
+
     public TextMeshProUGUI playerOneCardsPlayed;
     public TextMeshProUGUI playerOneNumberOfMoves;
     public TextMeshProUGUI playerOneTotalDamage;
@@ -13,6 +15,7 @@ public class AnalyticsManager : Singleton<AnalyticsManager> {
     public TextMeshProUGUI playerOneTrapsPlayed;
     public TextMeshProUGUI playerOneSpellsPlayed;
     public TextMeshProUGUI playerOneEnchantmentsPlayed;
+
     public TextMeshProUGUI playerTwoCardsPlayed;
     public TextMeshProUGUI playerTwoNumberOfMoves;
     public TextMeshProUGUI playerTwoTotalDamage;
@@ -22,6 +25,7 @@ public class AnalyticsManager : Singleton<AnalyticsManager> {
     public TextMeshProUGUI playerTwoEnchantmentsPlayed;
 
     private int _amountOfTurns = 0;
+
     private int _playerOneCardsPlayed = 0;
     private int _playerOneNumberOfMoves = 0;
     private int _playerOneTotalDamage = 0;
@@ -29,6 +33,7 @@ public class AnalyticsManager : Singleton<AnalyticsManager> {
     private int _playerOneTrapsPlayed = 0;
     private int _playerOneSpellsPlayed = 0;
     private int _playerOneEnchantmentsPlayed = 0;
+
     private int _playerTwoCardsPlayed = 0;
     private int _playerTwoNumberOfMoves = 0;
     private int _playerTwoTotalDamage = 0;
@@ -128,5 +133,23 @@ public class AnalyticsManager : Singleton<AnalyticsManager> {
                 playerWon.text = value;
                 break;
         }
+    }
+
+    public void Track(Analytics analytic, int value = 1) {
+        TrackAnalyticServerRpc(analytic, value);
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    public void TrackAnalyticServerRpc(Analytics analytic, int value) {
+        TrackAnalyticClientRpc(analytic, value);
+    }
+
+    [ClientRpc]
+    public void TrackAnalyticClientRpc(Analytics analytic, int value) {
+        TrackAnalytic(analytic, value);
+    }
+
+    public void TrackAnalytic(Analytics analytic, int value = 1) {
+        AnalyticsManager.Instance.IncrementAnalytic(analytic, value);
     }
 }

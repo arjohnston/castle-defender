@@ -235,6 +235,12 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 CastSpell(location, card);
                 break;
         }
+
+        if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
+            AnalyticsManager.Instance.Track(Analytics.PLAYER_ONE_CARDS_PLAYED);
+        } else {
+            AnalyticsManager.Instance.Track(Analytics.PLAYER_TWO_CARDS_PLAYED);
+        }
     }
 
     public void SpawnCreature(Hex location, Card card) {
@@ -250,6 +256,12 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         SpawnCreatureServerRpc(location.Position(), clientId, card.type, card.sprite, card.meta, card.attributes, card.enchantment, card.spell);
 
         SoundManager.Instance.Play(Sounds.SPAWN);
+
+        if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
+            AnalyticsManager.Instance.Track(Analytics.PLAYER_ONE_CREATURES_PLAYED);
+        } else {
+            AnalyticsManager.Instance.Track(Analytics.PLAYER_TWO_CREATURES_PLAYED);
+        }
     }
 
     public void SpawnPermanent(Hex location, Card card) {
@@ -278,6 +290,12 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         SpawnTrapServerRpc(location.Position(), clientId, card.type, card.sprite, card.meta, card.attributes, card.enchantment, card.spell);
 
         SoundManager.Instance.Play(Sounds.SPAWN);
+
+        if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
+            AnalyticsManager.Instance.Track(Analytics.PLAYER_ONE_TRAPS_PLAYED);
+        } else {
+            AnalyticsManager.Instance.Track(Analytics.PLAYER_TWO_TRAPS_PLAYED);
+        }
     }
 
     private void ShowRadiusOfActivatedTraps() {
@@ -356,19 +374,24 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
             case SpellTypes.HEAL:
                 foreach(GameboardObject gbo in gbos) {
-                    gbo.SetHp(gbo.GetHp() + card.spell.effectAmount + gbo.GetSpellModifier());
+                    gbo.SetHp(card.spell.effectAmount + gbo.GetSpellModifier());
                 }
                 break;
 
             case SpellTypes.DAMAGE:
                 foreach(GameboardObject gbo in gbos) {
-                    gbo.SetHp(gbo.GetHp() - card.spell.effectAmount + gbo.GetSpellModifier());
+                    gbo.SetHp(-(card.spell.effectAmount + gbo.GetSpellModifier()));
+
+                    if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
+                        AnalyticsManager.Instance.Track(Analytics.PLAYER_ONE_TOTAL_DAMAGE, card.spell.effectAmount + gbo.GetSpellModifier());
+                    } else {
+                        AnalyticsManager.Instance.Track(Analytics.PLAYER_TWO_TOTAL_DAMAGE, card.spell.effectAmount + gbo.GetSpellModifier());
+                    }
                 }
                 break;
             
             case SpellTypes.STUN:
                 foreach(GameboardObject gbo in gbos) {
-                    gbo.SetHp(gbo.GetHp() - card.spell.effectAmount);
                     gbo.SetStunnedDuration(card.spell.effectDuration);
                 }
                 break;
@@ -385,13 +408,25 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
 
             case SpellTypes.DAMAGE_AND_STUN:
                 foreach(GameboardObject gbo in gbos) {
-                    gbo.SetHp(gbo.GetHp() - card.spell.effectAmount + gbo.GetSpellModifier());
+                    gbo.SetHp(-(card.spell.effectAmount + gbo.GetSpellModifier()));
                     gbo.SetStunnedDuration(card.spell.effectDuration);
+
+                    if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
+                        AnalyticsManager.Instance.Track(Analytics.PLAYER_ONE_TOTAL_DAMAGE, card.spell.effectAmount + gbo.GetSpellModifier());
+                    } else {
+                        AnalyticsManager.Instance.Track(Analytics.PLAYER_TWO_TOTAL_DAMAGE, card.spell.effectAmount + gbo.GetSpellModifier());
+                    }
                 }
                 break;
         }
 
         SoundManager.Instance.Play(Sounds.SPELL);
+
+        if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
+            AnalyticsManager.Instance.Track(Analytics.PLAYER_ONE_SPELLS_PLAYED);
+        } else {
+            AnalyticsManager.Instance.Track(Analytics.PLAYER_TWO_SPELLS_PLAYED);
+        }
     }
 
     public void CastEnchantment(Hex location, Card card) {
@@ -402,6 +437,12 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         gbo.AddEnchantment(card.enchantment);
 
         SoundManager.Instance.Play(Sounds.ENCHANT);
+
+        if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
+            AnalyticsManager.Instance.Track(Analytics.PLAYER_ONE_ENCHANTMENTS_PLAYED);
+        } else {
+            AnalyticsManager.Instance.Track(Analytics.PLAYER_TWO_ENCHANTMENTS_PLAYED);
+        }
     }
 
     public void ResetSelection() {
@@ -551,12 +592,21 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             if (gbo.IsValidMovement(target)) {
                 gbo.MoveToPosition(target);
 
-                if (targetGbo != null && IsEnemyTrap(targetGbo.gameObject)) targetGbo.ActivateTrap();
-                _trapDuration = _defaultTrapDuration;
-                activatedTraps.Add(targetGbo.GetHexPosition(), targetGbo.GetRange());
-                SoundManager.Instance.Play(Sounds.TRAP);
+                if (targetGbo != null && IsEnemyTrap(targetGbo.gameObject)) {
+                    targetGbo.ActivateTrap();
+                    _trapDuration = _defaultTrapDuration;
+                    activatedTraps.Add(targetGbo.GetHexPosition(), targetGbo.GetRange());
+                    SoundManager.Instance.Play(Sounds.TRAP);
+                }
+
+                if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
+                    AnalyticsManager.Instance.Track(Analytics.PLAYER_ONE_NUMBER_OF_MOVES);
+                } else {
+                    AnalyticsManager.Instance.Track(Analytics.PLAYER_TWO_NUMBER_OF_MOVES);
+                }
             } else {
                 GameManager.Instance.ShowToastMessage("Invalid move");
+                SoundManager.Instance.Play(Sounds.INVALID);
             }
 
             gbo.Deselect();
@@ -582,6 +632,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 SoundManager.Instance.Play(Sounds.ATTACK);
             } else {
                 GameManager.Instance.ShowToastMessage("Invalid attack");
+                SoundManager.Instance.Play(Sounds.INVALID);
             }
 
             _selectedGameboardObject.GetComponent<GameboardObject>().Deselect();

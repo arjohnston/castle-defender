@@ -19,10 +19,13 @@ public class MainMenu : MonoBehaviour {
     }
 
     public void QuitToMainMenu() {
-        GameManager.Instance.PlayerQuitServerRpc(NetworkManager.Singleton.LocalClientId);
         GameManager.Instance.ResetScene();
         GameSettings.isLaunchingAsHost = false;
         GameSettings.clientJoinCode = "";
         SceneManager.LoadScene(Scenes.MAIN_MENU);
+    }
+
+    public void ForfeitGame() {
+        GameManager.Instance.PlayerQuitServerRpc(NetworkManager.Singleton.LocalClientId);
     }
 }

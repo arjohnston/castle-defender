@@ -7,4 +7,5 @@ public enum Sounds {
     ENCHANT,
     ATTACK,
     TRAP,
+    INVALID,
 }

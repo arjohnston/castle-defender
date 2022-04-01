@@ -109,7 +109,7 @@ public class GameManager : NetworkSingleton<GameManager> {
             Logger.Instance.LogInfo($"player {id + 1} just disconnected.");
             _playersConnected--;
 
-            if (id == 0 || id == 1) {
+            if ((id == 0 || id == 1) && TurnManager.Instance.GetGameState() != GameState.WIN_CONDITION) {
                 TurnManager.Instance.SetGameState(GameState.WIN_CONDITION);
 
                 winConditionSubText.text = "Opponent disconnected";
@@ -165,11 +165,22 @@ public class GameManager : NetworkSingleton<GameManager> {
         return Players.SPECTATOR;
     }
 
+    public Players GetOpposingPlayer() {
+        if (NetworkManager.Singleton.IsHost && NetworkManager.Singleton.LocalClientId == 0) {
+            return Players.PLAYER_TWO;
+        }
+        if (NetworkManager.Singleton.IsClient && NetworkManager.Singleton.LocalClientId == 1) {
+            return Players.PLAYER_ONE;
+        }
+
+        return Players.SPECTATOR;
+    }
+
     private void CheckWinCondition() {
         int currentPlayerCastleHealth = GameboardObjectManager.Instance.GetCurrentPlayerCastleHealth();
         int opposingPlayerCastleHealth = GameboardObjectManager.Instance.GetOpposingPlayerCastleHealth();
 
-        if (TurnManager.Instance.GetGameState() != GameState.SETUP && !Application.isEditor) {
+        if (TurnManager.Instance.GetGameState() != GameState.SETUP && TurnManager.Instance.GetGameState() != GameState.WIN_CONDITION && !Application.isEditor) {
             if (currentPlayerCastleHealth <= 0) {
                 // You lose
                 TurnManager.Instance.SetGameState(GameState.WIN_CONDITION);
@@ -211,15 +222,18 @@ public class GameManager : NetworkSingleton<GameManager> {
 
     [ClientRpc]
     public void SetPlayerQuitClientRpc(ulong clientId) {
-        // TODO: Handle spectator leaving
-        if (NetworkManager.Singleton.LocalClientId != clientId) {
-            winConditionSubText.text = "Opponent forfeited";
+        if (clientId <= 1) {
+            winConditionText.text = NetworkManager.Singleton.LocalClientId != clientId ? "You won!" : "You lost.";
+            winConditionSubText.text = NetworkManager.Singleton.LocalClientId != clientId ? "Opponent forfeited" : "You forfeited";
             winConditionPanel.SetActive(true);
+            TurnManager.Instance.SetGameState(GameState.WIN_CONDITION);
 
-            if (GetCurrentPlayer() == Players.PLAYER_ONE) AnalyticsManager.Instance.SetAnalytic(Analytics.PLAYER_WON, "Player One");
-            else AnalyticsManager.Instance.SetAnalytic(Analytics.PLAYER_WON, "Player Two");
+            Players playerWon = NetworkManager.Singleton.LocalClientId == clientId ? GetOpposingPlayer() : GetCurrentPlayer();
+            AnalyticsManager.Instance.SetAnalytic(Analytics.PLAYER_WON, playerWon == Players.PLAYER_ONE ? "Player One" : "Player Two");
 
             FormatAndStoreTimeElapsed();
+        } else {
+            // TODO: Spectator message
         }
     }
 

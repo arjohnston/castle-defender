@@ -18,6 +18,7 @@ public class SoundManager : Singleton<SoundManager> {
     public AudioClip enchant;
     public AudioClip attack;
     public AudioClip trap;
+    public AudioClip invalid;
 
     // Start is called before the first frame update
     void Awake() {
@@ -86,6 +87,12 @@ public class SoundManager : Singleton<SoundManager> {
 
             case Sounds.TRAP:
                 singlePlaySource.clip = trap;
+                singlePlaySource.loop = false;
+                singlePlaySource.Play();
+                break;
+
+            case Sounds.INVALID:
+                singlePlaySource.clip = invalid;
                 singlePlaySource.loop = false;
                 singlePlaySource.Play();
                 break;
