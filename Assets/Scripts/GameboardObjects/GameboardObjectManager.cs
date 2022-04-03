@@ -103,6 +103,10 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
         }
     }
 
+    public GameboardObject GetCastle() {
+        return _castle;
+    }
+
     public int GetCurrentPlayerCastleHealth() {
         Players player = GameManager.Instance.GetCurrentPlayer();
 
