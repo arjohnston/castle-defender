@@ -77,11 +77,17 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
                     }
                 }
 
+                if (card.type == Types.CREATURE) {
+                    hitSpots.Add(GameboardObjectManager.Instance.GetCastle().GetHexPosition(), new HitSpot(HexColors.AVAILABLE_MOVES, GameSettings.creaturePlacementRange, true));
+                }
+
                 if ((gbo != null && (!gbo.IsTrap() || gbo.IsOwner)) || !isValidMovement || (card.type == Types.CREATURE && !IsValidCreaturePlacement(hexRayCast))) {
-                    hitSpots.Add(hexRayCast, new HitSpot(HexColors.INVALID_MOVE, card.attributes.occupiedRadius));
+                    if (!hitSpots.ContainsKey(hexRayCast)) hitSpots.Add(hexRayCast, new HitSpot(HexColors.INVALID_MOVE, card.attributes.occupiedRadius));
+                    else hitSpots[hexRayCast] = new HitSpot(HexColors.INVALID_MOVE, card.attributes.occupiedRadius);
                     isPlacementValid = false;
                 } else {
-                    hitSpots.Add(hexRayCast, new HitSpot(HexColors.VALID_MOVE, card.attributes.occupiedRadius));
+                    if (!hitSpots.ContainsKey(hexRayCast)) hitSpots.Add(hexRayCast, new HitSpot(HexColors.VALID_MOVE, card.attributes.occupiedRadius));
+                    else hitSpots[hexRayCast] = new HitSpot(HexColors.VALID_MOVE, card.attributes.occupiedRadius);
                     isPlacementValid = true;
                 }
             }

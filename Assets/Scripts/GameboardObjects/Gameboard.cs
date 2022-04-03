@@ -126,6 +126,7 @@ public class Gameboard : Singleton<Gameboard> {
     public void HighlightRaycastHitSpot(Dictionary<Hex, HitSpot> hitSpots) {
         foreach (KeyValuePair<Hex, HitSpot> hs in hitSpots) {
             if (!_highlightHitSpots.ContainsKey(hs.Key)) _highlightHitSpots.Add(hs.Key, hs.Value);
+            else _highlightHitSpots[hs.Key] = hs.Value;
         }
     }
 
@@ -348,5 +349,9 @@ public class Gameboard : Singleton<Gameboard> {
 
     public GameObject GetHexGameObject(Hex hex) {
         return _hexToGameObjectMap[hex];
+    }
+
+    public Dictionary<string, Hex> GetGameboard() {
+        return _hexes;
     }
 }

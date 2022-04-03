@@ -39,7 +39,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             _selectedGameboardObject.GetComponent<GameboardObject>().Deselect();
             _selectedGameboardObject = null;
         }
-
+        
         CheckOnLeftClick();
         HighlightHexes();
         SelectObjectAtRayCastHit();
@@ -100,6 +100,26 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             } else if (player == Players.PLAYER_TWO) {
                 SetPlayerTwoCastleHealthServerRpc(GameDefaults.CASTLE_HEALTH);
             }
+        }
+    }
+
+    // TODO: Can be used to show castle placement
+    // Need to think through render order of highlighted hexes, though.
+    private void ShowCastleAvailableMovestInSetup() {
+        if (TurnManager.Instance.GetGameState() == GameState.SETUP) {
+            Dictionary<Hex, HitSpot> hitSpots = new Dictionary<Hex, HitSpot>();
+
+            foreach (KeyValuePair<string, Hex> kvp in Gameboard.Instance.GetGameboard()) {
+                if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
+                    if (kvp.Value.R > 0) hitSpots.Add(kvp.Value, new HitSpot(HexColors.AVAILABLE_MOVES, 0, true));
+                }
+
+                if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO) {
+                    if (kvp.Value.R < 0) hitSpots.Add(kvp.Value, new HitSpot(HexColors.AVAILABLE_MOVES, 0, true));
+                }
+            }
+
+            Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
         }
     }
 
@@ -467,7 +487,9 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             if (TurnManager.Instance.IsMyTurn()) {
                 foreach (GameboardObject gbo in gameboardObjects) {
                     if (gbo != null && gbo.IsSpawned && TurnManager.Instance.IsMyTurn() && gbo.IsOwner && gbo.CanMoveOrAttack()) {
-                        if (!hitSpots.ContainsKey(gbo.GetHexPosition()) && !activatedTraps.ContainsKey(gbo.GetHexPosition())) hitSpots.Add(gbo.GetHexPosition(), new HitSpot(HexColors.CAN_MOVE, 0, true));
+                        // Show which GBO's can move
+                        if (!hitSpots.ContainsKey(gbo.GetHexPosition()) && !activatedTraps.ContainsKey(gbo.GetHexPosition())) hitSpots.Add(gbo.GetHexPosition(), new HitSpot(HexColors.CAN_MOVE, gbo.GetOccupiedRadius(), true));
+                        else if (!activatedTraps.ContainsKey(gbo.GetHexPosition())) hitSpots[gbo.GetHexPosition()] = new HitSpot(HexColors.CAN_MOVE, gbo.GetOccupiedRadius(), true);
                     }
                 }
 
