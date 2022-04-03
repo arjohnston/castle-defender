@@ -4,6 +4,7 @@ using Utilities.Singletons;
 using TMPro;
 using Unity.Netcode;
 using System.Collections;
+using System.Collections.Generic;
 
 public class TurnManager: NetworkSingleton<TurnManager> {
     public TextMeshProUGUI GameStateText;
@@ -23,6 +24,7 @@ public class TurnManager: NetworkSingleton<TurnManager> {
     private GameState _prevGameState = GameState.SETUP;
 
     void Update() {
+        HighlightCastleMovement();
         CheckOnPlayerTurnChange();
         UpdateClientGameState();
         FadeBanner();
@@ -225,6 +227,39 @@ public class TurnManager: NetworkSingleton<TurnManager> {
             FadeInBanner();
         } else {
             FadeOutBanner();
+        }
+    }
+
+    private void HighlightCastleMovement() {
+        if (GetGameState() == GameState.SETUP) {
+            Dictionary<Hex, HitSpot> hitSpots = new Dictionary<Hex, HitSpot>();
+            if(GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
+                int j = 11;
+                int k = 1;
+                for(int x = 0; x <= 11; x++) {
+                    for (int i = -12; i <= j; i++){
+                        Hex castleSpot = new Hex(i, k);
+                        hitSpots.Add(castleSpot, new HitSpot(HexColors.VALID_MOVE, 0));
+                    }
+                    k++; //until 12
+                    j--; //until 0
+                }
+            }
+            
+            if(GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO) {
+                int j = -11;
+                int k = -1;
+                for(int x = 0; x <= 11; x++) {
+                    for (int i = 12; i >= j; i--){
+                        Hex castleSpot = new Hex(i, k);
+                        hitSpots.Add(castleSpot, new HitSpot(HexColors.VALID_MOVE, 0));
+                    }
+                    k--; 
+                    j++; 
+                }
+            }
+
+            Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
         }
     }
 }
