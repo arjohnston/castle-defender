@@ -77,32 +77,11 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
                     }
                 }
 
-// note: for some reason when surrounding hitspots.add statement with if(!hitSpots.ContainsKey(hexRayCast)) on the ones that dont have them added, it causes a bug where
-// the player can place a card on one of their existing units and they will lose resources and the card, and not summon a unit.
-// for this reason, temporarily commented out hitSpots conditionals to not cause this bug
-                if ((gbo != null && (!gbo.IsTrap() || gbo.IsOwner)) || !isValidMovement) {
-                    // if (!hitSpots.ContainsKey(hexRayCast))
-                        hitSpots.Add(hexRayCast, new HitSpot(HexColors.INVALID_MOVE, card.attributes.occupiedRadius));
-                    // hitSpots[hexRayCast] = new HitSpot(HexColors.INVALID_MOVE, card.attributes.occupiedRadius);
+                if ((gbo != null && (!gbo.IsTrap() || gbo.IsOwner)) || !isValidMovement || (card.type == Types.CREATURE && !IsValidCreaturePlacement(hexRayCast))) {
+                    hitSpots.Add(hexRayCast, new HitSpot(HexColors.INVALID_MOVE, card.attributes.occupiedRadius));
                     isPlacementValid = false;
-                }
-                
-                if (card.type == Types.CREATURE && IsValidCreaturePlacement(hexRayCast)) {
-                    // if (!hitSpots.ContainsKey(hexRayCast))
-                        hitSpots.Add(hexRayCast, new HitSpot(HexColors.VALID_MOVE, card.attributes.occupiedRadius));
-                    // hitSpots[hexRayCast] = new HitSpot(HexColors.VALID_MOVE, card.attributes.occupiedRadius);
-                    isPlacementValid = true;
-                }
-                if (card.type == Types.CREATURE && !IsValidCreaturePlacement(hexRayCast)) {
-                    // if (!hitSpots.ContainsKey(hexRayCast))
-                        hitSpots.Add(hexRayCast, new HitSpot(HexColors.INVALID_MOVE, card.attributes.occupiedRadius));
-                    // hitSpots[hexRayCast] = new HitSpot(HexColors.INVALID_MOVE, card.attributes.occupiedRadius);
-                    isPlacementValid = false;
-                }
-                else {
-                    // if (!hitSpots.ContainsKey(hexRayCast))
-                        hitSpots.Add(hexRayCast, new HitSpot(HexColors.VALID_MOVE, card.attributes.occupiedRadius));
-                    // hitSpots[hexRayCast] = new HitSpot(HexColors.VALID_MOVE, card.attributes.occupiedRadius);
+                } else {
+                    hitSpots.Add(hexRayCast, new HitSpot(HexColors.VALID_MOVE, card.attributes.occupiedRadius));
                     isPlacementValid = true;
                 }
             }
@@ -137,6 +116,7 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         if (card.type == Types.CREATURE && !IsValidCreaturePlacement(hexRayCast)) {
             GameManager.Instance.ShowToastMessage("Invalid Creature Placement");
             SoundManager.Instance.Play(Sounds.INVALID);
+            isPlacementValid = false;
         }
 
         if (!isPlacementValid) {
@@ -150,15 +130,15 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         PlayerHand.Instance.RemoveCardIsDragged();
     }
-    private bool IsValidCreaturePlacement(Hex spawnLocation) {
-        // if hex that has been dragged to is within 5 tiles of center of castle bloom, return true, else return false
-            Hex castleLocation = GameboardObjectManager.Instance.GetCastle().GetHexPosition();
-            int distance = Cube.GetDistanceToHex(castleLocation, spawnLocation);
-            if(distance > GameSettings.creaturePlacementRange) {
-                return false;
-            }
-            
-            return true;
 
+    private bool IsValidCreaturePlacement(Hex spawnLocation) {
+        Hex castleLocation = GameboardObjectManager.Instance.GetCastle().GetHexPosition();
+        int distance = Cube.GetDistanceToHex(castleLocation, spawnLocation);
+
+        if (distance <= GameSettings.creaturePlacementRange) {
+            return true;
+        }
+        
+        return false;
     }
 }
