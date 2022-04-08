@@ -906,8 +906,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1000, y: 50}
+  m_AnchoredPosition: {x: 91, y: 56}
+  m_SizeDelta: {x: 485.1169, y: 25.8271}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &180780038
 MonoBehaviour:
@@ -918,20 +918,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 180780036}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4288df380f28d8f43bfc49534a0bffa4, type: 3}
+  m_Script: {fileID: 11500000, guid: e6ac89a29d0dea34082848dd052f295b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   volumeSlider: {fileID: 180780039}
-  masterVolume: 0.4
-  backgroundMusic: {fileID: 0}
-  menuMusic: {fileID: 0}
-  menuButtonHover: {fileID: 0}
-  spawn: {fileID: 0}
-  spell: {fileID: 0}
-  enchant: {fileID: 0}
-  attack: {fileID: 0}
-  trap: {fileID: 0}
-  invalid: {fileID: 0}
 --- !u!114 &180780039
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -984,7 +974,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 180780038}
-        m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: VolumeControl, Assembly-CSharp
         m_MethodName: ChangeVolume
         m_Mode: 1
         m_Arguments:
@@ -1029,8 +1019,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -220, y: 70}
-  m_SizeDelta: {x: 546.0193, y: 119.427795}
+  m_AnchoredPosition: {x: -255, y: 56}
+  m_SizeDelta: {x: 194.5, y: 48.1177}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &187148821
 MonoBehaviour:
@@ -1079,15 +1069,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 80
-  m_fontSizeBase: 80
+  m_fontSize: 40
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -7841,7 +7831,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4288df380f28d8f43bfc49534a0bffa4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  volumeSlider: {fileID: 0}
   masterVolume: 0.2
   backgroundMusic: {fileID: 8300000, guid: e0aa479aa6f53f34dbf77afd5bbc3521, type: 3}
   menuMusic: {fileID: 8300000, guid: 038578e05f5005d459f729655790b608, type: 3}
@@ -8686,8 +8675,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: 23.601, y: -59.714}
+  m_SizeDelta: {x: 47.2012, y: 47.201}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1039532142
 MonoBehaviour:
@@ -8702,7 +8691,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -11170,7 +11159,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.25}
   m_AnchorMax: {x: 1, y: 0.75}
-  m_AnchoredPosition: {x: -5, y: 0}
+  m_AnchoredPosition: {x: -4.9999847, y: 0}
   m_SizeDelta: {x: -20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1480332833
@@ -11429,8 +11418,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 110, y: 50}
-  m_SizeDelta: {x: 600, y: 100}
+  m_AnchoredPosition: {x: 19, y: -0.000088215}
+  m_SizeDelta: {x: 283.3348, y: 55.2801}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1490548764
 MonoBehaviour:
@@ -11454,12 +11443,12 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 80
+    m_FontSize: 40
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 7
+    m_MinSize: 4
     m_MaxSize: 80
-    m_Alignment: 0
+    m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
@@ -14171,8 +14160,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -170, y: -199}
-  m_SizeDelta: {x: 546.0193, y: 119.4278}
+  m_AnchoredPosition: {x: 17, y: -44.001}
+  m_SizeDelta: {x: 365.9311, y: 88.003}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1838338222
 MonoBehaviour:

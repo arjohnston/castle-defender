@@ -2,12 +2,10 @@ using Unity.Netcode;
 using System.Collections.Generic;
 using UnityEngine;
 using Utilities.Singletons;
-using UnityEngine.UI;
+
 
 public class SoundManager : Singleton<SoundManager> {
     // The sound manager will be used to control all sounds in the game (UI elements, monster attacks, etc)
-    [SerializeField] Slider volumeSlider;
-
     private Dictionary<int, Audio> ui;
     public float masterVolume = 0.4f;
 
@@ -25,34 +23,14 @@ public class SoundManager : Singleton<SoundManager> {
 
     // Start is called before the first frame update
     void Awake() {
-        
-        if (!PlayerPrefs.HasKey("musicVolume"))
-        {
-            PlayerPrefs.SetFloat("musicVolume", 1);
-            Load();
-        }
-        else
-        {
-            Load();
-        }
         InitializeBackground();
         InitializeSingleSound();
     }
 
-    public void ChangeVolume()
-    {
-        AudioListener.volume = volumeSlider.value;
-        Save();
-    }
-    
-    private void Load()
-    {
-        volumeSlider.value = PlayerPrefs.GetFloat("musicVolume");
-    }
-
-    private void Save()
-    {
-        PlayerPrefs.SetFloat("musicVolume", volumeSlider.value);
+    void Update() {
+        masterVolume = PlayerPrefs.GetFloat("musicVolume");
+        backgroundSource.volume = masterVolume;
+        singlePlaySource.volume = masterVolume;
     }
 
     private void InitializeBackground() {
