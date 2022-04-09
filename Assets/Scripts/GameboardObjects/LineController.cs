@@ -11,6 +11,8 @@ public class LineController : NetworkSingleton<LineController> {
     private bool _isDrawn = false;
     private float _timer = 0.0f;
     private float _drawTime = 0.5f;
+    private Vector3 prevFrom = new Vector3(0, 0, 0);
+    private Vector3 prevTo = new Vector3(0, 0, 0);
 
     void Update() {
         if (_isDrawn) {
@@ -22,18 +24,37 @@ public class LineController : NetworkSingleton<LineController> {
         }
     }
 
+    public void DeferLineDestruction(float seconds)
+    {
+        AddTimeLineClientRpc(seconds);
+    }
+    public void AddTime(float seconds)
+    {
+        _drawTime += seconds;
+    }
     public void DrawAttackLine(GameObject from, GameObject to) {
-        DrawAttackLineServerRpc(from.transform.position, to.transform.position);
+
+     DrawAttackLineServerRpc(from.transform.position, to.transform.position);
+
     }
 
     public void Draw(Vector3 from, Vector3 to) {
-        if (_isDrawn) return;
+        if (_isDrawn)
+        {
+            if(prevFrom == from && prevTo == to)
+            {
+                _drawTime += Time.deltaTime;
+            }
+            return;
+        }
         _isDrawn = true;
         line = Instantiate(LinePrefab, from, Quaternion.identity);
         LineRenderer lr = line.GetComponent<LineRenderer>();
         lr.positionCount = _resolution;
 
         lr.SetPositions(CalculateArcArray(from,to));
+        prevFrom = from;
+        prevTo = to;
 
     }
 
@@ -57,6 +78,9 @@ public class LineController : NetworkSingleton<LineController> {
         Destroy(line);
         _isDrawn = false;
         _timer = 0.0f;
+        _drawTime = .5f;
+        prevFrom = new Vector3(0, 0, 0);
+        prevTo = new Vector3 (0,0,0);
     }
 
     [ServerRpc(RequireOwnership=false)]
@@ -68,4 +92,17 @@ public class LineController : NetworkSingleton<LineController> {
     public void DrawAttackLineClientRpc(Vector3 from, Vector3 to) {
         Draw(from, to);
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void AddTimeLineServerRpc(float seconds)
+    {
+        AddTimeLineClientRpc(seconds);
+    }
+
+    [ClientRpc]
+    public void AddTimeLineClientRpc(float seconds)
+    {
+        AddTime(seconds);
+    }
+
 }

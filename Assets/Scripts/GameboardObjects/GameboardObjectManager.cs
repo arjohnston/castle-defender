@@ -526,7 +526,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 if (target != null && gbo.IsValidAttack(target) && !target.IsOwner && target.GetGboType() != Types.TRAP) {
                     if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_ATTACK, gbo.GetOccupiedRadius()));
                     Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
-
+                    LineController.Instance.DrawAttackLine(_selectedGameboardObject.gameObject, target.gameObject);
                     return;
                 }
 
@@ -653,9 +653,10 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             _selectedGameboardObject.GetComponent<GameboardObject>().Select();
         } else {
             if (gbo.IsValidAttack(target)) {
-                gbo.Attack(target);
                 LineController.Instance.DrawAttackLine(_selectedGameboardObject.gameObject, target.gameObject);
                 SoundManager.Instance.Play(Sounds.ATTACK);
+                LineController.Instance.DeferLineDestruction(1f);
+                gbo.Attack(target);
             } else {
                 GameManager.Instance.ShowToastMessage("Invalid attack");
                 SoundManager.Instance.Play(Sounds.INVALID);

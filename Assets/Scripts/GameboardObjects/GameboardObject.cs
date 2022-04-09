@@ -162,6 +162,7 @@ public class GameboardObject : NetworkBehaviour {
         if (!isInstantiated.Value) return;
 
         if (GetModifiedHp() <= 0) {
+            StartCoroutine(SimplePause(1f)); // this should match the attack line defer time
             GameboardObjectManager.Instance.DestroyGameObject(gameObject);
         }
 
@@ -599,5 +600,10 @@ public class GameboardObject : NetworkBehaviour {
     [ServerRpc]
     public void SetIsSelectedServerRpc(bool selected) {
         isSelected.Value = selected;
+    }
+    private IEnumerator SimplePause(float seconds)
+    {
+        yield return new WaitForSecondsRealtime(seconds);
+
     }
 }
