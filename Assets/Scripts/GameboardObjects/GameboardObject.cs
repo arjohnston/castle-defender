@@ -17,6 +17,11 @@ public class GameboardObject : NetworkBehaviour {
     private float flyingHeight = 0.75f;
     private bool hasAttacked = false;
 
+    private float _deferredAttackTimer = 0.0f;
+    private int _deferredAttackDamage = 0;
+    private GameboardObject _deferredAttackTarget;
+    private float _defaultDeferredAttackTimerAmount = 0.5f;
+
     private NetworkVariable<bool> isSelected = new NetworkVariable<bool>(false);
 
     [SerializeField]
@@ -54,6 +59,7 @@ public class GameboardObject : NetworkBehaviour {
     void Update() {
         CheckIfDestroyed();
         UpdatePosition();
+        DeferAttack();
     }
 
     public void SetupGboDetails(Card card) {
@@ -448,7 +454,9 @@ public class GameboardObject : NetworkBehaviour {
 
         if (damageModifier + GetDamage() <= 0) return;
 
-        target.SetHp(-(damageModifier + GetDamage()));
+        _deferredAttackTarget = target;
+        _deferredAttackDamage = -(damageModifier + GetDamage());
+        _deferredAttackTimer = _defaultDeferredAttackTimerAmount;
 
         SetRemainingAttackActionsServerRpc(remainingAttackActions.Value - 1);
         hasAttacked = true;
@@ -457,6 +465,21 @@ public class GameboardObject : NetworkBehaviour {
             AnalyticsManager.Instance.Track(Analytics.PLAYER_ONE_TOTAL_DAMAGE, damageModifier + GetDamage());
         } else {
             AnalyticsManager.Instance.Track(Analytics.PLAYER_ONE_TOTAL_DAMAGE, damageModifier + GetDamage());
+        }
+    }
+
+    public GameboardObject IsAttackPending() {
+        return _deferredAttackTarget;
+    }
+
+    private void DeferAttack() {
+        if (_deferredAttackTimer <= 0.0f && _deferredAttackTarget != null) {
+            _deferredAttackTarget.SetHp(_deferredAttackDamage);
+
+            _deferredAttackTarget = null;
+            _deferredAttackDamage = 0;
+        } else {
+            _deferredAttackTimer -= Time.deltaTime;
         }
     }
 
