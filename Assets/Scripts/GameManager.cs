@@ -108,50 +108,26 @@ public class GameManager : NetworkSingleton<GameManager> {
             Logger.Instance.LogInfo($"player {id + 1} just disconnected.");
             _playersConnected--;
 
-            /*
-            if ((id == 0 || id == 1) && TurnManager.Instance.GetGameState() != GameState.WIN_CONDITION) {
-                TurnManager.Instance.SetGameState(GameState.WIN_CONDITION);
-
-                winConditionSubText.text = "Opponent disconnected";
-                winConditionPanel.SetActive(true);
-
-                if (GetCurrentPlayer() == Players.PLAYER_ONE) AnalyticsManager.Instance.SetAnalytic(Analytics.PLAYER_WON, "Player One");
-                else AnalyticsManager.Instance.SetAnalytic(Analytics.PLAYER_WON, "Player Two");
-
-                FormatAndStoreTimeElapsed();
-                Logger.Instance.LogInfo("Expect to win");
-            }
-            */
             PlayerDisconnectedClientRpc(id);
-            //else if(TurnManager.Instance.GetGameState() != GameState.WIN_CONDITION)
-            //{
-            // winConditionSubText.text = "Game Over";
-            //winConditionPanel.SetActive(true);
-            //}
         };
 
         SoundManager.Instance.Play(Sounds.BACKGROUND_GAME);
     }
 
     [ClientRpc] 
-    public void PlayerDisconnectedClientRpc(ulong id)
-    {
-        if ((id == 0 || id == 1) && TurnManager.Instance.GetGameState() != GameState.WIN_CONDITION)
-        {
+    public void PlayerDisconnectedClientRpc(ulong id) {
+        if ((id == 0 || id == 1) && TurnManager.Instance.GetGameState() != GameState.WIN_CONDITION) {
             TurnManager.Instance.SetGameState(GameState.WIN_CONDITION);
 
             winConditionSubText.text = "Opponent disconnected";
             winConditionPanel.SetActive(true);
 
-            if(GetCurrentPlayer() == Players.SPECTATOR)
-            {
-                winConditionSubText.text = "Player " + (id+1) + " disconnected";
-                if(id == 0)
-                {
+            if (GetCurrentPlayer() == Players.SPECTATOR) {
+                winConditionSubText.text = "Player " + (id + 1) + " disconnected";
+
+                if (id == 0) {
                     winConditionText.text = "Player 2 won";
-                }
-                else
-                {
+                } else {
                     winConditionText.text = "Player 1 won";
                 }
             }
@@ -160,7 +136,6 @@ public class GameManager : NetworkSingleton<GameManager> {
             else AnalyticsManager.Instance.SetAnalytic(Analytics.PLAYER_WON, "Player Two");
 
             FormatAndStoreTimeElapsed();
-            Logger.Instance.LogInfo("Expect to win");
         }
         
 
