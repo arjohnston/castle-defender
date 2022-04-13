@@ -91,9 +91,9 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 gbo.SetPosition(hex);
             }
 
-            //if (player == Players.SPECTATOR) {
-                //gbo.gameObject.transform.GetChild(0).gameObject.SetActive(false);
-            //}
+            if (player == Players.SPECTATOR) {
+                gbo.gameObject.transform.GetChild(0).gameObject.SetActive(false);
+            }
 
             if (player == Players.PLAYER_ONE) {
                 SetPlayerOneCastleHealthServerRpc(GameDefaults.CASTLE_HEALTH);
