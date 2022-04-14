@@ -149,8 +149,10 @@ public class DeckManager : NetworkSingleton<DeckManager> {
     }
 
     public void DrawInitialHandOfCards() {
-        for (int i = 0; i < GameSettings.initialPlayerHandSize; i++) {
-            DrawCard();
+        //Didn't want to use update since this is only called once
+        for (float i = GameSettings.initialPlayerHandSize; i > 0; i--) {
+            Invoke("DrawCard",(i-(.5f*i)));
+            Debug.Log("invoked at" + (i - (.5f*i)));
         }
     }
 
@@ -160,6 +162,7 @@ public class DeckManager : NetworkSingleton<DeckManager> {
 
         Card card = playerDeck.Pop();
         PlayerHand.Instance.AddCardToHand(card);
+        CardDrawAnimation.Instance.PlayerDraw();
 
         SetPlayerDeck();
     }

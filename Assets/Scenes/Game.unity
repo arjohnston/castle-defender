@@ -7717,6 +7717,7 @@ GameObject:
   - component: {fileID: 983941258}
   - component: {fileID: 983941259}
   - component: {fileID: 983941260}
+  - component: {fileID: 983941261}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -8052,6 +8053,20 @@ MonoBehaviour:
   playerTwoTrapsPlayed: {fileID: 1340026077}
   playerTwoSpellsPlayed: {fileID: 309575274}
   playerTwoEnchantmentsPlayed: {fileID: 122173697}
+--- !u!114 &983941261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983941246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c3fde751b7354aec961a2126060cd79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerHandArea: {fileID: 51128012}
+  gameboardDeckPrefab: {fileID: 1466029038368381171, guid: fdfd357dc1a5f41479ecbc204263d6aa, type: 3}
 --- !u!1 &1003180441
 GameObject:
   m_ObjectHideFlags: 0
