@@ -8,16 +8,17 @@ public class CardDrawAnimation : Singleton<CardDrawAnimation>
     // Start is called before the first frame update
     private Vector3 p1DrawStartLocation;
     private Vector3 p2DrawStartLocation;
-    public GameObject playerHandArea;
-    public GameObject gameboardDeckPrefab;
+    //PlayerHand.Instance.GetPlayerHandArea
+    private GameObject gameboardDeckPrefab;
     private float animationDuration = 3f;
     private float[] animationProgress;
     private bool[] animating;
     private GameObject[] deck;
     private int animationsToDo=0;
-    private int totalAllowedAnimations = 10; // 10 cause 5x2 for start of game card draws
-    void Start()
+    private int totalAllowedAnimations = 5;
+    void Awake()
     {
+        gameboardDeckPrefab = DeckManager.Instance.GameboardDeckPrefab;
         animating = new bool[totalAllowedAnimations];
         animationProgress = new float[totalAllowedAnimations];
         deck = new GameObject[totalAllowedAnimations];
@@ -47,7 +48,7 @@ public class CardDrawAnimation : Singleton<CardDrawAnimation>
                 {
                     if (deck[a].transform.position == p1DrawStartLocation + new Vector3(0f, 0f, -40f))
                     {
-                        Debug.Log("locations match!");
+                        //can do something once it reaches the end of path
                     }
                     animating[a] = false;
                     Destroy(deck[a]);
@@ -65,13 +66,5 @@ public class CardDrawAnimation : Singleton<CardDrawAnimation>
     public void PlayerDraw()
     {
             animationsToDo++;
-            //deck = Instantiate(gameboardDeckPrefab, p1DrawStartLocation, Quaternion.identity);
-            //Debug.Log("deck made");
-            //animating = true;
-
-    }
-    public void OpponentDraw()
-    {
-
     }
 }

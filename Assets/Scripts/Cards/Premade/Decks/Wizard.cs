@@ -68,6 +68,7 @@ public class Wizard : Deck {
             d.Push(CardsLibrary.CreateFieryGreaves());
 
         base.SetDeck(d);
+        base.SetDeckName("Wizard");
     }
 
 }

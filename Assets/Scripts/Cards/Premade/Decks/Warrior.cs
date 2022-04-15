@@ -59,6 +59,7 @@ public class Warrior : Deck {
             d.Push(CardsLibrary.CreateArrowStorm());
 
         base.SetDeck(d);
+        base.SetDeckName("Warrior");
     }
 
 }
