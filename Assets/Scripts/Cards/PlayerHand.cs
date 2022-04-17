@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Utilities.Singletons;
 using System.Linq;
 using TMPro;
+using System;
 
 public class PlayerHand : Singleton<PlayerHand> {
     public GameObject CardHandPrefab;
@@ -53,7 +54,7 @@ public class PlayerHand : Singleton<PlayerHand> {
         foreach (KeyValuePair<GameObject, Card> kvp in renderedPlayerHandCards) {
             TextMeshProUGUI[] playerCardText = kvp.Key.GetComponentsInChildren<TextMeshProUGUI>();
 
-            playerCardText[4].text = (kvp.Value.attributes.cost + _resourceCostModifier).ToString();
+            playerCardText[4].text = Math.Max(0, (kvp.Value.attributes.cost + _resourceCostModifier)).ToString();
         }
     }
 
@@ -117,7 +118,7 @@ public class PlayerHand : Singleton<PlayerHand> {
                     kvp.Key.transform.SetAsLastSibling(); // Move to front most so its not obscured by other cards
                     kvp.Key.transform.localScale = new Vector3(1.3f, 1.3f, 1.3f); // zoom in
                     kvp.Key.transform.eulerAngles = Vector3.zero; // remove rotation
-                    kvp.Key.transform.localPosition = new Vector3((CardWidth + PlayerHandCardTranslateXAmount) * distanceFromCenter, 30.0f, 0f); // move up
+                    kvp.Key.transform.localPosition = new Vector3((CardWidth + PlayerHandCardTranslateXAmount) * distanceFromCenter, 80.0f, 0f); // move up
                 } else {
                     int index = renderedPlayerHandCards.ToArray().ToList().IndexOf(kvp);
                     if (indexOfHoveredCard > -1 && index >= indexOfHoveredCard) index -= 1;

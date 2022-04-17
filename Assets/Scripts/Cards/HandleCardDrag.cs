@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System;
 
 public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -131,7 +132,7 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         } else {
             GameboardObjectManager.Instance.UseCard(hexRayCast, card);
             PlayerHand.Instance.RemoveCardFromHand(gameObject);
-            ResourceManager.Instance.UseResource(card.attributes.cost + PlayerHand.Instance.GetResourceCostModifier());
+            ResourceManager.Instance.UseResource(Math.Max(0, card.attributes.cost + PlayerHand.Instance.GetResourceCostModifier()));
         }
 
         PlayerHand.Instance.RemoveCardIsDragged();

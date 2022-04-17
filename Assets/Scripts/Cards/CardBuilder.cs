@@ -2,6 +2,7 @@ using UnityEngine;
 using Utilities.Singletons;
 using TMPro;
 using UnityEngine.UI;
+using System;
 
 public class CardBuilder : Singleton<CardBuilder> {
     [Header("Card Fronts")]
@@ -86,7 +87,7 @@ public class CardBuilder : Singleton<CardBuilder> {
             playerCardText[4].color = Color.black; // cost
         }
         
-        playerCardText[4].text = card.attributes.cost.ToString();
+        playerCardText[4].text = Math.Max(0, card.attributes.cost).ToString();
 
         Image[] playerCardImages = gameObject.GetComponentsInChildren<Image>();
 

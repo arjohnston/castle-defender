@@ -9,6 +9,7 @@ public static class CardsLibrary {
             Sprites.WALL,
             new Meta{
                 title = "Wall",
+                description = "A permanent wall, defending units behind where you place it",
             },
             new Attributes{
                 hp = 5,

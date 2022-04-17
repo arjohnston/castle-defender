@@ -66,7 +66,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                     Sprites.CASTLE,
                     new Meta{
                     title = "Castle",
-                    description = "Player castle."
+                    description = "Player castle; defend yours, and destroy the enemies!"
                     },
                     new Attributes{
                         hp = GameDefaults.CASTLE_HEALTH,
