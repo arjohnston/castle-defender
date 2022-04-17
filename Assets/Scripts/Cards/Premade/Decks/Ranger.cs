@@ -71,6 +71,7 @@ public class Ranger : Deck {
             d.Push(CardsLibrary.CreateArrowStorm());
 
         base.SetDeck(d);
+        base.SetDeckName("Ranger");
     }
   
 }

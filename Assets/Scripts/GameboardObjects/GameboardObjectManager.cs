@@ -16,7 +16,6 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
     [SerializeField] public GameObject WallPrefab;
     [SerializeField] private GameboardObject _castle;
     [SerializeField] private Transform[] points;
-    [SerializeField] private LineController lineScript;
 
     [SerializeField] private GameObject _selectedGameboardObject = null;
     [SerializeField] private bool _leftClickMouseChanged = false;

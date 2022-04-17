@@ -16,6 +16,10 @@ public class DeckManager : NetworkSingleton<DeckManager> {
 
     private Stack<Card> playerDeck;
     private Stack<Card> playerGrave;
+    public GameObject deckCount;
+    private string deckName;
+    public Camera userCamera;
+    private Vector2 oldMousePos;
 
     public GameObject GameboardDeckPrefab;
     public Material DeckBackMaterial;
@@ -30,16 +34,19 @@ public class DeckManager : NetworkSingleton<DeckManager> {
 
     void Start() {
         CreateDeckGameObjects();
+
     }
 
     void Update() {
         ShowHideGameboardDecks();
         CheckOnLeftClick();
         CheckIfDeckClicked();
+        hideDeckCount();
     }
 
     public void InitializeDeck(Deck deck) {
         playerDeck = Shuffle(deck.GetDeck());
+        deckName = deck.GetDeckName();
         playerGrave = new Stack<Card>();
 
         if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE) {
@@ -138,6 +145,16 @@ public class DeckManager : NetworkSingleton<DeckManager> {
                 if (gameboardObjectRayCast.name.Contains("Grave_p1")) {
                     // TODO: handle doing something with the graveyard
                 }
+                else
+                {
+                    deckCount.SetActive(true);
+                    Vector3 deckPos = deckCount.transform.position;
+                    deckPos.y = Mouse.current.position.y.ReadValue();
+                    deckPos.x = Mouse.current.position.x.ReadValue();
+                    deckCount.transform.position = deckPos;
+                    deckCount.GetComponent<TMPro.TextMeshProUGUI>().text = "Class: "+ deckName + "\n"+"Cards Remaining:" + playerOneDeckCountServer.Value;
+
+                }
             } 
 
             if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO) {
@@ -147,10 +164,18 @@ public class DeckManager : NetworkSingleton<DeckManager> {
             } 
         }
     }
-
+    public void hideDeckCount()
+    {
+        Vector2 currentMouse = new Vector2(Mouse.current.position.x.ReadValue(), Mouse.current.position.y.ReadValue());
+        if (oldMousePos != currentMouse)
+        {
+            deckCount.SetActive(false);
+        }
+        oldMousePos = currentMouse;
+    }
     public void DrawInitialHandOfCards() {
-        for (int i = 0; i < GameSettings.initialPlayerHandSize; i++) {
-            DrawCard();
+        for (float i = GameSettings.initialPlayerHandSize; i > 0; i--) {
+            Invoke("DrawCard",(i-(.5f*i)));
         }
     }
 
@@ -160,6 +185,7 @@ public class DeckManager : NetworkSingleton<DeckManager> {
 
         Card card = playerDeck.Pop();
         PlayerHand.Instance.AddCardToHand(card);
+        CardDrawAnimation.Instance.PlayerDraw();
 
         SetPlayerDeck();
     }
