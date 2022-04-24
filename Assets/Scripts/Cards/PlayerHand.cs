@@ -104,10 +104,9 @@ public class PlayerHand : Singleton<PlayerHand> {
                 {
                     drawGBO[a].transform.position = Vector3.Lerp(cardSpawnLocation.transform.position,
                         playerHandArea.transform.position, drawTimer[a]);
-                Debug.Log(drawTimer[a]);
                 drawGBO[a].transform.eulerAngles = new Vector3(0f, 0f, -40+(drawTimer[a]*40));
                     if (drawTimer[a] > 1f)
-                    {
+                    { 
                         drawAnimationsToDo--;
                         drawAnimation[a] = false;
                         renderedPlayerHandCards.Enqueue(playerHandAnimations.Dequeue());

@@ -9,6 +9,7 @@ public class CardDrawAnimation : Singleton<CardDrawAnimation>
     private Vector3 p1DrawStartLocation;
     private Vector3 p2DrawStartLocation;
     private Vector3 player;
+    private int player2Adjustment = 1;
     //PlayerHand.Instance.GetPlayerHandArea
     private GameObject gameboardDeckPrefab;
     private float animationDuration = 2f;
@@ -36,20 +37,23 @@ public class CardDrawAnimation : Singleton<CardDrawAnimation>
         }
         PlayerDrawCheck();
     }
-    private void Start()
-    {
-        if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE)
-            player = p1DrawStartLocation;
-        else if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO)
-            player = p2DrawStartLocation;
-    }
     public void PlayerDrawCheck()
     {
+        if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE)
+        {
+            player = p1DrawStartLocation;
+
+        }
+        else if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO)
+        {
+            player = p2DrawStartLocation;
+            player2Adjustment = -1;
+        }
         for (int a = 0; a < totalAllowedAnimations; a++) {
             if (animating[a])
             {
                 deck[a].transform.position = Vector3.Lerp(player,
-                   (player + new Vector3(0f, 0f, -30f)), animationProgress[a]);
+                   (player + new Vector3(0f, 0f, -30f *player2Adjustment)), animationProgress[a]);
                 if (animationProgress[a] > 1f)
                 {
                     if (deck[a].transform.position == player + new Vector3(0f, 0f, -40f))
