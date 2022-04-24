@@ -39,7 +39,6 @@ public class CardDrawAnimation : Singleton<CardDrawAnimation>
     {
         for (int a = 0; a < totalAllowedAnimations; a++) {
             if(animationsToDo>1)
-            Debug.Log(a + "amounts to do" + animationsToDo);
             if (animating[a])
             {
                 deck[a].transform.position = Vector3.Lerp(p1DrawStartLocation,

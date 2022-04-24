@@ -66,7 +66,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                     Sprites.CASTLE,
                     new Meta{
                     title = "Castle",
-                    description = "Player castle; defend yours, and destroy the enemies!"
+                    description = "Player castle; defend yours, and destroy the enemy's!"
                     },
                     new Attributes{
                         hp = GameDefaults.CASTLE_HEALTH,
@@ -585,7 +585,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             mousePosition.x *= Screen.width;
             mousePosition.y *= Screen.height;
 
-            _tooltip.transform.position = mousePosition + new Vector2(70f, -100f);
+            _tooltip.transform.position = mousePosition + new Vector2(30f, 100f);
         }
     }
 

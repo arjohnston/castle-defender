@@ -86,8 +86,34 @@ public class CardBuilder : Singleton<CardBuilder> {
             playerCardText[0].color = Color.black; // title
             playerCardText[4].color = Color.black; // cost
         }
+
+            if (card.attributes.hp < card.attributes.maxHP)//creature is damaged
+            {
+                playerCardText[2].color = Color.red;
+                playerCardText[2].fontStyle = FontStyles.Bold;
+            }
+            else if (card.attributes.hp > card.attributes.maxHP)
+            {
+                playerCardText[2].color = Color.green;
+                playerCardText[2].fontStyle = FontStyles.Bold;
+            }
+            else
+            {
+                playerCardText[2].color = Color.white;
+            }
+        if (card.attributes.damage < card.attributes.startingAttack)//creature attack is debuffed
+            {
+                playerCardText[3].color = Color.red;
+                playerCardText[3].fontStyle = FontStyles.Bold;
+            }
+            else if( card.attributes.damage > card.attributes.startingAttack)
+            {
+                playerCardText[3].color = Color.green;
+                playerCardText[3].fontStyle = FontStyles.Bold;
+            }
         
         playerCardText[4].text = Math.Max(0, card.attributes.cost).ToString();
+        // but does actual cost get stopped form falling below 0?
 
         Image[] playerCardImages = gameObject.GetComponentsInChildren<Image>();
 

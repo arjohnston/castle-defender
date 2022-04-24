@@ -161,6 +161,16 @@ public class DeckManager : NetworkSingleton<DeckManager> {
                 if (gameboardObjectRayCast.name.Contains("Grave_p2")) {
                     // TODO: handle doing something with the graveyard
                 }
+                else //if Deck_P2
+                {
+                    deckCount.SetActive(true);
+                    Vector3 deckPos = deckCount.transform.position;
+                    deckPos.y = Mouse.current.position.y.ReadValue();
+                    deckPos.x = Mouse.current.position.x.ReadValue();
+                    deckCount.transform.position = deckPos;
+                    deckCount.GetComponent<TMPro.TextMeshProUGUI>().text = "Class: " + deckName + "\n" + "Cards Remaining:" + playerTwoDeckCountServer.Value;
+
+                }
             } 
         }
     }

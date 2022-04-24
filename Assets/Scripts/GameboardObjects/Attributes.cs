@@ -8,6 +8,8 @@ public struct Attributes : INetworkSerializable {
     public int damage;
     public int occupiedRadius;
     public bool isRestrictedToMyTurn;
+    public int maxHP;
+    public int startingAttack;
 
     // creature mechanics
     public bool flying;
@@ -28,7 +30,7 @@ public struct Attributes : INetworkSerializable {
     // enchantment mechanics
 
     public Attributes(
-        int hp = 5, 
+        int hp = 5,
         int cost = 2, 
         int speed = 1, 
         int range = 1, 
@@ -63,10 +65,19 @@ public struct Attributes : INetworkSerializable {
         this.meleeHealthModifier = meleeHealthModifier;
         this.rangedHealthModifier = rangedHealthModifier;
         this.spellModifier = spellModifier;
+        this.maxHP = this.hp;
+        this.startingAttack= this.damage;
+    }
+    public void SetDependents()
+    {
+        this.maxHP = this.hp;
+        this.startingAttack = this.damage;
     }
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter {
         serializer.SerializeValue(ref hp);
+        serializer.SerializeValue(ref maxHP);
+        serializer.SerializeValue(ref startingAttack);
         serializer.SerializeValue(ref cost);
         serializer.SerializeValue(ref speed);
         serializer.SerializeValue(ref range);
