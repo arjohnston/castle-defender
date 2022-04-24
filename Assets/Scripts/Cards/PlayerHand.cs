@@ -8,9 +8,15 @@ using System;
 public class PlayerHand : Singleton<PlayerHand> {
     public GameObject CardHandPrefab;
     public GameObject playerHandArea;
+    public GameObject cardSpawnLocation;
+    public float[] drawTimer; 
+    public bool[] drawAnimation;
+    public GameObject[] drawGBO;
+    public Card[] drawCardData;
+    public int drawAnimationsToDo = 0;
 
     Queue<KeyValuePair<GameObject, Card>> renderedPlayerHandCards = new Queue<KeyValuePair<GameObject, Card>>();
-
+    Queue<KeyValuePair<GameObject, Card>> playerHandAnimations = new Queue<KeyValuePair<GameObject, Card>>();
     private List<Card> tempList;
 
     [Header("Player Hand Card")]
@@ -25,8 +31,17 @@ public class PlayerHand : Singleton<PlayerHand> {
     private int _resourceCostModifier = 0;
     private int _resourceCostModifierTurnDuration = 0;
 
+    private void Awake()
+    {
+        drawTimer = new float[5];
+        drawAnimation = new bool[5];
+        drawGBO = new GameObject[5];
+        drawCardData = new Card[5];
+    }
     void Update() {
         SetCostModifierForPlayerHandCards();
+        for (int n = 0; n < 5; n++) drawTimer[n] += Time.deltaTime / 2.5f;
+        StartDrawAnimation();
     }
 
     void LateUpdate() {
@@ -69,10 +84,49 @@ public class PlayerHand : Singleton<PlayerHand> {
             // Instantiate game object, add it to the dictionary
             GameObject playerCard = Instantiate(CardHandPrefab, new Vector3(0, 0, 0), Quaternion.identity, this.transform);
             playerCard.transform.SetParent(playerHandArea.transform, false);
-
+            playerCard.transform.position = cardSpawnLocation.transform.position;
+            playerCard.transform.eulerAngles = new Vector3(0f, 0f, -40f);
             CardBuilder.Instance.BuildCard(playerCard, card);
 
-            renderedPlayerHandCards.Enqueue(new KeyValuePair<GameObject, Card>(playerCard, card));
+            //drawAnimation = true;
+            //drawTimer = 0;
+            FillNextAnimationSlot(card, playerCard);
+            playerHandAnimations.Enqueue(new KeyValuePair<GameObject, Card>(playerCard, card));
+            //StartDrawAnimation() ;
+           
+        }
+    }
+    public void StartDrawAnimation()
+    {
+        for (int a = 0; a < 5; a++)
+        {
+                if (drawAnimation[a])
+                {
+                    drawGBO[a].transform.position = Vector3.Lerp(cardSpawnLocation.transform.position,
+                        playerHandArea.transform.position, drawTimer[a]);
+                Debug.Log(drawTimer[a]);
+                drawGBO[a].transform.eulerAngles = new Vector3(0f, 0f, -40+(drawTimer[a]*40));
+                    if (drawTimer[a] > 1f)
+                    {
+                        drawAnimationsToDo--;
+                        drawAnimation[a] = false;
+                        renderedPlayerHandCards.Enqueue(playerHandAnimations.Dequeue());
+                    }
+                }
+        }
+    }
+    public void FillNextAnimationSlot( Card card, GameObject gbo)
+    {
+        drawAnimationsToDo++;
+        for(int i =0; i <drawAnimationsToDo; i++)
+        {
+            if (!drawAnimation[i])
+            {
+                drawTimer[i] = 0f;
+                drawAnimation[i] = true;
+                drawGBO[i] = gbo;
+                drawCardData[i] = card;
+            }
         }
     }
 
