@@ -32,7 +32,7 @@ public class CameraController : Singleton<CameraController> {
 	public float MaxZoom = 100.0f;
 
 	// cinemachine
-	private CinemachineVirtualCamera _virtualCamera;
+	public CinemachineVirtualCamera _virtualCamera;
 	private float _cinemachineTargetYaw;
 	private float _cinemachineTargetPitch = 38.0f;
 
@@ -102,8 +102,8 @@ public class CameraController : Singleton<CameraController> {
 		if (Mouse.current.rightButton.isPressed) {
 			// if there is an input and camera position is not fixed
 			if (_input.look.sqrMagnitude >= _threshold && !LockCameraPosition) {
-				_cinemachineTargetYaw += _input.look.x;
-				_cinemachineTargetPitch += _input.look.y;
+				_cinemachineTargetYaw += _input.look.x *3;
+				_cinemachineTargetPitch += _input.look.y *3;
 			}
 
 			// clamp our rotations so our values are limited 360 degrees

@@ -20,7 +20,7 @@ public class GameboardObject : NetworkBehaviour {
     private float _deferredAttackTimer = 0.0f;
     private int _deferredAttackDamage = 0;
     private GameboardObject _deferredAttackTarget;
-    private float _defaultDeferredAttackTimerAmount = 0.5f;
+    public float _defaultDeferredAttackTimerAmount = 0.5f;
 
     private NetworkVariable<bool> isSelected = new NetworkVariable<bool>(false);
 
@@ -168,6 +168,7 @@ public class GameboardObject : NetworkBehaviour {
         if (!isInstantiated.Value) return;
 
         if (GetModifiedHp() <= 0) {
+            LineController.Instance.Clear();
             GameboardObjectManager.Instance.DestroyGameObject(gameObject);
         }
 
@@ -445,6 +446,7 @@ public class GameboardObject : NetworkBehaviour {
 
     public void Attack(GameboardObject target) {
         int damageModifier = 0;
+        ObjectAnimations.Instance.ShakeMe(target);
         if (target.GetGboType() == Types.PERMANENT) damageModifier += attributes.Value.permanentDamageModifier;
         if (!hasAttacked) damageModifier += attributes.Value.firstAttackDamageModifier;
 
@@ -456,6 +458,7 @@ public class GameboardObject : NetworkBehaviour {
 
         _deferredAttackTarget = target;
         _deferredAttackDamage = -(damageModifier + GetDamage());
+        ObjectAnimations.Instance.SpawnDamageText(target.transform, _deferredAttackDamage);
         _deferredAttackTimer = _defaultDeferredAttackTimerAmount;
 
         SetRemainingAttackActionsServerRpc(remainingAttackActions.Value - 1);

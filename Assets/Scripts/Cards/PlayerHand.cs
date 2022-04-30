@@ -33,15 +33,15 @@ public class PlayerHand : Singleton<PlayerHand> {
 
     private void Awake()
     {
-        drawTimer = new float[5];
-        drawAnimation = new bool[5];
-        drawGBO = new GameObject[5];
-        drawCardData = new Card[5];
+        drawTimer = new float[6];
+        drawAnimation = new bool[6];
+        drawGBO = new GameObject[6];
+        drawCardData = new Card[6];
     }
     void Update() {
         SetCostModifierForPlayerHandCards();
         for (int n = 0; n < 5; n++) drawTimer[n] += Time.deltaTime / 2.5f;
-        StartDrawAnimation();
+        ManageDrawAnimation();
     }
 
     void LateUpdate() {
@@ -88,17 +88,13 @@ public class PlayerHand : Singleton<PlayerHand> {
             playerCard.transform.eulerAngles = new Vector3(0f, 0f, -40f);
             CardBuilder.Instance.BuildCard(playerCard, card);
 
-            //drawAnimation = true;
-            //drawTimer = 0;
-            FillNextAnimationSlot(card, playerCard);
             playerHandAnimations.Enqueue(new KeyValuePair<GameObject, Card>(playerCard, card));
-            //StartDrawAnimation() ;
-           
+            FillNextAnimationSlot(card, playerCard);
         }
     }
-    public void StartDrawAnimation()
+    public void ManageDrawAnimation()
     {
-        for (int a = 0; a < 5; a++)
+        for (int a = 0; a < 6; a++)
         {
                 if (drawAnimation[a])
                 {
@@ -107,7 +103,6 @@ public class PlayerHand : Singleton<PlayerHand> {
                 drawGBO[a].transform.eulerAngles = new Vector3(0f, 0f, -40+(drawTimer[a]*40));
                     if (drawTimer[a] > 1f)
                     { 
-                        drawAnimationsToDo--;
                         drawAnimation[a] = false;
                         renderedPlayerHandCards.Enqueue(playerHandAnimations.Dequeue());
                     }
@@ -117,12 +112,13 @@ public class PlayerHand : Singleton<PlayerHand> {
     public void FillNextAnimationSlot( Card card, GameObject gbo)
     {
         drawAnimationsToDo++;
-        for(int i =0; i <drawAnimationsToDo; i++)
+        for(int i =0; i <6; i++)
         {
-            if (!drawAnimation[i])
+            if (!drawAnimation[i] && drawAnimationsToDo>0)
             {
-                drawTimer[i] = 0f;
                 drawAnimation[i] = true;
+                drawAnimationsToDo--;
+                drawTimer[i] = 0f;
                 drawGBO[i] = gbo;
                 drawCardData[i] = card;
             }
@@ -213,6 +209,6 @@ public class PlayerHand : Singleton<PlayerHand> {
     }
 
     public int Count() {
-        return renderedPlayerHandCards.Count;
+        return renderedPlayerHandCards.Count + playerHandAnimations.Count;
     }
 }

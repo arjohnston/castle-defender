@@ -7887,6 +7887,7 @@ GameObject:
   - component: {fileID: 983941259}
   - component: {fileID: 983941260}
   - component: {fileID: 983941261}
+  - component: {fileID: 983941262}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -8089,9 +8090,10 @@ MonoBehaviour:
   CardHandPrefab: {fileID: 3588415452138221120, guid: e980c534ec5e6874ebe5bd2f73f20f9c, type: 3}
   playerHandArea: {fileID: 51128012}
   cardSpawnLocation: {fileID: 797798747}
-  drawTimer: 0
-  drawAnimation: 0
-  playerCard: {fileID: 0}
+  drawTimer: []
+  drawAnimation: 
+  drawGBO: []
+  drawAnimationsToDo: 0
   CardWidth: 100
   PlayerHandCardRotationAmount: 9
   PlayerHandCardTranslateXAmount: -12
@@ -8239,6 +8241,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c3fde751b7354aec961a2126060cd79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &983941262
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983941246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27bad1a7d31cc47e7baa379dbf70e8d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damageText: {fileID: 6534272389265653478, guid: 60e4ecb0d4ec9478a8af5b821691e620, type: 3}
 --- !u!1 &1003180441
 GameObject:
   m_ObjectHideFlags: 0
