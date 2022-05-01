@@ -20,9 +20,9 @@ public class PlayerHand : Singleton<PlayerHand> {
     private List<Card> tempList;
 
     [Header("Player Hand Card")]
-    public int CardWidth = 100;
+    public int CardWidth = 200;
     public float PlayerHandCardRotationAmount = 10.0f;
-    public float PlayerHandCardTranslateXAmount = 7.0f;
+    public float PlayerHandCardTranslateXAmount = 10.0f;
     public float PlayerHandCardTranslateYAmount = -3.0f;
 
     private GameObject cardHovered;
@@ -167,7 +167,7 @@ public class PlayerHand : Singleton<PlayerHand> {
                     kvp.Key.transform.SetAsLastSibling(); // Move to front most so its not obscured by other cards
                     kvp.Key.transform.localScale = new Vector3(1.3f, 1.3f, 1.3f); // zoom in
                     kvp.Key.transform.eulerAngles = Vector3.zero; // remove rotation
-                    kvp.Key.transform.localPosition = new Vector3((CardWidth + PlayerHandCardTranslateXAmount) * distanceFromCenter, 80.0f, 0f); // move up
+                    kvp.Key.transform.localPosition = new Vector3((CardWidth + PlayerHandCardTranslateXAmount) * distanceFromCenter, 120.0f, 0f); // move up
                 } else {
                     int index = renderedPlayerHandCards.ToArray().ToList().IndexOf(kvp);
                     if (indexOfHoveredCard > -1 && index >= indexOfHoveredCard) index -= 1;
@@ -175,7 +175,7 @@ public class PlayerHand : Singleton<PlayerHand> {
                     kvp.Key.transform.SetSiblingIndex(index);
                     kvp.Key.transform.localScale = new Vector3(1f, 1f, 1f);
                     kvp.Key.transform.eulerAngles = new Vector3(0f, 0f, -(distanceFromCenter * PlayerHandCardRotationAmount));
-                    kvp.Key.transform.localPosition = new Vector3((CardWidth + PlayerHandCardTranslateXAmount) * distanceFromCenter, -PlayerHandCardTranslateYAmount * 3.0f - Mathf.Abs(PlayerHandCardTranslateYAmount * distanceFromCenter * 1.4f), 0f);
+                    kvp.Key.transform.localPosition = new Vector3((CardWidth + PlayerHandCardTranslateXAmount) * distanceFromCenter, -PlayerHandCardTranslateYAmount * 4.0f - Mathf.Abs(PlayerHandCardTranslateYAmount * distanceFromCenter * 1.4f), 0f);
                 }
             }
         }
