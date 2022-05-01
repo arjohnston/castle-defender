@@ -7,6 +7,11 @@ public abstract class Deck {
 
     public void SetDeck(Stack<Card> deck) {
         this.deck = deck;
+        foreach( Card d in deck)
+        {
+            //set the max hp and starting attack
+            d.attributes.SetDependents();
+        }
     }
     public Stack<Card> GetDeck() {
         return deck;

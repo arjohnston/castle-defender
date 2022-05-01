@@ -8,9 +8,11 @@ public class CardDrawAnimation : Singleton<CardDrawAnimation>
     // Start is called before the first frame update
     private Vector3 p1DrawStartLocation;
     private Vector3 p2DrawStartLocation;
+    private Vector3 player;
+    private int player2Adjustment = 1;
     //PlayerHand.Instance.GetPlayerHandArea
     private GameObject gameboardDeckPrefab;
-    private float animationDuration = 3f;
+    private float animationDuration = 2f;
     private float[] animationProgress;
     private bool[] animating;
     private GameObject[] deck;
@@ -37,27 +39,35 @@ public class CardDrawAnimation : Singleton<CardDrawAnimation>
     }
     public void PlayerDrawCheck()
     {
+        if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE)
+        {
+            player = p1DrawStartLocation;
+
+        }
+        else if (GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO)
+        {
+            player = p2DrawStartLocation;
+            player2Adjustment = -1;
+        }
         for (int a = 0; a < totalAllowedAnimations; a++) {
-            if(animationsToDo>1)
-            Debug.Log(a + "amounts to do" + animationsToDo);
             if (animating[a])
             {
-                deck[a].transform.position = Vector3.Lerp(p1DrawStartLocation,
-                   (p1DrawStartLocation + new Vector3(0f, 0f, -40f)), animationProgress[a]);
+                deck[a].transform.position = Vector3.Lerp(player,
+                   (player + new Vector3(0f, 0f, -30f *player2Adjustment)), animationProgress[a]);
                 if (animationProgress[a] > 1f)
                 {
-                    if (deck[a].transform.position == p1DrawStartLocation + new Vector3(0f, 0f, -40f))
+                    if (deck[a].transform.position == player + new Vector3(0f, 0f, -40f))
                     {
                         //can do something once it reaches the end of path
                     }
                     animating[a] = false;
                     Destroy(deck[a]);
                 }
-            }else if (!animating[a] && animationsToDo>=1)
+            }else if (!animating[a] && animationsToDo>0)
             {
                 animationsToDo--;
-                animationProgress[a] = 0;
-                deck[a] = Instantiate(gameboardDeckPrefab, p1DrawStartLocation, Quaternion.identity);
+                animationProgress[a] = 0f;
+                deck[a] = Instantiate(gameboardDeckPrefab, player, Quaternion.identity);
                 animating[a] = true;
             }
             

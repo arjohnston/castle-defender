@@ -13,11 +13,8 @@ public class LineController : NetworkSingleton<LineController> {
     private float _drawTime = 0.5f;
 
     void Update() {
-        if (_isDrawn) {
             _timer += Time.deltaTime;
-        }
-
-        if (_timer >= _drawTime) {
+        if (_timer >= _drawTime && _isDrawn) {
             Clear();
         }
     }
@@ -27,7 +24,10 @@ public class LineController : NetworkSingleton<LineController> {
     }
 
     public void Draw(Vector3 from, Vector3 to) {
-        if (_isDrawn) return;
+        if (_isDrawn)
+        {
+            Clear();
+        }
         _isDrawn = true;
         line = Instantiate(LinePrefab, from, Quaternion.identity);
         LineRenderer lr = line.GetComponent<LineRenderer>();
@@ -53,7 +53,7 @@ public class LineController : NetworkSingleton<LineController> {
     }
 
 
-    private void Clear() {
+    public void Clear() {
         Destroy(line);
         _isDrawn = false;
         _timer = 0.0f;

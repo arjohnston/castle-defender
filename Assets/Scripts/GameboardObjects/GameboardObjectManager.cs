@@ -66,7 +66,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                     Sprites.CASTLE,
                     new Meta{
                     title = "Castle",
-                    description = "Player castle; defend yours, and destroy the enemies!"
+                    description = "Player castle; defend yours, and destroy the enemy's!"
                     },
                     new Attributes{
                         hp = GameDefaults.CASTLE_HEALTH,
@@ -524,7 +524,10 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
                 
                 if (target != null && gbo.IsValidAttack(target) && !target.IsOwner && target.GetGboType() != Types.TRAP) {
                     if (!hitSpots.ContainsKey(raycastHitSpot)) hitSpots.Add(raycastHitSpot, new HitSpot(HexColors.VALID_ATTACK, gbo.GetOccupiedRadius()));
-                    Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+                    {
+                        LineController.Instance.DrawAttackLine(_selectedGameboardObject, target.gameObject);
+                        Gameboard.Instance.HighlightRaycastHitSpot(hitSpots);
+                    }
 
                     return;
                 }
@@ -585,7 +588,7 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             mousePosition.x *= Screen.width;
             mousePosition.y *= Screen.height;
 
-            _tooltip.transform.position = mousePosition + new Vector2(70f, -100f);
+            _tooltip.transform.position = mousePosition + new Vector2(90f, 100f);
         }
     }
 
@@ -652,8 +655,8 @@ public class GameboardObjectManager : NetworkSingleton<GameboardObjectManager>
             _selectedGameboardObject.GetComponent<GameboardObject>().Select();
         } else {
             if (gbo.IsValidAttack(target)) {
-                gbo.Attack(target);
                 LineController.Instance.DrawAttackLine(_selectedGameboardObject.gameObject, target.gameObject);
+                gbo.Attack(target);
                 SoundManager.Instance.Play(Sounds.ATTACK);
             } else {
                 GameManager.Instance.ShowToastMessage("Invalid attack");
