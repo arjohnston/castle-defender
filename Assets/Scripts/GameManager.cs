@@ -30,6 +30,13 @@ public class GameManager : NetworkSingleton<GameManager> {
     public TextMeshProUGUI currentPlayerResources;
     public TextMeshProUGUI opposingPlayerResources;
 
+    public Image currentPlayerImage;
+    public Image opposingPlayerImage;
+
+    public Sprite knight;
+    public Sprite wizard;
+    public Sprite sorceress;
+
     public bool allowMultiplayerInEditor = false;
 
     private DateTime _startTime;
@@ -150,6 +157,40 @@ public class GameManager : NetworkSingleton<GameManager> {
         UpdatePlayerStats();
         CheckWinCondition();
         FadeMessage();
+    }
+
+    public void SetUIPortraits(DeckTypes type) {
+        SetUIPortaitsServerRpc(GetCurrentPlayer(), type);
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    public void SetUIPortaitsServerRpc(Players player, DeckTypes type) {
+        SetUIPortraitsClientRpc(player, type);
+    }
+
+    [ClientRpc]
+    public void SetUIPortraitsClientRpc(Players player, DeckTypes type) {
+        Sprite image = knight;
+
+        switch (type) {
+            case DeckTypes.WARRIOR:
+                image = knight;
+                break;
+
+            case DeckTypes.RANGER:
+                image = sorceress;
+                break;
+
+            case DeckTypes.WIZARD:
+                image = wizard;
+                break;
+        }
+
+        if (GetCurrentPlayer() == player) {
+            currentPlayerImage.sprite = image;
+        } else {
+            opposingPlayerImage.sprite = image;
+        }
     }
 
     private void FormatAndStoreTimeElapsed() {
