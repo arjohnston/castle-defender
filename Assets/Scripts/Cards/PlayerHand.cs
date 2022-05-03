@@ -40,7 +40,7 @@ public class PlayerHand : Singleton<PlayerHand> {
     }
     void Update() {
         SetCostModifierForPlayerHandCards();
-        for (int n = 0; n < 5; n++) drawTimer[n] += Time.deltaTime / 2.5f;
+        for (int n = 0; n < 5; n++) drawTimer[n] += Time.deltaTime;
         ManageDrawAnimation();
     }
 

@@ -33,6 +33,8 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         hexRayCast = Gameboard.Instance.GetHexRayCastHit();
         hitSpots = new Dictionary<Hex, HitSpot>();
 
+        if (card == null) return;
+
         if (hexRayCast != null) {
             GameboardObject gbo = GameboardObjectManager.Instance.GetGboAtHex(hexRayCast);
 
@@ -102,6 +104,7 @@ public class HandleCardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         if (!TurnManager.Instance.IsMyTurn()) return;
         
         Card card = PlayerHand.Instance.GetCardForGameObject(gameObject);
+        if (card == null) return;
 
         if (hexRayCast == null) {
             GameManager.Instance.ShowToastMessage("Invalid placement");

@@ -163,8 +163,7 @@ public class CardBuilder : Singleton<CardBuilder> {
                 return Wolf;
 
             case Sprites.SHINOBI:
-                // return Shinobi;
-                return Orc;
+                return Shinobi;
             
             case Sprites.ARCHER:
                 return Archer;
@@ -224,8 +223,7 @@ public class CardBuilder : Singleton<CardBuilder> {
                 return Squire;
             
             case Sprites.ASSASSIN:
-                // return Assassin;
-                return Orc;
+                return Assassin;
 
             case Sprites.DRAGON:
                 return Dragon;
@@ -262,8 +260,7 @@ public class CardBuilder : Singleton<CardBuilder> {
                 return Archmage;
 
             case Sprites.ETERNALDRAGON:
-                // return EternalDragon;
-                return Orc;
+                return EternalDragon;
 
             case Sprites.SKELETONS:
                 return Skeletons;

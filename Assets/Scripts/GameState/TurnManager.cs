@@ -6,12 +6,15 @@ using Unity.Netcode;
 using System.Collections;
 
 public class TurnManager: NetworkSingleton<TurnManager> {
-    public TextMeshProUGUI GameStateText;
     public Button GameStateButton;
     public GameObject Banner;
     private bool _bannerIsAnimatingFadeIn = false;
     private float _bannerFadeAnimationTiming = 1.3f;
     private float _bannerState = 0.0f;
+
+    public Sprite resourcesMyTurnSprite;
+    public Sprite resourcesOpponentTurnSprite;
+    public Image resourcesImage;
 
     [SerializeField] private NetworkVariable<GameState> gameStateServer = new NetworkVariable<GameState>(GameState.SETUP);
 
@@ -63,7 +66,6 @@ public class TurnManager: NetworkSingleton<TurnManager> {
         if (GetGameState() == GameState.SETUP) {
             SetGameState(GameState.PLAYER_ONE_TURN);
             GameboardObjectManager.Instance.ResetActions(Players.PLAYER_ONE);
-            GameStateText.text = "Player One";
             GameStateButton.GetComponentInChildren<TextMeshProUGUI>().text = "End Turn";
             GameStateButton.interactable = GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE;
 
@@ -99,16 +101,12 @@ public class TurnManager: NetworkSingleton<TurnManager> {
             case GameState.PLAYER_ONE_TURN:
                 if (_hasTurnChanged) GameboardObjectManager.Instance.ResetActions(Players.PLAYER_ONE);
 
-                GameStateText.text = "Player One";
-                GameStateButton.GetComponentInChildren<TextMeshProUGUI>().text = "End Turn";
                 GameStateButton.interactable = GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_ONE;
                 break;
 
             case GameState.PLAYER_TWO_TURN:
                 if (_hasTurnChanged)  GameboardObjectManager.Instance.ResetActions(Players.PLAYER_TWO);
 
-                GameStateText.text = "Player Two";
-                GameStateButton.GetComponentInChildren<TextMeshProUGUI>().text = "End Turn";
                 GameStateButton.interactable = GameManager.Instance.GetCurrentPlayer() == Players.PLAYER_TWO;
                 SetHasGameStartedServerRpc(true);
                 break;
@@ -119,8 +117,16 @@ public class TurnManager: NetworkSingleton<TurnManager> {
 
         if (IsMyTurn()) {
             Banner.GetComponentInChildren<TextMeshProUGUI>().text = "Your Turn";
+            GameStateButton.GetComponentInChildren<TextMeshProUGUI>().text = "End Turn";
+            resourcesImage.sprite = resourcesMyTurnSprite;
         } else {
             Banner.GetComponentInChildren<TextMeshProUGUI>().text = "Opponent's Turn";
+            GameStateButton.GetComponentInChildren<TextMeshProUGUI>().text = "Opponent's Turn";
+            resourcesImage.sprite = resourcesOpponentTurnSprite;
+        }
+
+        if (GetGameState() == GameState.SETUP) {
+            GameStateButton.GetComponentInChildren<TextMeshProUGUI>().text = "Ready";
         }
 
         if (_hasTurnChanged) {
