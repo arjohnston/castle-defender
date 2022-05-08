@@ -19,6 +19,8 @@ public class GameManager : NetworkSingleton<GameManager> {
     public TextMeshProUGUI winConditionSubText;
     private int _playersConnected = 0;
 
+    public Texture2D cursor;
+
     public GameObject ToastMessage;
     private bool _messageIsAnimatingFadeIn = false;
     private float _messageFadeAnimationTiming = 6.0f;
@@ -54,6 +56,8 @@ public class GameManager : NetworkSingleton<GameManager> {
         if ((Application.isEditor && !allowMultiplayerInEditor) || !string.IsNullOrEmpty(GameSettings.clientJoinCode)) {
             waitingForOthersPanel.SetActive(false);
         }
+
+        Cursor.SetCursor(cursor, Vector2.zero, CursorMode.Auto);
     }
 
     private void HandleException(string logString, string stackTrace, LogType type) {

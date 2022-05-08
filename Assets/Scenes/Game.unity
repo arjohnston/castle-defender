@@ -8958,6 +8958,7 @@ MonoBehaviour:
   waitingForOthersPanelJoinCodeText: {fileID: 752339951}
   winConditionText: {fileID: 1622180594}
   winConditionSubText: {fileID: 1879951241}
+  cursor: {fileID: 2800000, guid: 2ce3b05c61962d3458ea093e09953263, type: 3}
   ToastMessage: {fileID: 110724937}
   currentPlayerHp: {fileID: 465378274}
   opposingPlayerHp: {fileID: 1781537047}
@@ -9166,41 +9167,41 @@ MonoBehaviour:
   Spell: {fileID: 21300000, guid: 9379d07d3d9d8614b92074468a2414de, type: 3}
   Enchantment: {fileID: 21300000, guid: e13eb12b665bdcf43a4f951d2e99b760, type: 3}
   Castle: {fileID: 21300000, guid: 90c7ed5937e50d64c9fc0c9f679bdba2, type: 3}
-  Wall: {fileID: 21300000, guid: 3e9a12d158fe9e64bbeeb0dc6282b0f8, type: 3}
+  Wall: {fileID: 21300000, guid: 8189e1c1a43a2c8448dbca5ef7296a5b, type: 3}
   Orc: {fileID: 21300000, guid: 480535f8aca0fed4a8d598c4c229b1e8, type: 3}
   Ranger: {fileID: 0}
   Wolf: {fileID: 21300000, guid: 6b7c47181ce1a6d40afd90e4db4ac522, type: 3}
   Shinobi: {fileID: 21300000, guid: b557faefdffcd87468bf2be9971f094f, type: 3}
   Archer: {fileID: 21300000, guid: a8ccbb7ffee697e4ea6214b310bd23a6, type: 3}
-  Minions: {fileID: 21300000, guid: c429f41b94d3fcb44bf1c235cf4449a0, type: 3}
+  Minions: {fileID: 21300000, guid: 6d3173b8ff972b449ac658b806e07b3c, type: 3}
   WargRider: {fileID: 21300000, guid: a946029a6bd990d4094484b7d8f7a9a4, type: 3}
   Plaguecrafter: {fileID: 21300000, guid: 3396c9d0ca49c6d4bb0b5a8b4ca2db10, type: 3}
   TwoGoblins: {fileID: 21300000, guid: fcea75ea4ea9e3c468b9ef0b839d4062, type: 3}
   Dragonling: {fileID: 21300000, guid: 354d7f556cd24bb41a968f691b0b354e, type: 3}
-  KelensDagger: {fileID: 21300000, guid: 1af86ae0697dd0241a2141cf1a41f7de, type: 3}
+  KelensDagger: {fileID: 21300000, guid: 5419f2d5fa6561046b6cde9624db3806, type: 3}
   BearTrap: {fileID: 21300000, guid: c70c9a08b7421a74895bb3515b3430bb, type: 3}
   SpikePit: {fileID: 21300000, guid: 78b1090a615a5dc479bca1c43d064934, type: 3}
-  Purge: {fileID: 21300000, guid: 4304ddda42d7e3a4286f56b8c65199dd, type: 3}
+  Purge: {fileID: 21300000, guid: bece9e44d7735504d866622c0a48115c, type: 3}
   ElytrianBlessing: {fileID: 21300000, guid: 52d91da4e07e51743b21b9112764a680, type: 3}
-  Swamp: {fileID: 21300000, guid: e99132643b8ff804faf7446e6d5969c7, type: 3}
+  Swamp: {fileID: 21300000, guid: 923a5b84f8792074c8e1b2e30ac43c74, type: 3}
   ElvenLongbow: {fileID: 21300000, guid: 7c022fb0ed75fc346816288ed5605df9, type: 3}
-  Charge: {fileID: 21300000, guid: c15e2eedbf80eb243a6c8ed527c8fb19, type: 3}
+  Charge: {fileID: 21300000, guid: cc8ead852fa80e24e8f956fbac61bff5, type: 3}
   Heal: {fileID: 21300000, guid: fc4c47f2037022449b1ef96be3eb014d, type: 3}
-  FieryGreaves: {fileID: 21300000, guid: 9a6a449f98ef2b944ab496c1598eb7d2, type: 3}
+  FieryGreaves: {fileID: 21300000, guid: 9277d3313555d6549b30aaeca84470e7, type: 3}
   ArrowStorm: {fileID: 21300000, guid: 6c0c09ca2657c2a4ebda94665986efef, type: 3}
   Knight: {fileID: 21300000, guid: 22eead67953403940b91508eecc70d6a, type: 3}
   Squire: {fileID: 21300000, guid: a7ce5cc5c103fd547922000e105f4d01, type: 3}
-  Assassin: {fileID: 21300000, guid: 2a874a84c037bb24e8313fe9f96729a4, type: 3}
+  Assassin: {fileID: 21300000, guid: 21eaf719c90e64d49aeb39c9ebfe9c1f, type: 3}
   Dragon: {fileID: 21300000, guid: a16118c804870bd48818b328ab1dabb9, type: 3}
-  Catapult: {fileID: 21300000, guid: ea48352486d994c41b824fcd2e5e4701, type: 3}
-  CavalryLancer: {fileID: 21300000, guid: 2a874a84c037bb24e8313fe9f96729a4, type: 3}
+  Catapult: {fileID: 21300000, guid: 21eaf719c90e64d49aeb39c9ebfe9c1f, type: 3}
+  CavalryLancer: {fileID: 21300000, guid: f2ca6ec5d8e11f746a80e92291ffc6a4, type: 3}
   DeusVult: {fileID: 21300000, guid: b557faefdffcd87468bf2be9971f094f, type: 3}
   TowerArcher: {fileID: 21300000, guid: 17a41abec10370849b01ac578a51825c, type: 3}
   CallToArms: {fileID: 21300000, guid: bd3122b30710cd341876b0219801cffd, type: 3}
   ColossalHammer: {fileID: 21300000, guid: 8b5bc294228cda74ba64083f853bded1, type: 3}
   ClericsRobe: {fileID: 21300000, guid: c431fc34124462e4c8213933a0523660, type: 3}
   ManaElemental: {fileID: 0}
-  AncientGolem: {fileID: 21300000, guid: 8330df28166c3bd42b812a48d28c686c, type: 3}
+  AncientGolem: {fileID: 21300000, guid: 559087a5b6f1b614ba364e976edc3cfb, type: 3}
   Archmage: {fileID: 21300000, guid: eea7aa0bf85b3f849947f1453c304a8a, type: 3}
   EternalDragon: {fileID: 21300000, guid: 1732fee206132ad468f4ea43dbc3d392, type: 3}
   Skeletons: {fileID: 21300000, guid: 5f34b61dc9ebd0143ab1b3140fb0264b, type: 3}
@@ -9210,13 +9211,13 @@ MonoBehaviour:
   NecroticPlague: {fileID: 21300000, guid: c03e64c3d334db0459123669ef310851, type: 3}
   LightningBolt: {fileID: 21300000, guid: 9f6c997b74cf29d4383d6431e64f82eb, type: 3}
   Meteor: {fileID: 21300000, guid: a8e33342605ef524b86db3a72ec94cf4, type: 3}
-  LightningStorm: {fileID: 21300000, guid: fbaa183cb4992664f91b84134d0055f2, type: 3}
+  LightningStorm: {fileID: 21300000, guid: 90143a534773a4d45a3761f4be04d384, type: 3}
   EarthShatter: {fileID: 21300000, guid: 4c00258f803dc574b8d27c5d0e4a6075, type: 3}
   DeepFreeze: {fileID: 21300000, guid: c1d8771cf8306b1419ad933dc61c39cc, type: 3}
   Fireball: {fileID: 21300000, guid: 0d5b4d02e8118894f84b6cdf77b2dee8, type: 3}
   SoulRing: {fileID: 21300000, guid: db8ff530297b2624b8dbfba96f8b4e71, type: 3}
-  DevilsCollar: {fileID: 21300000, guid: ee27fec38252e654285cf2b09825eb3d, type: 3}
-  Ghoul: {fileID: 21300000, guid: c429f41b94d3fcb44bf1c235cf4449a0, type: 3}
+  DevilsCollar: {fileID: 21300000, guid: aa3bcc64182f57941b4291946d78fa30, type: 3}
+  Ghoul: {fileID: 21300000, guid: 6d3173b8ff972b449ac658b806e07b3c, type: 3}
 --- !u!114 &983941258
 MonoBehaviour:
   m_ObjectHideFlags: 0
