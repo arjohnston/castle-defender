@@ -14,7 +14,7 @@ public class Ranger : Deck {
             d.Push(CardsLibrary.CreateWolf());
 
         for (int i = 0; i < 2; i++)
-            d.Push(CardsLibrary.CreateShinobi());
+            d.Push(CardsLibrary.CreateDemonSpawn());
 
         for (int i = 0; i < 1; i++)
             d.Push(CardsLibrary.CreateArcher());

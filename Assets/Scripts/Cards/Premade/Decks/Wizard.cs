@@ -8,7 +8,7 @@ public class Wizard : Deck {
             d.Push(CardsLibrary.CreateWall());
         
         for (int i = 0; i < 2; i++)
-            d.Push(CardsLibrary.CreateManaElemental());
+            d.Push(CardsLibrary.CreateCursedNecromancer());
 
         for (int i = 0; i < 2; i++)
             d.Push(CardsLibrary.CreateAncientGolem());

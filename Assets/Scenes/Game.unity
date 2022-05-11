@@ -9169,12 +9169,14 @@ MonoBehaviour:
   Castle: {fileID: 21300000, guid: 90c7ed5937e50d64c9fc0c9f679bdba2, type: 3}
   Wall: {fileID: 21300000, guid: 8189e1c1a43a2c8448dbca5ef7296a5b, type: 3}
   Orc: {fileID: 21300000, guid: 480535f8aca0fed4a8d598c4c229b1e8, type: 3}
-  Ranger: {fileID: 0}
+  Cannon: {fileID: 21300000, guid: f2ca6ec5d8e11f746a80e92291ffc6a4, type: 3}
+  Ranger: {fileID: 21300000, guid: 7c022fb0ed75fc346816288ed5605df9, type: 3}
   Wolf: {fileID: 21300000, guid: 6b7c47181ce1a6d40afd90e4db4ac522, type: 3}
   Shinobi: {fileID: 21300000, guid: b557faefdffcd87468bf2be9971f094f, type: 3}
   Archer: {fileID: 21300000, guid: a8ccbb7ffee697e4ea6214b310bd23a6, type: 3}
   Minions: {fileID: 21300000, guid: 6d3173b8ff972b449ac658b806e07b3c, type: 3}
   WargRider: {fileID: 21300000, guid: a946029a6bd990d4094484b7d8f7a9a4, type: 3}
+  DemonSpawn: {fileID: 21300000, guid: b557faefdffcd87468bf2be9971f094f, type: 3}
   Plaguecrafter: {fileID: 21300000, guid: 3396c9d0ca49c6d4bb0b5a8b4ca2db10, type: 3}
   TwoGoblins: {fileID: 21300000, guid: fcea75ea4ea9e3c468b9ef0b839d4062, type: 3}
   Dragonling: {fileID: 21300000, guid: 354d7f556cd24bb41a968f691b0b354e, type: 3}
@@ -9194,8 +9196,8 @@ MonoBehaviour:
   Assassin: {fileID: 21300000, guid: 21eaf719c90e64d49aeb39c9ebfe9c1f, type: 3}
   Dragon: {fileID: 21300000, guid: a16118c804870bd48818b328ab1dabb9, type: 3}
   Catapult: {fileID: 21300000, guid: 21eaf719c90e64d49aeb39c9ebfe9c1f, type: 3}
-  CavalryLancer: {fileID: 21300000, guid: f2ca6ec5d8e11f746a80e92291ffc6a4, type: 3}
-  DeusVult: {fileID: 21300000, guid: b557faefdffcd87468bf2be9971f094f, type: 3}
+  Griffin: {fileID: 21300000, guid: a946029a6bd990d4094484b7d8f7a9a4, type: 3}
+  DeusVult: {fileID: 21300000, guid: 710da0d831f6c14419e3e2aab44069ca, type: 3}
   TowerArcher: {fileID: 21300000, guid: 17a41abec10370849b01ac578a51825c, type: 3}
   CallToArms: {fileID: 21300000, guid: bd3122b30710cd341876b0219801cffd, type: 3}
   ColossalHammer: {fileID: 21300000, guid: 8b5bc294228cda74ba64083f853bded1, type: 3}
@@ -9212,7 +9214,7 @@ MonoBehaviour:
   LightningBolt: {fileID: 21300000, guid: 9f6c997b74cf29d4383d6431e64f82eb, type: 3}
   Meteor: {fileID: 21300000, guid: a8e33342605ef524b86db3a72ec94cf4, type: 3}
   LightningStorm: {fileID: 21300000, guid: 90143a534773a4d45a3761f4be04d384, type: 3}
-  EarthShatter: {fileID: 21300000, guid: 4c00258f803dc574b8d27c5d0e4a6075, type: 3}
+  EarthShatter: {fileID: 21300000, guid: fdbc855ef3443004cbad18033c048731, type: 3}
   DeepFreeze: {fileID: 21300000, guid: c1d8771cf8306b1419ad933dc61c39cc, type: 3}
   Fireball: {fileID: 21300000, guid: 0d5b4d02e8118894f84b6cdf77b2dee8, type: 3}
   SoulRing: {fileID: 21300000, guid: db8ff530297b2624b8dbfba96f8b4e71, type: 3}

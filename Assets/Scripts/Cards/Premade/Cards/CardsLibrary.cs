@@ -65,13 +65,13 @@ public static class CardsLibrary {
         );
     }
 
-    public static Card CreateShinobi() {
+    public static Card CreateDemonSpawn() {
         return new Card(
             Types.CREATURE,
-            Sprites.SHINOBI,
+            Sprites.DemonSpawn,
             new Meta{
-                title = "Shinobi",
-                description = "A special class of assassin",
+                title = "Demon Spawn",
+                description = "A demon freed from the underworld!",
             },
             new Attributes{
                 hp = 1,
@@ -180,8 +180,8 @@ public static class CardsLibrary {
             Types.CREATURE,
             Sprites.TWOGOBLINS,
             new Meta{
-                title = "Two Goblins",
-                description = "Two pesky goblins, looking for mayhem",
+                title = "Goblin Tagteam",
+                description = "Two pesky goblins working together, looking for mayhem",
             },
             new Attributes{
                 hp = 2,
@@ -519,20 +519,20 @@ public static class CardsLibrary {
         );
     }
 
-    public static Card CreateAssassin() {
+    public static Card CreateCannon() {
         return new Card(
             Types.CREATURE,
-            Sprites.ASSASSIN,
+            Sprites.Cannon,
             new Meta{
-                title = "Assassin",
-                description = "A silent killer.",
+                title = "Cannon",
+                description = "A slow, but devastating artillery piece",
             },
             new Attributes{
-                hp = 2,
+                hp = 1,
                 cost = 2,
-                speed = 3,
-                range = 1,
-                damage = 2,
+                speed = 1,
+                range = 5,
+                damage = 4,
                 occupiedRadius = 0,
                 speedModifier = 1.0f,
             },
@@ -569,8 +569,8 @@ public static class CardsLibrary {
             Types.CREATURE,
             Sprites.CATAPULT,
             new Meta{
-                title = "Catapult",
-                description = "Can attack up to 10 units away. Does +3 damage to structures.",
+                title = "Trebuchet ",
+                description = "A terrifying siege weapon. Does +3 damage to structures.",
             },
             new Attributes{
                 hp = 3,
@@ -587,12 +587,12 @@ public static class CardsLibrary {
         );
     }
  
-    public static Card CreateCavalryLancer() {
+    public static Card CreateGriffin() {
         return new Card(
             Types.CREATURE,
-            Sprites.CAVALRYLANCER,
+            Sprites.Griffin,
             new Meta{
-                title = "Cavalry Lancer",
+                title = "Griffin",
                 description = "First Attack deals 2 bonus damage.",
             },
             new Attributes{
@@ -797,7 +797,7 @@ public static class CardsLibrary {
             Sprites.ETERNALDRAGON,
             new Meta{
                 title = "Eternal Dragon",
-                description = "Create a flying dragon",
+                description = "A majestic dragon from ages past",
             },
             new Attributes{
                 hp = 3,
@@ -865,7 +865,7 @@ public static class CardsLibrary {
             Sprites.GHOUL,
             new Meta{
                 title = "Ghoul",
-                description = "Weakling creature",
+                description = "A Weakling creature, more suited as cannon fodder than a warrior!",
             },
             new Attributes{
                 hp = 1,
@@ -911,7 +911,7 @@ public static class CardsLibrary {
             Sprites.FROSTGIANT,
             new Meta{
                 title = "Frost Giant",
-                description = "Two pesky goblins, looking for mayhem",
+                description = "A towering mythical beings from the far North",
             },
             new Attributes{
                 hp = 4,

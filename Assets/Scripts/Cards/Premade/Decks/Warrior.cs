@@ -17,7 +17,7 @@ public class Warrior : Deck {
             d.Push(CardsLibrary.CreateArcher());
 
         for (int i = 0; i < 1; i++)
-            d.Push(CardsLibrary.CreateAssassin());
+            d.Push(CardsLibrary.CreateCannon());
 
         for (int i = 0; i < 1; i++)
             d.Push(CardsLibrary.CreateDragon());
@@ -26,7 +26,7 @@ public class Warrior : Deck {
             d.Push(CardsLibrary.CreateCatapult());
 
         for (int i = 0; i < 2; i++)
-            d.Push(CardsLibrary.CreateCavalryLancer());
+            d.Push(CardsLibrary.CreateGriffin());
 
         for (int i = 0; i < 1; i++)
             d.Push(CardsLibrary.CreateMinions());
