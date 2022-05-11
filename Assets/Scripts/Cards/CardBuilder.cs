@@ -4,7 +4,8 @@ using TMPro;
 using UnityEngine.UI;
 using System;
 
-public class CardBuilder : Singleton<CardBuilder> {
+public class CardBuilder : Singleton<CardBuilder>
+{
     [Header("Card Fronts")]
     public Sprite Creature;
     public Sprite Trap;
@@ -15,12 +16,14 @@ public class CardBuilder : Singleton<CardBuilder> {
     public Sprite Castle;
     public Sprite Wall;
     public Sprite Orc;
+    public Sprite Cannon;
     public Sprite Ranger;
     public Sprite Wolf;
-    public Sprite Shinobi;
+    //public Sprite Shinobi;
     public Sprite Archer;
     public Sprite Minions;
     public Sprite WargRider;
+    public Sprite DemonSpawn;
     public Sprite Plaguecrafter;
     public Sprite TwoGoblins;
     public Sprite Dragonling;
@@ -37,16 +40,16 @@ public class CardBuilder : Singleton<CardBuilder> {
     public Sprite ArrowStorm;
     public Sprite Knight;
     public Sprite Squire;
-    public Sprite Assassin;
+    //public Sprite Assassin;
     public Sprite Dragon;
     public Sprite Catapult;
-    public Sprite CavalryLancer;
+    public Sprite Griffin;
     public Sprite DeusVult;
     public Sprite TowerArcher;
     public Sprite CallToArms;
     public Sprite ColossalHammer;
     public Sprite ClericsRobe;
-    public Sprite ManaElemental;
+   // public Sprite ManaElemental;
     public Sprite AncientGolem;
     public Sprite Archmage;
     public Sprite EternalDragon;
@@ -67,57 +70,63 @@ public class CardBuilder : Singleton<CardBuilder> {
 
 
 
-    public void BuildCard(GameObject gameObject, Card card, bool ignoreSpellEffects = true) {
+    public void BuildCard(GameObject gameObject, Card card, bool ignoreSpellEffects = true)
+    {
         TextMeshProUGUI[] playerCardText = gameObject.GetComponentsInChildren<TextMeshProUGUI>();
         playerCardText[0].text = card.meta.title;
         playerCardText[1].text = card.meta.description;
 
-        if (card.type == Types.SPELL || card.type == Types.ENCHANTMENT) {
+        if (card.type == Types.SPELL || card.type == Types.ENCHANTMENT)
+        {
             // Spells & enchantments do not have HP/DMG since they're ethereal
             playerCardText[2].text = "";
             playerCardText[3].text = "";
-        } else {
+        }
+        else
+        {
             playerCardText[2].text = card.attributes.hp.ToString();
             playerCardText[3].text = card.attributes.damage.ToString();
         }
 
-        if (card.type == Types.ENCHANTMENT) {
+        if (card.type == Types.ENCHANTMENT)
+        {
             // Card is light, so increase contrast
             playerCardText[0].color = Color.black; // title
             playerCardText[4].color = Color.black; // cost
         }
 
-            if (card.attributes.hp < card.attributes.maxHP)//creature is damaged
-            {
-                playerCardText[2].color = Color.red;
-                playerCardText[2].fontStyle = FontStyles.Bold;
-            }
-            else if (card.attributes.hp > card.attributes.maxHP)
-            {
-                playerCardText[2].color = Color.green;
-                playerCardText[2].fontStyle = FontStyles.Bold;
-            }
-            else
-            {
-                playerCardText[2].color = Color.white;
-            }
+        if (card.attributes.hp < card.attributes.maxHP)//creature is damaged
+        {
+            playerCardText[2].color = Color.red;
+            playerCardText[2].fontStyle = FontStyles.Bold;
+        }
+        else if (card.attributes.hp > card.attributes.maxHP)
+        {
+            playerCardText[2].color = Color.green;
+            playerCardText[2].fontStyle = FontStyles.Bold;
+        }
+        else
+        {
+            playerCardText[2].color = Color.white;
+        }
         if (card.attributes.damage < card.attributes.startingAttack)//creature attack is debuffed
-            {
-                playerCardText[3].color = Color.red;
-                playerCardText[3].fontStyle = FontStyles.Bold;
-            }
-            else if( card.attributes.damage > card.attributes.startingAttack)
-            {
-                playerCardText[3].color = Color.green;
-                playerCardText[3].fontStyle = FontStyles.Bold;
-            }
-        
+        {
+            playerCardText[3].color = Color.red;
+            playerCardText[3].fontStyle = FontStyles.Bold;
+        }
+        else if (card.attributes.damage > card.attributes.startingAttack)
+        {
+            playerCardText[3].color = Color.green;
+            playerCardText[3].fontStyle = FontStyles.Bold;
+        }
+
         playerCardText[4].text = Math.Max(0, card.attributes.cost).ToString();
         // but does actual cost get stopped form falling below 0?
 
         Image[] playerCardImages = gameObject.GetComponentsInChildren<Image>();
 
-        switch(card.type) {
+        switch (card.type)
+        {
             case Types.CREATURE:
                 playerCardImages[0].sprite = Creature;
                 break;
@@ -138,14 +147,17 @@ public class CardBuilder : Singleton<CardBuilder> {
 
         playerCardImages[1].sprite = GetSprite(card.sprite);
 
-        if (ignoreSpellEffects) {
+        if (ignoreSpellEffects)
+        {
             playerCardImages[2].gameObject.SetActive(false); // Stunned
             playerCardImages[3].gameObject.SetActive(false); // Grounded
         }
     }
 
-    public Sprite GetSprite(Sprites sprite) {
-        switch (sprite) {
+    public Sprite GetSprite(Sprites sprite)
+    {
+        switch (sprite)
+        {
             case Sprites.ORC:
                 return Orc;
 
@@ -162,9 +174,10 @@ public class CardBuilder : Singleton<CardBuilder> {
             case Sprites.WOLF:
                 return Wolf;
 
-            case Sprites.SHINOBI:
-                return Shinobi;
-            
+            case Sprites.DemonSpawn:
+                // return Shinobi;
+                return DemonSpawn;
+
             case Sprites.ARCHER:
                 return Archer;
 
@@ -176,7 +189,7 @@ public class CardBuilder : Singleton<CardBuilder> {
 
             case Sprites.PLAGUECRAFTER:
                 return Plaguecrafter;
-            
+
             case Sprites.TWOGOBLINS:
                 return TwoGoblins;
 
@@ -221,9 +234,10 @@ public class CardBuilder : Singleton<CardBuilder> {
 
             case Sprites.SQUIRE:
                 return Squire;
-            
-            case Sprites.ASSASSIN:
-                return Assassin;
+
+            case Sprites.Cannon:
+                // return Assassin;
+                return Cannon;
 
             case Sprites.DRAGON:
                 return Dragon;
@@ -231,8 +245,8 @@ public class CardBuilder : Singleton<CardBuilder> {
             case Sprites.CATAPULT:
                 return Catapult;
 
-            case Sprites.CAVALRYLANCER:
-                return CavalryLancer;
+            case Sprites.Griffin:
+                return Griffin;
 
             case Sprites.DEUSVULT:
                 return DeusVult;
